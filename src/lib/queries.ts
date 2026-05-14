@@ -299,29 +299,33 @@ export interface DriverCareerStats {
   championships: number;
 }
 
-export function getDriverCareerStats(driverId: number, raceNumber: number): DriverCareerStats {
-  const n = (sql: string) => queryOne<{ n: number }>(sql, driverId, raceNumber)!.n;
+/** Returns career stats strictly BEFORE beforeRaceNumber (i.e. the given race is not counted). */
+export function getDriverCareerStats(
+  driverId: number,
+  beforeRaceNumber: number
+): DriverCareerStats {
+  const n = (sql: string) => queryOne<{ n: number }>(sql, driverId, beforeRaceNumber)!.n;
 
   const starts = n(
-    `SELECT COUNT(*) AS n FROM round_entries WHERE driver_id = ? AND race_number <= ?`
+    `SELECT COUNT(*) AS n FROM round_entries WHERE driver_id = ? AND race_number < ?`
   );
   const wins = n(
-    `SELECT COUNT(*) AS n FROM race_results WHERE driver_id = ? AND position = 1 AND race_number <= ?`
+    `SELECT COUNT(*) AS n FROM race_results WHERE driver_id = ? AND position = 1 AND race_number < ?`
   );
   const podiums = n(
-    `SELECT COUNT(*) AS n FROM race_results WHERE driver_id = ? AND position BETWEEN 1 AND 3 AND race_number <= ?`
+    `SELECT COUNT(*) AS n FROM race_results WHERE driver_id = ? AND position BETWEEN 1 AND 3 AND race_number < ?`
   );
   const poles = n(
-    `SELECT COUNT(*) AS n FROM qualifying_results WHERE driver_id = ? AND position = 1 AND race_number <= ?`
+    `SELECT COUNT(*) AS n FROM qualifying_results WHERE driver_id = ? AND position = 1 AND race_number < ?`
   );
   const fastest_laps = n(
-    `SELECT COUNT(*) AS n FROM race_results WHERE driver_id = ? AND fastest_lap_rank = 1 AND race_number <= ?`
+    `SELECT COUNT(*) AS n FROM race_results WHERE driver_id = ? AND fastest_lap_rank = 1 AND race_number < ?`
   );
   const racePoints = n(
-    `SELECT COALESCE(SUM(points), 0) AS n FROM race_results WHERE driver_id = ? AND race_number <= ?`
+    `SELECT COALESCE(SUM(points), 0) AS n FROM race_results WHERE driver_id = ? AND race_number < ?`
   );
   const sprintPoints = n(
-    `SELECT COALESCE(SUM(points), 0) AS n FROM sprint_results WHERE driver_id = ? AND race_number <= ?`
+    `SELECT COALESCE(SUM(points), 0) AS n FROM sprint_results WHERE driver_id = ? AND race_number < ?`
   );
 
   const championships = queryOne<{ n: number }>(
@@ -330,12 +334,12 @@ export function getDriverCareerStats(driverId: number, raceNumber: number): Driv
      JOIN races r ON r.race_number = ds.race_number
      WHERE ds.driver_id = ?
        AND ds.position = 1
-       AND ds.race_number <= ?
+       AND ds.race_number < ?
        AND ds.race_number = (
          SELECT MAX(race_number) FROM races WHERE season = r.season
        )`,
     driverId,
-    raceNumber
+    beforeRaceNumber
   )!.n;
 
   return {
@@ -355,30 +359,124 @@ export interface DriverSeasonStanding {
   win_count: number;
 }
 
-export function getDriverStandingAsOf(
+/** Standing for a single driver going INTO the given race (i.e. after the previous race of the same season). */
+export function getDriverStandingBeforeRace(
   driverId: number,
-  raceNumber: number
+  raceNumber: number,
+  season: number
 ): DriverSeasonStanding | undefined {
   return queryOne<DriverSeasonStanding>(
     `SELECT position, points, win_count
      FROM driver_standings
-     WHERE driver_id = ? AND race_number = ?`,
+     WHERE driver_id = ?
+       AND race_number = (
+         SELECT MAX(r.race_number)
+         FROM races r
+         WHERE r.season = ? AND r.race_number < ?
+       )`,
     driverId,
+    season,
+    raceNumber
+  );
+}
+
+/** Full drivers' championship table going INTO the given race (after the previous race of the same season). */
+export function getDriverStandingsBeforeRace(
+  raceNumber: number,
+  season: number
+): DriverStandingRow[] {
+  return queryAll<DriverStandingRow>(
+    `SELECT ds.driver_id,
+            d.slug AS driver_slug,
+            d.full_name,
+            t.name AS team_name,
+            ds.position,
+            ds.points,
+            ds.win_count
+     FROM driver_standings ds
+     JOIN drivers d ON d.id = ds.driver_id
+     LEFT JOIN teams t ON t.id = ds.team_id
+     WHERE ds.race_number = (
+       SELECT MAX(r.race_number)
+       FROM races r
+       WHERE r.season = ? AND r.race_number < ?
+     )
+     ORDER BY ds.position ASC NULLS LAST`,
+    season,
+    raceNumber
+  );
+}
+
+/** Full constructors' championship table going INTO the given race (after the previous race of the same season). */
+export function getTeamStandingsBeforeRace(raceNumber: number, season: number): TeamStandingRow[] {
+  return queryAll<TeamStandingRow>(
+    `SELECT ts.team_id,
+            t.name AS team_name,
+            ts.position,
+            ts.points,
+            ts.win_count
+     FROM team_standings ts
+     JOIN teams t ON t.id = ts.team_id
+     WHERE ts.race_number = (
+       SELECT MAX(r.race_number)
+       FROM races r
+       WHERE r.season = ? AND r.race_number < ?
+     )
+     ORDER BY ts.position ASC NULLS LAST`,
+    season,
     raceNumber
   );
 }
 
 export interface DriverRacePair {
   driver_slug: string;
-  race_slug: string;
+  season: number;
+  race_slug: string; // stripped (no year prefix)
 }
 
 export function getAllDriverRacePairs(): DriverRacePair[] {
-  return queryAll<DriverRacePair>(
-    `SELECT DISTINCT d.slug AS driver_slug, r.slug AS race_slug
-     FROM round_entries re
-     JOIN drivers d ON d.id = re.driver_id
-     JOIN races   r ON r.race_number = re.race_number
+  const rows = queryAll<{ driver_slug: string; season: number; race_slug: string }>(
+    `SELECT DISTINCT d.slug AS driver_slug, r.season, r.slug AS race_slug
+     FROM races r
+     JOIN (
+       SELECT driver_id, race_number FROM round_entries
+       UNION SELECT driver_id, race_number FROM qualifying_results
+       UNION SELECT driver_id, race_number FROM race_results
+       UNION SELECT driver_id, race_number FROM sprint_qualifying_results
+       UNION SELECT driver_id, race_number FROM sprint_results
+       UNION SELECT driver_id, race_number FROM driver_standings
+     ) x ON x.race_number = r.race_number
+     JOIN drivers d ON d.id = x.driver_id
      ORDER BY r.race_number`
   );
+  return rows.map((r) => ({
+    driver_slug: r.driver_slug,
+    season: r.season,
+    race_slug: stripYearPrefix(r.race_slug, r.season),
+  }));
+}
+
+/** Maps season → first race slug (stripped) for the seasons a driver has pages in. Used by nav fallback. */
+export function getDriverSeasonFirstRaces(driverId: number): Record<number, string> {
+  const rows = queryAll<{ season: number; race_slug: string }>(
+    `SELECT r.season, r.slug AS race_slug
+     FROM races r
+     INNER JOIN (
+       SELECT r2.season, MIN(r2.race_number) AS first_rn
+       FROM races r2
+       WHERE r2.race_number IN (
+         SELECT race_number FROM round_entries WHERE driver_id = ?
+         UNION SELECT race_number FROM driver_standings WHERE driver_id = ?
+       )
+       GROUP BY r2.season
+     ) first ON r.season = first.season AND r.race_number = first.first_rn
+     ORDER BY r.season`,
+    driverId,
+    driverId
+  );
+  const result: Record<number, string> = {};
+  for (const row of rows) {
+    result[row.season] = stripYearPrefix(row.race_slug, row.season);
+  }
+  return result;
 }

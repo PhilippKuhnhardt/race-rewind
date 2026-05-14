@@ -9,8 +9,10 @@ import {
   getRaceResults,
   getDriverStandings,
   getTeamStandings,
+  getDriverStandingsBeforeRace,
+  getTeamStandingsBeforeRace,
 } from '../../../lib/queries';
-import { orDash, formatPts, formatPos, formatGap } from '../../../lib/format';
+import { orDash, formatPts, formatPos, formatGap, formatDelta } from '../../../lib/format';
 
 export function getStaticPaths() {
   return getAllRaces().map((r) => ({
@@ -29,6 +31,12 @@ const sprint = race.has_sprint ? getSprintResults(race.race_number) : [];
 const results = getRaceResults(race.race_number);
 const driverChamp = getDriverStandings(race.race_number);
 const teamChamp = getTeamStandings(race.race_number);
+const preRaceDriverChamp = getDriverStandingsBeforeRace(race.race_number, race.season);
+const preRaceTeamChamp = getTeamStandingsBeforeRace(race.race_number, race.season);
+
+// Position lookups for delta columns
+const preRaceDriverPosById = new Map(preRaceDriverChamp.map((r) => [r.driver_id, r.position]));
+const preRaceTeamPosById = new Map(preRaceTeamChamp.map((r) => [r.team_id, r.position]));
 
 const isModernQuali = quali.length > 0 && (quali[0].q1_time != null || quali[0].q2_time != null);
 const winnerTime = results.find((r) => r.position === 1)?.time ?? null;
@@ -40,6 +48,9 @@ const startingGrid =
 
 const title = `${race.season} ${race.name} — Results & Standings`;
 const description = `${race.season} ${race.name} at ${race.circuit_name}${race.circuit_locality ? ', ' + race.circuit_locality : ''}: ${race.has_sprint ? 'sprint, ' : ''}race results and championship standings.`;
+
+const driverLink = (driverSlug: string) =>
+  `/drivers/${driverSlug}/${race.season}/${raceSlug}/`;
 ---
 
 <Base
@@ -59,283 +70,363 @@ const description = `${race.season} ${race.name} at ${race.circuit_name}${race.c
     </p>
   </div>
 
-  <!-- Qualifying (when data exists) -->
-  {
-    quali.length > 0 && (
-      <section class="section">
-        <h2>Qualifying</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th class="num">Pos</th>
-                <th>Driver</th>
-                <th>Team</th>
-                {isModernQuali ? (
-                  <>
-                    <th class="time">Q1</th>
-                    <th class="time">Q2</th>
-                    <th class="time">Q3</th>
-                    <th>Out</th>
-                  </>
-                ) : (
-                  <th class="time">Time</th>
-                )}
-              </tr>
-            </thead>
-            <tbody>
-              {quali.map((row) => (
-                <tr>
-                  <td class="num pos">{row.position ?? '—'}</td>
-                  <td>
-                    <a href={`/drivers/${row.driver_slug}/${race.slug}/`}>{row.full_name}</a>
-                  </td>
-                  <td>{row.team_name}</td>
-                  {isModernQuali ? (
-                    <>
-                      <td class="time">{orDash(row.q1_time)}</td>
-                      <td class="time">{orDash(row.q2_time)}</td>
-                      <td class="time">{orDash(row.q3_time)}</td>
-                      <td>{row.knocked_out_in ?? '—'}</td>
-                    </>
-                  ) : (
-                    <td class="time">{orDash(row.qualifying_time)}</td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    )
-  }
+  <!-- CSS-only tabs: Pre-Race (default) and Post-Race -->
+  <div class="race-tabs">
+    <input type="radio" id="tab-pre" name="race-tab" checked />
+    <input type="radio" id="tab-post" name="race-tab" />
+    <div class="tab-bar">
+      <label for="tab-pre">Pre-Race</label>
+      <label for="tab-post">Post-Race</label>
+    </div>
 
-  <!-- Starting grid fallback for races without qualifying data -->
-  {
-    startingGrid.length > 0 && (
-      <section class="section">
-        <h2>Starting Grid</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th class="num">Grid</th>
-                <th>Driver</th>
-                <th>Team</th>
-                <th class="num">No.</th>
-              </tr>
-            </thead>
-            <tbody>
-              {startingGrid.map((row) => (
-                <tr>
-                  <td class="num pos">{row.grid}</td>
-                  <td>
-                    <a href={`/drivers/${row.driver_slug}/${race.slug}/`}>{row.full_name}</a>
-                  </td>
-                  <td>{row.team_name}</td>
-                  <td class="num">{row.car_number ?? '—'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    )
-  }
-
-  <!-- Sprint Qualifying -->
-  {
-    sprintQuali.length > 0 && (
-      <section class="section">
-        <h2>Sprint Qualifying</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th class="num">Pos</th>
-                <th>Driver</th>
-                <th>Team</th>
-                <th class="time">SQ1</th>
-                <th class="time">SQ2</th>
-                <th class="time">SQ3</th>
-                <th>Out</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sprintQuali.map((row) => (
-                <tr>
-                  <td class="num pos">{row.position ?? '—'}</td>
-                  <td>
-                    <a href={`/drivers/${row.driver_slug}/${race.slug}/`}>{row.full_name}</a>
-                  </td>
-                  <td>{row.team_name}</td>
-                  <td class="time">{orDash(row.sq1_time)}</td>
-                  <td class="time">{orDash(row.sq2_time)}</td>
-                  <td class="time">{orDash(row.sq3_time)}</td>
-                  <td>{row.knocked_out_in ?? '—'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    )
-  }
-
-  <!-- Sprint Race -->
-  {
-    sprint.length > 0 && (
-      <section class="section">
-        <h2>Sprint Race</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th class="num">Pos</th>
-                <th>Driver</th>
-                <th>Team</th>
-                <th class="num">Grid</th>
-                <th class="num">Laps</th>
-                <th class="time">Time / Gap</th>
-                <th>Status</th>
-                <th class="num">Pts</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sprint.map((row) => (
-                <tr>
-                  <td class="num pos">{formatPos(row.position)}</td>
-                  <td class:list={[{ fl: row.fastest_lap_rank === 1 }]}>
-                    <a href={`/drivers/${row.driver_slug}/${race.slug}/`}>{row.full_name}</a>
-                  </td>
-                  <td>{row.team_name}</td>
-                  <td class="num">{row.grid ?? '—'}</td>
-                  <td class="num">{row.laps_completed ?? '—'}</td>
-                  <td class="time">{orDash(row.time)}</td>
-                  <td class:list={[{ dnf: row.position == null }]}>{row.detail ?? '—'}</td>
-                  <td class="num">{formatPts(row.points)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    )
-  }
-
-  <!-- Race -->
-  {
-    results.length > 0 && (
-      <section class="section">
-        <h2>Race</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th class="num">Pos</th>
-                <th>Driver</th>
-                <th>Team</th>
-                <th class="num">No.</th>
-                <th class="num">Grid</th>
-                <th class="num">Laps</th>
-                <th class="time">Time / Gap</th>
-                <th>Status</th>
-                <th class="num">Stops</th>
-                <th class="num">Pts</th>
-              </tr>
-            </thead>
-            <tbody>
-              {results.map((row) => {
-                const gap = formatGap(winnerTime, row);
-                const status = row.is_classified ? 'Finished' : (row.detail ?? '—');
-                return (
+    <!-- PRE-RACE PANEL -->
+    <div class="tab-panel tab-pre-panel">
+      <!-- Qualifying (when data exists) -->
+      {
+        quali.length > 0 && (
+          <section class="section">
+            <h2>Qualifying</h2>
+            <div class="table-wrap">
+              <table>
+                <thead>
                   <tr>
-                    <td class="num pos">{formatPos(row.position)}</td>
-                    <td class:list={[{ fl: row.fastest_lap_rank === 1 }]}>
-                      <a href={`/drivers/${row.driver_slug}/${race.slug}/`}>{row.full_name}</a>
-                    </td>
-                    <td>{row.team_name}</td>
-                    <td class="num">{row.car_number ?? '—'}</td>
-                    <td class="num">{row.grid ?? '—'}</td>
-                    <td class="num">{row.laps_completed ?? '—'}</td>
-                    <td class="time">{gap}</td>
-                    <td class:list={[{ dnf: !row.is_classified }]}>{status}</td>
-                    <td class="num">{row.pit_stop_count ?? '—'}</td>
-                    <td class="num">{formatPts(row.points)}</td>
+                    <th class="num">Pos</th>
+                    <th>Driver</th>
+                    <th>Team</th>
+                    {isModernQuali ? (
+                      <>
+                        <th class="time">Q1</th>
+                        <th class="time">Q2</th>
+                        <th class="time">Q3</th>
+                        <th>Out</th>
+                      </>
+                    ) : (
+                      <th class="time">Time</th>
+                    )}
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-        <p class="section-note">Purple driver name = set fastest lap of the race.</p>
-      </section>
-    )
-  }
+                </thead>
+                <tbody>
+                  {quali.map((row) => (
+                    <tr>
+                      <td class="num pos">{row.position ?? '—'}</td>
+                      <td>
+                        <a href={driverLink(row.driver_slug)}>{row.full_name}</a>
+                      </td>
+                      <td>{row.team_name}</td>
+                      {isModernQuali ? (
+                        <>
+                          <td class="time">{orDash(row.q1_time)}</td>
+                          <td class="time">{orDash(row.q2_time)}</td>
+                          <td class="time">{orDash(row.q3_time)}</td>
+                          <td>{row.knocked_out_in ?? '—'}</td>
+                        </>
+                      ) : (
+                        <td class="time">{orDash(row.qualifying_time)}</td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )
+      }
 
-  <!-- Drivers' Championship -->
-  {
-    driverChamp.length > 0 && (
-      <section class="section">
-        <h2>Drivers&rsquo; Championship</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th class="num">Pos</th>
-                <th>Driver</th>
-                <th>Team</th>
-                <th class="num">Pts</th>
-                <th class="num">Wins</th>
-              </tr>
-            </thead>
-            <tbody>
-              {driverChamp.map((row) => (
-                <tr>
-                  <td class="num pos">{row.position ?? '—'}</td>
-                  <td>
-                    <a href={`/drivers/${row.driver_slug}/${race.slug}/`}>{row.full_name}</a>
-                  </td>
-                  <td>{row.team_name ?? '—'}</td>
-                  <td class="num">{formatPts(row.points)}</td>
-                  <td class="num">{row.win_count}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    )
-  }
+      <!-- Starting grid fallback for races without qualifying data -->
+      {
+        startingGrid.length > 0 && (
+          <section class="section">
+            <h2>Starting Grid</h2>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th class="num">Grid</th>
+                    <th>Driver</th>
+                    <th>Team</th>
+                    <th class="num">No.</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {startingGrid.map((row) => (
+                    <tr>
+                      <td class="num pos">{row.grid}</td>
+                      <td>
+                        <a href={driverLink(row.driver_slug)}>{row.full_name}</a>
+                      </td>
+                      <td>{row.team_name}</td>
+                      <td class="num">{row.car_number ?? '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )
+      }
 
-  <!-- Constructors' Championship -->
-  {
-    teamChamp.length > 0 && (
-      <section class="section">
-        <h2>Constructors&rsquo; Championship</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th class="num">Pos</th>
-                <th>Team</th>
-                <th class="num">Pts</th>
-                <th class="num">Wins</th>
-              </tr>
-            </thead>
-            <tbody>
-              {teamChamp.map((row) => (
-                <tr>
-                  <td class="num pos">{row.position ?? '—'}</td>
-                  <td>{row.team_name}</td>
-                  <td class="num">{formatPts(row.points)}</td>
-                  <td class="num">{row.win_count}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    )
-  }
+      <!-- Sprint Qualifying -->
+      {
+        sprintQuali.length > 0 && (
+          <section class="section">
+            <h2>Sprint Qualifying</h2>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th class="num">Pos</th>
+                    <th>Driver</th>
+                    <th>Team</th>
+                    <th class="time">SQ1</th>
+                    <th class="time">SQ2</th>
+                    <th class="time">SQ3</th>
+                    <th>Out</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sprintQuali.map((row) => (
+                    <tr>
+                      <td class="num pos">{row.position ?? '—'}</td>
+                      <td>
+                        <a href={driverLink(row.driver_slug)}>{row.full_name}</a>
+                      </td>
+                      <td>{row.team_name}</td>
+                      <td class="time">{orDash(row.sq1_time)}</td>
+                      <td class="time">{orDash(row.sq2_time)}</td>
+                      <td class="time">{orDash(row.sq3_time)}</td>
+                      <td>{row.knocked_out_in ?? '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )
+      }
+
+      <!-- Pre-race championship standings -->
+      {
+        preRaceDriverChamp.length > 0 ? (
+          <section class="section">
+            <h2>Championship Going In</h2>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th class="num">Pos</th>
+                    <th>Driver</th>
+                    <th>Team</th>
+                    <th class="num">Pts</th>
+                    <th class="num">Wins</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {preRaceDriverChamp.map((row) => (
+                    <tr>
+                      <td class="num pos">{row.position ?? '—'}</td>
+                      <td>
+                        <a href={driverLink(row.driver_slug)}>{row.full_name}</a>
+                      </td>
+                      <td>{row.team_name ?? '—'}</td>
+                      <td class="num">{formatPts(row.points)}</td>
+                      <td class="num">{row.win_count}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        ) : (
+          <section class="section">
+            <h2>Championship Going In</h2>
+            <p class="section-note">First race of the season — championship not yet started.</p>
+          </section>
+        )
+      }
+    </div>
+
+    <!-- POST-RACE PANEL -->
+    <div class="tab-panel tab-post-panel">
+      <!-- Sprint Race -->
+      {
+        sprint.length > 0 && (
+          <section class="section">
+            <h2>Sprint Race</h2>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th class="num">Pos</th>
+                    <th>Driver</th>
+                    <th>Team</th>
+                    <th class="num">Grid</th>
+                    <th class="num">Laps</th>
+                    <th class="time">Time / Gap</th>
+                    <th>Status</th>
+                    <th class="num">Pts</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sprint.map((row) => (
+                    <tr>
+                      <td class="num pos">{formatPos(row.position)}</td>
+                      <td class:list={[{ fl: row.fastest_lap_rank === 1 }]}>
+                        <a href={driverLink(row.driver_slug)}>{row.full_name}</a>
+                      </td>
+                      <td>{row.team_name}</td>
+                      <td class="num">{row.grid ?? '—'}</td>
+                      <td class="num">{row.laps_completed ?? '—'}</td>
+                      <td class="time">{orDash(row.time)}</td>
+                      <td class:list={[{ dnf: row.position == null }]}>{row.detail ?? '—'}</td>
+                      <td class="num">{formatPts(row.points)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )
+      }
+
+      <!-- Race -->
+      {
+        results.length > 0 && (
+          <section class="section">
+            <h2>Race</h2>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th class="num">Pos</th>
+                    <th>Driver</th>
+                    <th>Team</th>
+                    <th class="num">No.</th>
+                    <th class="num">Grid</th>
+                    <th class="num">Laps</th>
+                    <th class="time">Time / Gap</th>
+                    <th>Status</th>
+                    <th class="num">Stops</th>
+                    <th class="num">Pts</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {results.map((row) => {
+                    const gap = formatGap(winnerTime, row);
+                    const status = row.is_classified ? 'Finished' : (row.detail ?? '—');
+                    return (
+                      <tr>
+                        <td class="num pos">{formatPos(row.position)}</td>
+                        <td class:list={[{ fl: row.fastest_lap_rank === 1 }]}>
+                          <a href={driverLink(row.driver_slug)}>{row.full_name}</a>
+                        </td>
+                        <td>{row.team_name}</td>
+                        <td class="num">{row.car_number ?? '—'}</td>
+                        <td class="num">{row.grid ?? '—'}</td>
+                        <td class="num">{row.laps_completed ?? '—'}</td>
+                        <td class="time">{gap}</td>
+                        <td class:list={[{ dnf: !row.is_classified }]}>{status}</td>
+                        <td class="num">{row.pit_stop_count ?? '—'}</td>
+                        <td class="num">{formatPts(row.points)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <p class="section-note">Purple driver name = set fastest lap of the race.</p>
+          </section>
+        )
+      }
+
+      <!-- Drivers' Championship (post-race with position deltas) -->
+      {
+        driverChamp.length > 0 && (
+          <section class="section">
+            <h2>Drivers&rsquo; Championship</h2>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th class="num">Pos</th>
+                    <th class="num delta-col">&Delta;</th>
+                    <th>Driver</th>
+                    <th>Team</th>
+                    <th class="num">Pts</th>
+                    <th class="num">Wins</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {driverChamp.map((row) => {
+                    const prevPos = preRaceDriverPosById.get(row.driver_id) ?? null;
+                    const delta = formatDelta(prevPos, row.position);
+                    const deltaClass =
+                      delta.startsWith('+')
+                        ? 'delta-up'
+                        : delta.startsWith('-')
+                          ? 'delta-down'
+                          : 'delta-eq';
+                    return (
+                      <tr>
+                        <td class="num pos">{row.position ?? '—'}</td>
+                        <td class:list={['num', 'delta-col', deltaClass]}>{delta}</td>
+                        <td>
+                          <a href={driverLink(row.driver_slug)}>{row.full_name}</a>
+                        </td>
+                        <td>{row.team_name ?? '—'}</td>
+                        <td class="num">{formatPts(row.points)}</td>
+                        <td class="num">{row.win_count}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )
+      }
+
+      <!-- Constructors' Championship -->
+      {
+        teamChamp.length > 0 && (
+          <section class="section">
+            <h2>Constructors&rsquo; Championship</h2>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th class="num">Pos</th>
+                    <th class="num delta-col">&Delta;</th>
+                    <th>Team</th>
+                    <th class="num">Pts</th>
+                    <th class="num">Wins</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {teamChamp.map((row) => {
+                    const prevPos = preRaceTeamPosById.get(row.team_id) ?? null;
+                    const delta = formatDelta(prevPos, row.position);
+                    const deltaClass =
+                      delta.startsWith('+')
+                        ? 'delta-up'
+                        : delta.startsWith('-')
+                          ? 'delta-down'
+                          : 'delta-eq';
+                    return (
+                      <tr>
+                        <td class="num pos">{row.position ?? '—'}</td>
+                        <td class:list={['num', 'delta-col', deltaClass]}>{delta}</td>
+                        <td>{row.team_name}</td>
+                        <td class="num">{formatPts(row.points)}</td>
+                        <td class="num">{row.win_count}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )
+      }
+    </div>
+  </div>
 </Base>

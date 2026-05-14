@@ -253,6 +253,55 @@ td {
   font-variant-numeric: tabular-nums;
 }
 
+/* ---- Race tabs (CSS-only, Pre-Race / Post-Race) ---- */
+.race-tabs input[type='radio'] {
+  display: none;
+}
+
+.tab-bar {
+  display: flex;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 0.25rem;
+}
+
+.tab-bar label {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.12s;
+}
+
+.tab-bar label:hover {
+  color: var(--text);
+}
+
+#tab-pre:checked ~ .tab-bar label[for='tab-pre'],
+#tab-post:checked ~ .tab-bar label[for='tab-post'] {
+  color: var(--text);
+  border-bottom-color: var(--red);
+}
+
+.tab-panel {
+  display: none;
+}
+
+#tab-pre:checked ~ .tab-pre-panel {
+  display: block;
+}
+
+#tab-post:checked ~ .tab-post-panel {
+  display: block;
+}
+
+/* Narrow delta column in standings tables */
+.delta-col {
+  width: 2.5rem;
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 640px) {
   h1 {

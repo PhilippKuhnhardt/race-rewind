@@ -1,46 +1,48 @@
 ---
-import Base from '../../../layouts/Base.astro';
+import Base from '../../../../layouts/Base.astro';
 import {
   getAllDriverRacePairs,
   getDriverBySlug,
   getRaceBySlug,
-  getDriverRaceEntry,
   getDriverCareerStats,
-  getDriverStandingAsOf,
-} from '../../../lib/queries';
-import { formatPos, formatPts, stripYearPrefix } from '../../../lib/format';
+  getDriverStandingBeforeRace,
+  getDriverSeasonFirstRaces,
+} from '../../../../lib/queries';
+import { formatPts, stripYearPrefix } from '../../../../lib/format';
 
 export function getStaticPaths() {
   return getAllDriverRacePairs().map((p) => ({
-    params: { slug: p.driver_slug, race: p.race_slug },
+    params: { slug: p.driver_slug, season: String(p.season), race: p.race_slug },
   }));
 }
 
-const { slug, race: raceSlug } = Astro.params;
+const { slug, season, race: raceSlug } = Astro.params;
 
 const driver = getDriverBySlug(slug);
 if (!driver) throw new Error(`Driver not found: ${slug}`);
 
-const race = getRaceBySlug(raceSlug);
-if (!race) throw new Error(`Race not found: ${raceSlug}`);
+const fullSlug = `${season}-${raceSlug}`;
+const race = getRaceBySlug(fullSlug);
+if (!race) throw new Error(`Race not found: ${fullSlug}`);
 
-const raceUrlSlug = stripYearPrefix(race.slug, race.season);
-const entry = getDriverRaceEntry(driver.id, race.race_number);
+const raceNavSlug = stripYearPrefix(race.slug, race.season);
 const stats = getDriverCareerStats(driver.id, race.race_number);
-const standing = getDriverStandingAsOf(driver.id, race.race_number);
+const standing = getDriverStandingBeforeRace(driver.id, race.race_number, race.season);
+const seasonFirstRaces = getDriverSeasonFirstRaces(driver.id);
 
 const title = `${driver.full_name} — ${race.season} ${race.name}`;
-const description = `${driver.full_name}'s stats as of the ${race.season} ${race.name}: ${stats.wins} career wins, ${stats.podiums} podiums, ${stats.championships} world championship${stats.championships !== 1 ? 's' : ''}.`;
+const description = `${driver.full_name}'s career going into the ${race.season} ${race.name}: ${stats.wins} wins, ${stats.podiums} podiums, ${stats.championships} championship${stats.championships !== 1 ? 's' : ''}.`;
 ---
 
 <Base
   title={title}
   description={description}
-  canonical={`/drivers/${slug}/${raceSlug}/`}
+  canonical={`/drivers/${slug}/${season}/${raceSlug}/`}
   navSeason={race.season}
-  navRaceSlug={raceUrlSlug}
+  navRaceSlug={raceNavSlug}
+  navContext={{ kind: 'driver', entitySlug: slug, entitySeasons: seasonFirstRaces }}
 >
-  <a class="back-link" href={`/seasons/${race.season}/${raceUrlSlug}/`}>
+  <a class="back-link" href={`/seasons/${race.season}/${raceNavSlug}/`}>
     &larr; {race.season}
     {race.name}
   </a>
@@ -62,39 +64,38 @@ const description = `${driver.full_name}'s stats as of the ${race.season} ${race
   </div>
 
   {
-    entry && (
+    standing ? (
       <section class="section">
-        <h2>This Race</h2>
+        <h2>Going Into This Race</h2>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>Team</th>
-                <th class="num">Grid</th>
-                <th class="num">Finish</th>
-                <th class="num">Pts</th>
-                <th>Status</th>
+                <th class="num">Championship Pos</th>
+                <th class="num">Points</th>
+                <th class="num">Wins</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>{entry.team_name}</td>
-                <td class="num">{entry.grid ?? '—'}</td>
-                <td class="num pos">{formatPos(entry.position)}</td>
-                <td class="num">{formatPts(entry.points)}</td>
-                <td class:list={[{ dnf: !entry.is_classified }]}>
-                  {entry.is_classified ? 'Finished' : (entry.detail ?? '—')}
-                </td>
+                <td class="num pos">{standing.position ?? '—'}</td>
+                <td class="num">{formatPts(standing.points)}</td>
+                <td class="num">{standing.win_count}</td>
               </tr>
             </tbody>
           </table>
         </div>
       </section>
+    ) : (
+      <section class="section">
+        <h2>Going Into This Race</h2>
+        <p class="section-note">First race of the season — championship not yet started.</p>
+      </section>
     )
   }
 
   <section class="section">
-    <h2>Career as of This Race</h2>
+    <h2>Career Going Into This Race</h2>
     <div class="stat-grid">
       <div class="stat-card">
         <div class="stat-label">Starts</div>
@@ -126,30 +127,4 @@ const description = `${driver.full_name}'s stats as of the ${race.season} ${race
       </div>
     </div>
   </section>
-
-  {
-    standing && (
-      <section class="section">
-        <h2>This Season</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th class="num">Championship Pos</th>
-                <th class="num">Points</th>
-                <th class="num">Wins</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="num pos">{standing.position ?? '—'}</td>
-                <td class="num">{formatPts(standing.points)}</td>
-                <td class="num">{standing.win_count}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-    )
-  }
 </Base>

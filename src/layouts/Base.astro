@@ -5,15 +5,22 @@ import { getLatestRace } from '../lib/queries';
 import { stripYearPrefix } from '../lib/format';
 import { SITE_URL } from '../lib/const';
 
+interface NavContext {
+  kind: 'season' | 'driver';
+  entitySlug?: string;
+  entitySeasons?: Record<number, string>;
+}
+
 interface Props {
   title: string;
   description: string;
   canonical: string;
   navSeason?: number;
   navRaceSlug?: string;
+  navContext?: NavContext;
 }
 
-const { title, description, canonical, navSeason, navRaceSlug } = Astro.props;
+const { title, description, canonical, navSeason, navRaceSlug, navContext } = Astro.props;
 const canonicalURL = new URL(canonical, SITE_URL).href;
 
 const latest = navSeason == null || navRaceSlug == null ? getLatestRace() : null;
@@ -41,7 +48,7 @@ const effectiveNavRaceSlug = navRaceSlug ?? stripYearPrefix(latest!.slug, latest
     <header>
       <div class="container site-header-row">
         <span class="wordmark">F1 <span>History</span></span>
-        <RaceNav currentSeason={effectiveNavSeason} currentRaceSlug={effectiveNavRaceSlug} />
+        <RaceNav currentSeason={effectiveNavSeason} currentRaceSlug={effectiveNavRaceSlug} context={navContext} />
       </div>
     </header>
 

@@ -1,13 +1,22 @@
 ---
 import { getAllRacesBySeason } from '../lib/queries';
 
+interface NavContext {
+  kind: 'season' | 'driver';
+  entitySlug?: string;
+  entitySeasons?: Record<number, string>; // season → first race slug (stripped)
+}
+
 interface Props {
   currentSeason: number;
   currentRaceSlug: string;
+  context?: NavContext;
 }
 
-const { currentSeason, currentRaceSlug } = Astro.props;
+const { currentSeason, currentRaceSlug, context } = Astro.props;
 const { seasons, byseason } = getAllRacesBySeason();
+
+const contextJson = context ? JSON.stringify(context) : 'null';
 ---
 
 <nav class="race-nav" aria-label="Race selector">
@@ -32,18 +41,41 @@ const { seasons, byseason } = getAllRacesBySeason();
   </select>
 </nav>
 
-<script>
-  const seasonSel = document.getElementById('nav-season') as HTMLSelectElement;
-  const raceSel = document.getElementById('nav-race') as HTMLSelectElement;
+<script define:vars={{ contextJson }}>
+  const ctx = JSON.parse(contextJson);
+  const seasonSel = document.getElementById('nav-season');
+  const raceSel = document.getElementById('nav-race');
+
+  function buildUrl(season, race) {
+    if (ctx && ctx.kind === 'driver' && ctx.entitySlug) {
+      const entitySeasons = ctx.entitySeasons ?? {};
+      if (entitySeasons[season] !== undefined) {
+        return `/drivers/${ctx.entitySlug}/${season}/${race}/`;
+      }
+      // Driver didn't compete that season — fall back to season page
+    }
+    return `/seasons/${season}/${race}/`;
+  }
 
   seasonSel.addEventListener('change', () => {
     const season = seasonSel.value;
-    const firstRace = (seasonSel.selectedOptions[0] as HTMLOptionElement).dataset.firstRace;
-    if (firstRace) window.location.href = `/seasons/${season}/${firstRace}/`;
+    const selectedOption = seasonSel.selectedOptions[0];
+    const firstSeasonRace = selectedOption.dataset.firstRace;
+
+    if (ctx && ctx.kind === 'driver' && ctx.entitySlug) {
+      const entitySeasons = ctx.entitySeasons ?? {};
+      if (entitySeasons[season] !== undefined) {
+        window.location.href = `/drivers/${ctx.entitySlug}/${season}/${entitySeasons[season]}/`;
+        return;
+      }
+    }
+    if (firstSeasonRace) window.location.href = `/seasons/${season}/${firstSeasonRace}/`;
   });
 
   raceSel.addEventListener('change', () => {
-    window.location.href = `/seasons/${seasonSel.value}/${raceSel.value}/`;
+    const season = seasonSel.value;
+    const race = raceSel.value;
+    window.location.href = buildUrl(season, race);
   });
 </script>
 
