@@ -1,0 +1,19 @@
+.claude
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.pytest_cache
+
+# Node / Astro
+node_modules/
+dist/
+.astro/
+
+# Misc
+.env
+.env.local
