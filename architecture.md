@@ -1,6 +1,6 @@
 # F1 History Site — Architecture Overview
 
-A time-travel F1 stats site: pick any historic race and see standings, driver/team stats, and championship context *as they were at that point in time*. Built for rewatching old seasons without spoilers.
+A time-travel F1 stats site: pick any historic race and see standings, driver/team stats, and championship context _as they were at that point in time_. Built for rewatching old seasons without spoilers.
 
 ## Goals & Constraints
 
@@ -13,16 +13,16 @@ A time-travel F1 stats site: pick any historic race and see standings, driver/te
 
 ## Tech Stack
 
-| Layer | Choice | Why |
-|-------|--------|-----|
-| Framework | Astro (`output: 'static'`) | Islands architecture, near-zero JS, great SEO defaults, full static output |
-| Hosting | Cloudflare Pages | Unmetered bandwidth, free tier covers the whole stack |
-| Database | SQLite (committed to repo) | Fully derived from source CSVs; ~10–15 MB; no infrastructure, no sync, no drift |
-| DB driver | `better-sqlite3` (build-time only) | Reads the committed .sqlite during `astro build`; never shipped to the browser |
-| Ingest | Python stdlib (`csv`, `sqlite3`) | Clean separation from the Astro stack; no deps beyond the standard library |
-| Analytics | Cloudflare Web Analytics + Google Search Console | Privacy-friendly, no cookie banner needed, SEO insights |
-| Ads | Google AdSense → Ezoic → Mediavine (at scale) | Standard progression as traffic grows |
-| Domain | Cloudflare Registrar | At-cost pricing, free WHOIS privacy |
+| Layer     | Choice                                           | Why                                                                             |
+| --------- | ------------------------------------------------ | ------------------------------------------------------------------------------- |
+| Framework | Astro (`output: 'static'`)                       | Islands architecture, near-zero JS, great SEO defaults, full static output      |
+| Hosting   | Cloudflare Pages                                 | Unmetered bandwidth, free tier covers the whole stack                           |
+| Database  | SQLite (committed to repo)                       | Fully derived from source CSVs; ~10–15 MB; no infrastructure, no sync, no drift |
+| DB driver | `better-sqlite3` (build-time only)               | Reads the committed .sqlite during `astro build`; never shipped to the browser  |
+| Ingest    | Python stdlib (`csv`, `sqlite3`)                 | Clean separation from the Astro stack; no deps beyond the standard library      |
+| Analytics | Cloudflare Web Analytics + Google Search Console | Privacy-friendly, no cookie banner needed, SEO insights                         |
+| Ads       | Google AdSense → Ezoic → Mediavine (at scale)    | Standard progression as traffic grows                                           |
+| Domain    | Cloudflare Registrar                             | At-cost pricing, free WHOIS privacy                                             |
 
 **Not used (and why):** Cloudflare D1, Cloudflare Workers, Drizzle ORM, Wrangler. The data is fully historical and immutable, so all ~28k pages can be pre-rendered at build. SSR and its associated infrastructure add complexity without providing value for this use case.
 
@@ -87,12 +87,12 @@ Cancelled rounds are excluded from the timeline (they have a null `race_number` 
 
 Every entity carries three identifiers:
 
-| Identifier | Purpose | Example |
-|---|---|---|
-| `id` (integer PK) | Stable join key inside the DB | `1234` |
-| `jolpica_id` (integer) | Back-reference to source CSV `id` column | `847` |
-| `jolpica_api_id` (text) | Back-reference to Jolpica HTTP API `api_id` | `driver_NNme7ruE` |
-| `slug` (text) | URL segment for our site | `michael-schumacher`, `1998-hungarian-grand-prix` |
+| Identifier              | Purpose                                     | Example                                           |
+| ----------------------- | ------------------------------------------- | ------------------------------------------------- |
+| `id` (integer PK)       | Stable join key inside the DB               | `1234`                                            |
+| `jolpica_id` (integer)  | Back-reference to source CSV `id` column    | `847`                                             |
+| `jolpica_api_id` (text) | Back-reference to Jolpica HTTP API `api_id` | `driver_NNme7ruE`                                 |
+| `slug` (text)           | URL segment for our site                    | `michael-schumacher`, `1998-hungarian-grand-prix` |
 
 Slugs are generated deterministically at ingest and stable across re-runs. For races: `{year}-{slugified-name}` (e.g. `1998-hungarian-grand-prix`). For drivers: `{forename}-{surname}` lowercased. For teams/circuits: prefer Jolpica's `reference` column.
 
@@ -202,16 +202,16 @@ SELECT COUNT(*) FROM driver_standings ds
 
 ### Pre-rendered pages (~28k total)
 
-| Route | Count | Notes |
-|-------|-------|-------|
-| `/` | 1 | Home |
-| `/seasons/` | 1 | Season index |
-| `/seasons/[year]/` | ~77 | Season overview |
-| `/seasons/[year]/[race-slug]/` | ~1,171 | Race-weekend page |
-| `/drivers/` | 1 | Driver index |
-| `/drivers/[slug]/` | ~879 | Driver career view |
-| `/drivers/[slug]/[race-slug]/` | ~26k | Time-travel view (driver × race they participated in) |
-| `/teams/[slug]/` | ~215 | Team overview |
+| Route                          | Count  | Notes                                                 |
+| ------------------------------ | ------ | ----------------------------------------------------- |
+| `/`                            | 1      | Home                                                  |
+| `/seasons/`                    | 1      | Season index                                          |
+| `/seasons/[year]/`             | ~77    | Season overview                                       |
+| `/seasons/[year]/[race-slug]/` | ~1,171 | Race-weekend page                                     |
+| `/drivers/`                    | 1      | Driver index                                          |
+| `/drivers/[slug]/`             | ~879   | Driver career view                                    |
+| `/drivers/[slug]/[race-slug]/` | ~26k   | Time-travel view (driver × race they participated in) |
+| `/teams/[slug]/`               | ~215   | Team overview                                         |
 
 **Build time estimate:** ~2–5 min on Cloudflare Pages' standard builder (4 vCPU, 4 GB RAM). Well within the 20-min timeout and 500 builds/month free quota.
 
@@ -260,6 +260,7 @@ dist/  (fully static site, ~28k HTML files)
 **Re-ingest contract:** drop-and-rebuild every time. To update for a new race: add the new Jolpica dump folder and re-run. No incremental logic, no migrations.
 
 **Schedule:**
+
 - Full historical import (1950–present): one-time, already done via committed CSV dump
 - GitHub Actions weekly during F1 season — fetch latest Jolpica dump, re-run ingest, commit updated SQLite, trigger Pages redeploy
 - Manual runs for backfills or corrections
@@ -287,6 +288,7 @@ When lap-chart pages are wanted: add `laps` and `pit_stops` tables to `schema.sq
 ### Per-Page Requirements
 
 Every page renders with:
+
 - Unique `<title>` (e.g. "1998 Hungarian Grand Prix — Qualifying, Results & Standings")
 - Unique meta description
 - Canonical URL
@@ -307,6 +309,7 @@ Every page renders with:
 ### Content Layer (Manual)
 
 Pillar articles in `src/content/` (Astro content collections, MDX) — pre-rendered at build alongside the data pages:
+
 - "How to rewatch [season] F1 spoiler-free"
 - "F1 mid-season comebacks"
 - "Every notable mid-season team change"
@@ -346,13 +349,13 @@ No Wrangler, no D1, no cloud credentials needed for local development.
 
 ## Cost Projection
 
-| Service | Free tier | Expected usage | Cost |
-|---------|-----------|----------------|------|
-| Cloudflare Pages | Unlimited bandwidth, 500 builds/mo | ~50 builds/mo during season | $0 |
-| Cloudflare Workers | — | Not used (fully static) | $0 |
-| Cloudflare D1 | — | Not used | $0 |
-| Cloudflare Analytics | Unlimited | — | $0 |
-| Domain | — | ~$10/year | ~$1/mo |
+| Service              | Free tier                          | Expected usage              | Cost   |
+| -------------------- | ---------------------------------- | --------------------------- | ------ |
+| Cloudflare Pages     | Unlimited bandwidth, 500 builds/mo | ~50 builds/mo during season | $0     |
+| Cloudflare Workers   | —                                  | Not used (fully static)     | $0     |
+| Cloudflare D1        | —                                  | Not used                    | $0     |
+| Cloudflare Analytics | Unlimited                          | —                           | $0     |
+| Domain               | —                                  | ~$10/year                   | ~$1/mo |
 
 Realistic monthly cost: **~$1** (domain only).
 

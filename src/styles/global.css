@@ -1,0 +1,268 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --red: #e10600;
+  --text: #1a1a1a;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+  --bg-alt: #f9fafb;
+  --mono: ui-monospace, 'Cascadia Code', 'Fira Code', Menlo, monospace;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+  color: var(--text);
+  line-height: 1.6;
+  background: #fff;
+}
+
+.container {
+  max-width: 1060px;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+/* ---- Typography ---- */
+h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+h3 {
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+a {
+  color: var(--red);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* ---- Layout ---- */
+header {
+  border-bottom: 2px solid var(--red);
+  padding-block: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+header .wordmark {
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+header .wordmark span {
+  color: var(--red);
+}
+
+main {
+  padding-bottom: 4rem;
+}
+
+footer {
+  border-top: 1px solid var(--border);
+  padding-block: 1.25rem;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+}
+
+/* ---- Page header ---- */
+.page-header {
+  margin-bottom: 2rem;
+}
+.page-header .meta {
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+  margin-top: 0.25rem;
+}
+
+/* ---- Sections ---- */
+.section {
+  margin-block: 2.5rem;
+}
+.section h2 {
+  margin-bottom: 0.875rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.375rem;
+}
+
+/* ---- Tables ---- */
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+thead th {
+  background: var(--bg-alt);
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+tbody tr {
+  border-bottom: 1px solid var(--border);
+}
+tbody tr:nth-child(even) {
+  background: var(--bg-alt);
+}
+tbody tr:last-child {
+  border-bottom: none;
+}
+
+td {
+  padding: 0.5rem 0.75rem;
+  vertical-align: middle;
+}
+
+/* Right-align numeric columns */
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Monospace for lap times and gaps */
+.time {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+/* Position badge */
+.pos {
+  font-weight: 700;
+  width: 2rem;
+}
+
+/* Fastest lap indicator */
+.fl {
+  color: #a855f7;
+  font-weight: 600;
+}
+
+/* Standings delta */
+.delta-up {
+  color: #16a34a;
+  font-weight: 600;
+}
+.delta-down {
+  color: #dc2626;
+  font-weight: 600;
+}
+.delta-eq {
+  color: var(--text-muted);
+}
+
+/* DNF / DNS */
+.dnf {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Section footnote (e.g. fastest lap legend) */
+.section-note {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}
+
+/* ---- Header with inline nav ---- */
+.site-header-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+/* ---- Driver page ---- */
+.back-link {
+  display: inline-block;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+}
+.back-link:hover {
+  color: var(--red);
+  text-decoration: none;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-block: 1rem;
+}
+
+.stat-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
+  background: var(--bg-alt);
+}
+
+.stat-card .stat-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.stat-card .stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 640px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+  td,
+  th {
+    padding: 0.4rem 0.5rem;
+  }
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

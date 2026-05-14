@@ -1,0 +1,83 @@
+---
+import { getAllRacesBySeason } from '../lib/queries';
+
+interface Props {
+  currentSeason: number;
+  currentRaceSlug: string;
+}
+
+const { currentSeason, currentRaceSlug } = Astro.props;
+const { seasons, byseason } = getAllRacesBySeason();
+---
+
+<nav class="race-nav" aria-label="Race selector">
+  <select id="nav-season" aria-label="Season">
+    {
+      seasons.map((y) => (
+        <option value={y} selected={y === currentSeason} data-first-race={byseason[y]?.[0]?.slug}>
+          {y}
+        </option>
+      ))
+    }
+  </select>
+
+  <select id="nav-race" aria-label="Race">
+    {
+      (byseason[currentSeason] ?? []).map((r) => (
+        <option value={r.slug} selected={r.slug === currentRaceSlug}>
+          {r.name}
+        </option>
+      ))
+    }
+  </select>
+</nav>
+
+<script>
+  const seasonSel = document.getElementById('nav-season') as HTMLSelectElement;
+  const raceSel = document.getElementById('nav-race') as HTMLSelectElement;
+
+  seasonSel.addEventListener('change', () => {
+    const season = seasonSel.value;
+    const firstRace = (seasonSel.selectedOptions[0] as HTMLOptionElement).dataset.firstRace;
+    if (firstRace) window.location.href = `/seasons/${season}/${firstRace}/`;
+  });
+
+  raceSel.addEventListener('change', () => {
+    window.location.href = `/seasons/${seasonSel.value}/${raceSel.value}/`;
+  });
+</script>
+
+<style>
+  .race-nav {
+    display: flex;
+    gap: 0.625rem;
+    align-items: center;
+  }
+
+  .race-nav select {
+    font-size: 0.875rem;
+    font-family: inherit;
+    padding: 0.375rem 2rem 0.375rem 0.625rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #fff
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")
+      no-repeat right 0.5rem center;
+    appearance: none;
+    cursor: pointer;
+    color: var(--text);
+  }
+
+  .race-nav select:focus {
+    outline: 2px solid var(--red);
+    outline-offset: 1px;
+  }
+
+  #nav-season {
+    width: 5.5rem;
+  }
+  #nav-race {
+    flex: 1;
+    max-width: 28rem;
+  }
+</style>

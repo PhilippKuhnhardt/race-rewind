@@ -45,6 +45,14 @@ def _load_driver_standings(
         if key not in best or snum > (as_int(best[key], "session_number") or 0):
             best[key] = r
 
+    # Resolve team per (race_number, driver_id); MIN collapses rare shared-drive duplicates.
+    team_by_entry: dict[tuple[int, int], int] = {
+        (row[0], row[1]): row[2]
+        for row in con.execute(
+            "SELECT race_number, driver_id, MIN(team_id) FROM round_entries GROUP BY race_number, driver_id"
+        )
+    }
+
     records = []
     for (round_id, jdriver_id), r in best.items():
         race_number = rn_by_round.get(int(round_id))
@@ -54,6 +62,7 @@ def _load_driver_standings(
         records.append((
             race_number,
             driver_id,
+            team_by_entry.get((race_number, driver_id)),
             as_int(r, "position"),
             as_float(r, "points") or 0.0,
             as_int(r, "win_count") or 0,
@@ -66,9 +75,9 @@ def _load_driver_standings(
     for i in range(0, len(records), BATCH):
         con.executemany("""
             INSERT INTO driver_standings
-              (race_number, driver_id, position, points, win_count,
+              (race_number, driver_id, team_id, position, points, win_count,
                highest_finish, is_eligible, adjustment_type)
-            VALUES (?,?,?,?,?,?,?,?)
+            VALUES (?,?,?,?,?,?,?,?,?)
         """, records[i:i + BATCH])
 
 

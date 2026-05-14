@@ -4,9 +4,9 @@ Time-travel F1 stats — pick any historic race and see standings, results, and 
 
 ## Prerequisites
 
-| Tool | Purpose | Install |
-|------|---------|---------|
-| [pnpm](https://pnpm.io) | JS package manager (Astro) | `npm i -g pnpm` |
+| Tool                             | Purpose                            | Install                                            |
+| -------------------------------- | ---------------------------------- | -------------------------------------------------- |
+| [pnpm](https://pnpm.io)          | JS package manager (Astro)         | `npm i -g pnpm`                                    |
 | [uv](https://docs.astral.sh/uv/) | Python package manager (ingestion) | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
 
 No other global installs needed — uv manages the Python version and virtual environment automatically.

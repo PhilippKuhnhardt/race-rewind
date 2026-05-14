@@ -276,6 +276,7 @@ CREATE TABLE sprint_qualifying_results (
 CREATE TABLE driver_standings (
     race_number     INTEGER NOT NULL REFERENCES races(race_number),
     driver_id       INTEGER NOT NULL REFERENCES drivers(id),
+    team_id         INTEGER REFERENCES teams(id),  -- denormalized from round_entries; MIN(team_id) for shared drives
     position        INTEGER,          -- null when driver is not eligible for championship
     points          REAL    NOT NULL,
     win_count       INTEGER NOT NULL,

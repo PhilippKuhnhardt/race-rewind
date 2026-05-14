@@ -1,0 +1,58 @@
+---
+import '../styles/global.css';
+import RaceNav from '../components/RaceNav.astro';
+import { getLatestRace } from '../lib/queries';
+import { stripYearPrefix } from '../lib/format';
+import { SITE_URL } from '../lib/const';
+
+interface Props {
+  title: string;
+  description: string;
+  canonical: string;
+  navSeason?: number;
+  navRaceSlug?: string;
+}
+
+const { title, description, canonical, navSeason, navRaceSlug } = Astro.props;
+const canonicalURL = new URL(canonical, SITE_URL).href;
+
+const latest = navSeason == null || navRaceSlug == null ? getLatestRace() : null;
+const effectiveNavSeason = navSeason ?? latest!.season;
+const effectiveNavRaceSlug = navRaceSlug ?? stripYearPrefix(latest!.slug, latest!.season);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:type" content="website" />
+  </head>
+  <body>
+    <header>
+      <div class="container site-header-row">
+        <span class="wordmark">F1 <span>History</span></span>
+        <RaceNav currentSeason={effectiveNavSeason} currentRaceSlug={effectiveNavRaceSlug} />
+      </div>
+    </header>
+
+    <main class="container">
+      <slot />
+    </main>
+
+    <footer>
+      <div class="container">
+        Independent fan site — not affiliated with Formula One Group, FIA, or any team.
+      </div>
+    </footer>
+  </body>
+</html>
