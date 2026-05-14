@@ -1,0 +1,214 @@
+---
+import Base from '../../../layouts/Base.astro';
+import {
+  getAllSeasons,
+  getSeasonBookends,
+  getSeasonGrid,
+  getDriverStandings,
+  getTeamStandings,
+  getDriverCareerStats,
+  getDriverPriorSeasons,
+  getDriverBestChampionshipPos,
+} from '../../../lib/queries';
+import { stripYearPrefix, formatPts } from '../../../lib/format';
+
+export function getStaticPaths() {
+  return getAllSeasons().map((s) => ({
+    params: { season: String(s) },
+  }));
+}
+
+function computeAge(dob: string | null, atDate: string): number | null {
+  if (!dob) return null;
+  const d = new Date(dob);
+  const r = new Date(atDate);
+  let age = r.getFullYear() - d.getFullYear();
+  const m = r.getMonth() - d.getMonth();
+  if (m < 0 || (m === 0 && r.getDate() < d.getDate())) age--;
+  return age;
+}
+
+function ordinal(n: number): string {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
+const { season: seasonStr } = Astro.params;
+const season = Number(seasonStr);
+
+const bookends = getSeasonBookends(season);
+
+const hasData = bookends.latestCompletedRaceNumber != null;
+const isComplete =
+  hasData && bookends.latestCompletedRaceNumber === bookends.lastRaceNumber;
+
+// asOfRaceNumber is the latest race with results, or the first race if none yet.
+const asOfRaceNumber = bookends.latestCompletedRaceNumber ?? bookends.firstRaceNumber;
+const asOfDate = bookends.latestCompletedDate ?? bookends.firstDate;
+
+const driverChamp = hasData ? getDriverStandings(asOfRaceNumber) : [];
+const teamChamp = hasData ? getTeamStandings(asOfRaceNumber) : [];
+const grid = getSeasonGrid(asOfRaceNumber);
+const lastRaceSlug = stripYearPrefix(bookends.lastSlug, season);
+
+// Career totals including the as-of race: pass asOfRaceNumber + 1 (strict-less-than logic)
+const careerRefRaceNumber = hasData ? asOfRaceNumber + 1 : bookends.firstRaceNumber;
+
+const driverCareerRows = grid.map((d) => {
+  const career = getDriverCareerStats(d.driver_id, careerRefRaceNumber);
+  const seasons = getDriverPriorSeasons(d.driver_id, careerRefRaceNumber);
+  const bestChamp = getDriverBestChampionshipPos(d.driver_id, careerRefRaceNumber);
+  const age = computeAge(d.date_of_birth, asOfDate);
+  return { ...d, career, seasons, bestChamp, age };
+});
+
+driverCareerRows.sort((a, b) => {
+  if (a.team_name !== b.team_name) return a.team_name.localeCompare(b.team_name);
+  return b.career.points - a.career.points;
+});
+
+const title = `${season} Season — Postseason`;
+const description = isComplete
+  ? `${season} F1 season final standings: drivers' and constructors' championships and career totals.`
+  : `${season} F1 season in progress — standings as of round ${bookends.latestCompletedRound}.`;
+---
+
+<Base
+  title={title}
+  description={description}
+  canonical={`/seasons/${season}/postseason/`}
+  navSeason={season}
+  sidebar={{ season, current: { kind: 'post' } }}
+>
+  <div class="page-header">
+    <h1>{season} Season</h1>
+    <p class="meta">
+      {bookends.raceCount} rounds &middot; {bookends.firstDate} &ndash; {bookends.lastDate}
+    </p>
+  </div>
+
+  {
+    !isComplete && hasData && (
+      <div class="season-in-progress">
+        Season in progress &mdash; standings as of round {bookends.latestCompletedRound} / {bookends.raceCount}
+        ({bookends.latestCompletedName}).
+      </div>
+    )
+  }
+  {
+    !hasData && (
+      <div class="season-in-progress">No results available yet for this season.</div>
+    )
+  }
+
+  {
+    driverChamp.length > 0 && (
+      <section class="section">
+        <h2>Drivers&rsquo; Championship</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="num">Pos</th>
+                <th>Driver</th>
+                <th>Team</th>
+                <th class="num">Wins</th>
+                <th class="num">Points</th>
+              </tr>
+            </thead>
+            <tbody>
+              {driverChamp.map((row) => (
+                <tr>
+                  <td class="num pos">{row.position ?? '—'}</td>
+                  <td>
+                    <a href={`/drivers/${row.driver_slug}/${season}/${lastRaceSlug}/`}>
+                      {row.full_name}
+                    </a>
+                  </td>
+                  <td>{row.team_name ?? '—'}</td>
+                  <td class="num">{row.win_count}</td>
+                  <td class="num">{formatPts(row.points)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    teamChamp.length > 0 && (
+      <section class="section">
+        <h2>Constructors&rsquo; Championship</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="num">Pos</th>
+                <th>Team</th>
+                <th class="num">Wins</th>
+                <th class="num">Points</th>
+              </tr>
+            </thead>
+            <tbody>
+              {teamChamp.map((row) => (
+                <tr>
+                  <td class="num pos">{row.position ?? '—'}</td>
+                  <td>{row.team_name}</td>
+                  <td class="num">{row.win_count}</td>
+                  <td class="num">{formatPts(row.points)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section">
+    <h2>Career Totals After the Season</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Driver</th>
+            <th>Team</th>
+            <th class="num">Age</th>
+            <th class="num">Seasons</th>
+            <th class="num">Starts</th>
+            <th class="num">Wins</th>
+            <th class="num">Podiums</th>
+            <th class="num">Points</th>
+            <th class="num">Best</th>
+            <th class="num">Champs</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            driverCareerRows.map((row) => (
+              <tr>
+                <td>
+                  <a href={`/drivers/${row.driver_slug}/${season}/${lastRaceSlug}/`}>
+                    {row.full_name}
+                  </a>
+                </td>
+                <td>{row.team_name}</td>
+                <td class="num">{row.age ?? '—'}</td>
+                <td class="num">{row.seasons}</td>
+                <td class="num">{row.career.starts}</td>
+                <td class="num">{row.career.wins}</td>
+                <td class="num">{row.career.podiums}</td>
+                <td class="num">{formatPts(row.career.points)}</td>
+                <td class="num">{row.bestChamp != null ? ordinal(row.bestChamp) : '—'}</td>
+                <td class="num">{row.career.championships}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</Base>

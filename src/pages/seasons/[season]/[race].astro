@@ -43,7 +43,9 @@ const winnerTime = results.find((r) => r.position === 1)?.time ?? null;
 // Starting grid derived from race results — shown only when no qualifying data exists
 const startingGrid =
   quali.length === 0
-    ? [...results].sort((a, b) => (a.grid ?? 999) - (b.grid ?? 999)).filter((r) => r.grid != null)
+    ? [...results]
+        .filter((r) => r.grid != null && r.grid > 0)
+        .sort((a, b) => a.grid! - b.grid!)
     : [];
 
 const title = `${race.season} ${race.name} — Results & Standings`;
@@ -58,7 +60,7 @@ const driverLink = (driverSlug: string) =>
   description={description}
   canonical={`/seasons/${season}/${raceSlug}/`}
   navSeason={race.season}
-  navRaceSlug={raceSlug}
+  sidebar={{ season: race.season, current: { kind: 'race', raceSlug } }}
 >
   <div class="page-header">
     <h1>{race.season} {race.name}</h1>
@@ -98,7 +100,6 @@ const driverLink = (driverSlug: string) =>
                         <th class="time">Q1</th>
                         <th class="time">Q2</th>
                         <th class="time">Q3</th>
-                        <th>Out</th>
                       </>
                     ) : (
                       <th class="time">Time</th>
@@ -118,7 +119,6 @@ const driverLink = (driverSlug: string) =>
                           <td class="time">{orDash(row.q1_time)}</td>
                           <td class="time">{orDash(row.q2_time)}</td>
                           <td class="time">{orDash(row.q3_time)}</td>
-                          <td>{row.knocked_out_in ?? '—'}</td>
                         </>
                       ) : (
                         <td class="time">{orDash(row.qualifying_time)}</td>
@@ -274,7 +274,7 @@ const driverLink = (driverSlug: string) =>
                         <a href={driverLink(row.driver_slug)}>{row.full_name}</a>
                       </td>
                       <td>{row.team_name}</td>
-                      <td class="num">{row.grid ?? '—'}</td>
+                      <td class="num">{row.grid ? row.grid : '—'}</td>
                       <td class="num">{row.laps_completed ?? '—'}</td>
                       <td class="time">{orDash(row.time)}</td>
                       <td class:list={[{ dnf: row.position == null }]}>{row.detail ?? '—'}</td>
@@ -321,7 +321,7 @@ const driverLink = (driverSlug: string) =>
                         </td>
                         <td>{row.team_name}</td>
                         <td class="num">{row.car_number ?? '—'}</td>
-                        <td class="num">{row.grid ?? '—'}</td>
+                        <td class="num">{row.grid ? row.grid : '—'}</td>
                         <td class="num">{row.laps_completed ?? '—'}</td>
                         <td class="time">{gap}</td>
                         <td class:list={[{ dnf: !row.is_classified }]}>{status}</td>

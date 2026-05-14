@@ -1,8 +1,8 @@
 ---
 import '../styles/global.css';
 import RaceNav from '../components/RaceNav.astro';
+import SeasonSidebar from '../components/SeasonSidebar.astro';
 import { getLatestRace } from '../lib/queries';
-import { stripYearPrefix } from '../lib/format';
 import { SITE_URL } from '../lib/const';
 
 interface NavContext {
@@ -11,21 +11,25 @@ interface NavContext {
   entitySeasons?: Record<number, string>;
 }
 
+interface SidebarCurrent {
+  kind: 'pre' | 'post' | 'race';
+  raceSlug?: string;
+}
+
 interface Props {
   title: string;
   description: string;
   canonical: string;
   navSeason?: number;
-  navRaceSlug?: string;
   navContext?: NavContext;
+  sidebar?: { season: number; current: SidebarCurrent };
 }
 
-const { title, description, canonical, navSeason, navRaceSlug, navContext } = Astro.props;
+const { title, description, canonical, navSeason, navContext, sidebar } = Astro.props;
 const canonicalURL = new URL(canonical, SITE_URL).href;
 
-const latest = navSeason == null || navRaceSlug == null ? getLatestRace() : null;
+const latest = navSeason == null ? getLatestRace() : null;
 const effectiveNavSeason = navSeason ?? latest!.season;
-const effectiveNavRaceSlug = navRaceSlug ?? stripYearPrefix(latest!.slug, latest!.season);
 ---
 
 <!doctype html>
@@ -48,12 +52,23 @@ const effectiveNavRaceSlug = navRaceSlug ?? stripYearPrefix(latest!.slug, latest
     <header>
       <div class="container site-header-row">
         <span class="wordmark">F1 <span>History</span></span>
-        <RaceNav currentSeason={effectiveNavSeason} currentRaceSlug={effectiveNavRaceSlug} context={navContext} />
+        <RaceNav currentSeason={effectiveNavSeason} context={navContext} />
       </div>
     </header>
 
     <main class="container">
-      <slot />
+      {
+        sidebar ? (
+          <div class="layout-sidebar">
+            <SeasonSidebar season={sidebar.season} current={sidebar.current} />
+            <div>
+              <slot />
+            </div>
+          </div>
+        ) : (
+          <slot />
+        )
+      }
     </main>
 
     <footer>

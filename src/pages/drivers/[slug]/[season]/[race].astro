@@ -39,7 +39,6 @@ const description = `${driver.full_name}'s career going into the ${race.season} 
   description={description}
   canonical={`/drivers/${slug}/${season}/${raceSlug}/`}
   navSeason={race.season}
-  navRaceSlug={raceNavSlug}
   navContext={{ kind: 'driver', entitySlug: slug, entitySeasons: seasonFirstRaces }}
 >
   <a class="back-link" href={`/seasons/${race.season}/${raceNavSlug}/`}>

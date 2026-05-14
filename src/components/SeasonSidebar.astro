@@ -1,0 +1,153 @@
+---
+import { getAllRacesBySeason } from '../lib/queries';
+
+interface Current {
+  kind: 'pre' | 'post' | 'race';
+  raceSlug?: string; // stripped, only when kind === 'race'
+}
+
+interface Props {
+  season: number;
+  current: Current;
+}
+
+const { season, current } = Astro.props;
+const { byseason } = getAllRacesBySeason();
+const races = byseason[season] ?? [];
+
+function shortName(name: string): string {
+  return name.replace(/ Grand Prix$/, '');
+}
+---
+
+<nav class="season-sidebar" aria-label="Season navigation">
+  <a
+    href={`/seasons/${season}/preseason/`}
+    class:list={['sidebar-link', { 'sidebar-active': current.kind === 'pre' }]}
+    aria-current={current.kind === 'pre' ? 'page' : undefined}
+  >
+    Start of season
+  </a>
+
+  <details class="sidebar-races-wrap" open={current.kind === 'race' || undefined}>
+    <summary class="sidebar-summary">All races</summary>
+    <ol class="sidebar-races">
+      {
+        races.map((r, i) => {
+          const isActive = current.kind === 'race' && current.raceSlug === r.slug;
+          return (
+            <li>
+              <a
+                href={`/seasons/${season}/${r.slug}/`}
+                class:list={['sidebar-race-link', { 'sidebar-active': isActive }]}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                <span class="sidebar-rnd">{i + 1}</span>
+                <span>{shortName(r.name)}</span>
+              </a>
+            </li>
+          );
+        })
+      }
+    </ol>
+  </details>
+
+  <a
+    href={`/seasons/${season}/postseason/`}
+    class:list={['sidebar-link', { 'sidebar-active': current.kind === 'post' }]}
+    aria-current={current.kind === 'post' ? 'page' : undefined}
+  >
+    End of season
+  </a>
+</nav>
+
+<style>
+  .season-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    padding-top: 0.25rem;
+    position: sticky;
+    top: 1rem;
+    align-self: start;
+  }
+
+  .sidebar-link {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .sidebar-link:hover {
+    background: var(--bg-alt);
+    text-decoration: none;
+  }
+
+  .sidebar-link.sidebar-active {
+    background: var(--bg-alt);
+    color: var(--red);
+  }
+
+  .sidebar-races-wrap {
+    border-radius: 6px;
+  }
+
+  .sidebar-summary {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    border-radius: 6px;
+    list-style: none;
+    user-select: none;
+  }
+
+  .sidebar-summary:hover {
+    background: var(--bg-alt);
+  }
+
+  .sidebar-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .sidebar-races {
+    list-style: none;
+    margin-top: 0.125rem;
+  }
+
+  .sidebar-race-link {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding: 0.3125rem 0.75rem 0.3125rem 1rem;
+    border-radius: 5px;
+    font-size: 0.875rem;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .sidebar-race-link:hover {
+    background: var(--bg-alt);
+    text-decoration: none;
+  }
+
+  .sidebar-race-link.sidebar-active {
+    background: var(--bg-alt);
+    color: var(--red);
+    font-weight: 600;
+  }
+
+  .sidebar-rnd {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    min-width: 1.25rem;
+    text-align: right;
+    flex-shrink: 0;
+  }
+</style>

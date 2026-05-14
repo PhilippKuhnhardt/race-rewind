@@ -9,32 +9,21 @@ interface NavContext {
 
 interface Props {
   currentSeason: number;
-  currentRaceSlug: string;
   context?: NavContext;
 }
 
-const { currentSeason, currentRaceSlug, context } = Astro.props;
+const { currentSeason, context } = Astro.props;
 const { seasons, byseason } = getAllRacesBySeason();
 
 const contextJson = context ? JSON.stringify(context) : 'null';
 ---
 
-<nav class="race-nav" aria-label="Race selector">
+<nav class="race-nav" aria-label="Season selector">
   <select id="nav-season" aria-label="Season">
     {
       seasons.map((y) => (
-        <option value={y} selected={y === currentSeason} data-first-race={byseason[y]?.[0]?.slug}>
+        <option value={y} selected={y === currentSeason}>
           {y}
-        </option>
-      ))
-    }
-  </select>
-
-  <select id="nav-race" aria-label="Race">
-    {
-      (byseason[currentSeason] ?? []).map((r) => (
-        <option value={r.slug} selected={r.slug === currentRaceSlug}>
-          {r.name}
         </option>
       ))
     }
@@ -44,23 +33,9 @@ const contextJson = context ? JSON.stringify(context) : 'null';
 <script define:vars={{ contextJson }}>
   const ctx = JSON.parse(contextJson);
   const seasonSel = document.getElementById('nav-season');
-  const raceSel = document.getElementById('nav-race');
-
-  function buildUrl(season, race) {
-    if (ctx && ctx.kind === 'driver' && ctx.entitySlug) {
-      const entitySeasons = ctx.entitySeasons ?? {};
-      if (entitySeasons[season] !== undefined) {
-        return `/drivers/${ctx.entitySlug}/${season}/${race}/`;
-      }
-      // Driver didn't compete that season — fall back to season page
-    }
-    return `/seasons/${season}/${race}/`;
-  }
 
   seasonSel.addEventListener('change', () => {
     const season = seasonSel.value;
-    const selectedOption = seasonSel.selectedOptions[0];
-    const firstSeasonRace = selectedOption.dataset.firstRace;
 
     if (ctx && ctx.kind === 'driver' && ctx.entitySlug) {
       const entitySeasons = ctx.entitySeasons ?? {};
@@ -69,13 +44,7 @@ const contextJson = context ? JSON.stringify(context) : 'null';
         return;
       }
     }
-    if (firstSeasonRace) window.location.href = `/seasons/${season}/${firstSeasonRace}/`;
-  });
-
-  raceSel.addEventListener('change', () => {
-    const season = seasonSel.value;
-    const race = raceSel.value;
-    window.location.href = buildUrl(season, race);
+    window.location.href = `/seasons/${season}/preseason/`;
   });
 </script>
 
@@ -107,9 +76,5 @@ const contextJson = context ? JSON.stringify(context) : 'null';
 
   #nav-season {
     width: 5.5rem;
-  }
-  #nav-race {
-    flex: 1;
-    max-width: 28rem;
   }
 </style>

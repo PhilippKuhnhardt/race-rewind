@@ -480,3 +480,128 @@ export function getDriverSeasonFirstRaces(driverId: number): Record<number, stri
   }
   return result;
 }
+
+// ---------------------------------------------------------------------------
+// Season overview helpers
+// ---------------------------------------------------------------------------
+
+export function getAllSeasons(): number[] {
+  return queryAll<{ season: number }>(
+    `SELECT DISTINCT season FROM races ORDER BY season`
+  ).map((r) => r.season);
+}
+
+export interface SeasonBookends {
+  firstRaceNumber: number;
+  firstSlug: string; // year-prefixed
+  firstDate: string;
+  lastRaceNumber: number;
+  lastSlug: string; // year-prefixed
+  lastDate: string;
+  raceCount: number;
+  latestCompletedRaceNumber: number | null;
+  latestCompletedRound: number | null;
+  latestCompletedName: string | null;
+  latestCompletedDate: string | null;
+}
+
+export function getSeasonBookends(season: number): SeasonBookends {
+  const bounds = queryOne<{ first: number; last: number; cnt: number }>(
+    `SELECT MIN(race_number) AS first, MAX(race_number) AS last, COUNT(*) AS cnt
+     FROM races WHERE season = ?`,
+    season
+  )!;
+
+  const firstRace = queryOne<{ slug: string; date: string }>(
+    `SELECT slug, date FROM races WHERE race_number = ?`,
+    bounds.first
+  )!;
+
+  const lastRace = queryOne<{ slug: string; date: string }>(
+    `SELECT slug, date FROM races WHERE race_number = ?`,
+    bounds.last
+  )!;
+
+  const completed = queryOne<{
+    rn: number;
+    round: number;
+    name: string;
+    date: string;
+  }>(
+    `SELECT r.race_number AS rn, r.round, r.name, r.date
+     FROM race_results rr
+     JOIN races r ON r.race_number = rr.race_number
+     WHERE r.season = ?
+     ORDER BY rr.race_number DESC
+     LIMIT 1`,
+    season
+  );
+
+  return {
+    firstRaceNumber: bounds.first,
+    firstSlug: firstRace.slug,
+    firstDate: firstRace.date,
+    lastRaceNumber: bounds.last,
+    lastSlug: lastRace.slug,
+    lastDate: lastRace.date,
+    raceCount: bounds.cnt,
+    latestCompletedRaceNumber: completed?.rn ?? null,
+    latestCompletedRound: completed?.round ?? null,
+    latestCompletedName: completed?.name ?? null,
+    latestCompletedDate: completed?.date ?? null,
+  };
+}
+
+export interface GridRow {
+  car_number: number | null;
+  driver_id: number;
+  driver_slug: string;
+  full_name: string;
+  date_of_birth: string | null;
+  team_name: string;
+  primary_color: string | null;
+}
+
+export function getSeasonGrid(raceNumber: number): GridRow[] {
+  return queryAll<GridRow>(
+    `SELECT MIN(re.car_number) AS car_number,
+            d.id AS driver_id, d.slug AS driver_slug, d.full_name, d.date_of_birth,
+            MIN(t.name) AS team_name, MIN(t.primary_color) AS primary_color
+     FROM round_entries re
+     JOIN drivers d ON d.id = re.driver_id
+     JOIN teams   t ON t.id = re.team_id
+     WHERE re.race_number = ?
+     GROUP BY d.id
+     ORDER BY MIN(t.name), MIN(re.car_number)`,
+    raceNumber
+  );
+}
+
+export function getDriverPriorSeasons(driverId: number, beforeRaceNumber: number): number {
+  return queryOne<{ n: number }>(
+    `SELECT COUNT(DISTINCT r.season) AS n
+     FROM round_entries re
+     JOIN races r ON r.race_number = re.race_number
+     WHERE re.driver_id = ? AND re.race_number < ?`,
+    driverId,
+    beforeRaceNumber
+  )!.n;
+}
+
+export function getDriverBestChampionshipPos(
+  driverId: number,
+  beforeRaceNumber: number
+): number | null {
+  return queryOne<{ pos: number | null }>(
+    `SELECT MIN(ds.position) AS pos
+     FROM driver_standings ds
+     JOIN races r ON r.race_number = ds.race_number
+     WHERE ds.driver_id = ?
+       AND ds.race_number < ?
+       AND ds.race_number = (
+         SELECT MAX(race_number) FROM races WHERE season = r.season
+       )`,
+    driverId,
+    beforeRaceNumber
+  )!.pos;
+}
