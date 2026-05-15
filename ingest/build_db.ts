@@ -67,7 +67,7 @@ async function build(dumpDir: string, outPath: string) {
   await buildDerived(db, client);
 
   console.log('Finalizing …');
-  await checkIntegrity(db, client);
+  await checkIntegrity(client);
   await client.execute('VACUUM');
   await client.execute('ANALYZE');
   client.close();
@@ -77,7 +77,7 @@ async function build(dumpDir: string, outPath: string) {
   console.log(`\nDone in ${elapsed}s — ${outPath} (${(size / 1_048_576).toFixed(1)} MB)`);
 }
 
-async function checkIntegrity(db: ReturnType<typeof drizzle>, client: ReturnType<typeof createClient>) {
+async function checkIntegrity(client: ReturnType<typeof createClient>) {
   const violations = await client.execute('PRAGMA foreign_key_check');
   if (violations.rows.length) {
     for (const v of violations.rows) console.error('FK violation:', v);

@@ -1,7 +1,6 @@
 import type { Client } from '@libsql/client';
 import type { LibSQLDatabase } from 'drizzle-orm/libsql';
 import { readCsv } from '../csv';
-import type { IngestState } from '../state';
 import * as schema from '../../src/db/schema';
 
 const CHUNK = 500;

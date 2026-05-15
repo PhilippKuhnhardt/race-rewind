@@ -3,6 +3,7 @@ export function slugify(text: string): string {
   const ascii = text
     .normalize('NFKD')
     .replace(/[̀-ͯ]/g, '')  // strip combining diacritical marks
+    // eslint-disable-next-line no-control-regex
     .replace(/[^\x00-\x7F]/g, '');   // strip remaining non-ASCII
   return ascii
     .toLowerCase()
