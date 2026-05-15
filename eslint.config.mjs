@@ -7,6 +7,15 @@ export default tseslint.config(
   tseslint.configs.recommended,
   ...eslintPluginAstro.configs['flat/recommended'],
   {
+    files: ['**/*.astro'],
+    languageOptions: {
+      parserOptions: {
+        parser: tseslint.parser,
+        extraFileExtensions: ['.astro'],
+      },
+    },
+  },
+  {
     ignores: ['dist/', '.astro/', 'node_modules/', '**/*.d.ts'],
   }
 );

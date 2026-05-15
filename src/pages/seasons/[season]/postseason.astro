@@ -12,8 +12,8 @@ import {
 } from '../../../lib/queries';
 import { stripYearPrefix, formatPts } from '../../../lib/format';
 
-export function getStaticPaths() {
-  return getAllSeasons().map((s) => ({
+export async function getStaticPaths() {
+  return (await getAllSeasons()).map((s) => ({
     params: { season: String(s) },
   }));
 }
@@ -37,7 +37,7 @@ function ordinal(n: number): string {
 const { season: seasonStr } = Astro.params;
 const season = Number(seasonStr);
 
-const bookends = getSeasonBookends(season);
+const bookends = await getSeasonBookends(season);
 
 const hasData = bookends.latestCompletedRaceNumber != null;
 const isComplete =
@@ -47,24 +47,30 @@ const isComplete =
 const asOfRaceNumber = bookends.latestCompletedRaceNumber ?? bookends.firstRaceNumber;
 const asOfDate = bookends.latestCompletedDate ?? bookends.firstDate;
 
-const driverChamp = hasData ? getDriverStandings(asOfRaceNumber) : [];
-const teamChamp = hasData ? getTeamStandings(asOfRaceNumber) : [];
-const grid = getSeasonGrid(asOfRaceNumber);
+const [driverChamp, teamChamp, grid] = await Promise.all([
+  hasData ? getDriverStandings(asOfRaceNumber) : Promise.resolve([]),
+  hasData ? getTeamStandings(asOfRaceNumber) : Promise.resolve([]),
+  getSeasonGrid(asOfRaceNumber),
+]);
 const lastRaceSlug = stripYearPrefix(bookends.lastSlug, season);
 
 // Career totals including the as-of race: pass asOfRaceNumber + 1 (strict-less-than logic)
 const careerRefRaceNumber = hasData ? asOfRaceNumber + 1 : bookends.firstRaceNumber;
 
-const driverCareerRows = grid.map((d) => {
-  const career = getDriverCareerStats(d.driver_id, careerRefRaceNumber);
-  const seasons = getDriverPriorSeasons(d.driver_id, careerRefRaceNumber);
-  const bestChamp = getDriverBestChampionshipPos(d.driver_id, careerRefRaceNumber);
-  const age = computeAge(d.date_of_birth, asOfDate);
-  return { ...d, career, seasons, bestChamp, age };
-});
+const driverCareerRows = await Promise.all(
+  grid.map(async (d) => {
+    const [career, seasons, bestChamp] = await Promise.all([
+      getDriverCareerStats(d.driver_id, careerRefRaceNumber),
+      getDriverPriorSeasons(d.driver_id, careerRefRaceNumber),
+      getDriverBestChampionshipPos(d.driver_id, careerRefRaceNumber),
+    ]);
+    const age = computeAge(d.date_of_birth, asOfDate);
+    return { ...d, career, seasons, bestChamp, age };
+  })
+);
 
 driverCareerRows.sort((a, b) => {
-  if (a.team_name !== b.team_name) return a.team_name.localeCompare(b.team_name);
+  if (a.team_name !== b.team_name) return (a.team_name ?? '').localeCompare(b.team_name ?? '');
   return b.career.points - a.career.points;
 });
 

@@ -12,7 +12,7 @@ interface Props {
 }
 
 const { season, current } = Astro.props;
-const { byseason } = getAllRacesBySeason();
+const { byseason } = await getAllRacesBySeason();
 const races = byseason[season] ?? [];
 
 function shortName(name: string): string {

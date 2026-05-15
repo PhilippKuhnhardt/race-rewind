@@ -28,7 +28,7 @@ interface Props {
 const { title, description, canonical, navSeason, navContext, sidebar } = Astro.props;
 const canonicalURL = new URL(canonical, SITE_URL).href;
 
-const latest = navSeason == null ? getLatestRace() : null;
+const latest = navSeason == null ? await getLatestRace() : null;
 const effectiveNavSeason = navSeason ?? latest!.season;
 ---
 

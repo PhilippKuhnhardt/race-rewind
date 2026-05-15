@@ -10,8 +10,8 @@ import {
 } from '../../../lib/queries';
 import { stripYearPrefix, formatPts } from '../../../lib/format';
 
-export function getStaticPaths() {
-  return getAllSeasons().map((s) => ({
+export async function getStaticPaths() {
+  return (await getAllSeasons()).map((s) => ({
     params: { season: String(s) },
   }));
 }
@@ -35,20 +35,24 @@ function ordinal(n: number): string {
 const { season: seasonStr } = Astro.params;
 const season = Number(seasonStr);
 
-const bookends = getSeasonBookends(season);
-const grid = getSeasonGrid(bookends.firstRaceNumber);
+const bookends = await getSeasonBookends(season);
+const grid = await getSeasonGrid(bookends.firstRaceNumber);
 const firstRaceSlug = stripYearPrefix(bookends.firstSlug, season);
 
-const driverStats = grid.map((d) => {
-  const career = getDriverCareerStats(d.driver_id, bookends.firstRaceNumber);
-  const seasons = getDriverPriorSeasons(d.driver_id, bookends.firstRaceNumber);
-  const bestChamp = getDriverBestChampionshipPos(d.driver_id, bookends.firstRaceNumber);
-  const age = computeAge(d.date_of_birth, bookends.firstDate);
-  return { ...d, career, seasons, bestChamp, age };
-});
+const driverStats = await Promise.all(
+  grid.map(async (d) => {
+    const [career, seasons, bestChamp] = await Promise.all([
+      getDriverCareerStats(d.driver_id, bookends.firstRaceNumber),
+      getDriverPriorSeasons(d.driver_id, bookends.firstRaceNumber),
+      getDriverBestChampionshipPos(d.driver_id, bookends.firstRaceNumber),
+    ]);
+    const age = computeAge(d.date_of_birth, bookends.firstDate);
+    return { ...d, career, seasons, bestChamp, age };
+  })
+);
 
 driverStats.sort((a, b) => {
-  if (a.team_name !== b.team_name) return a.team_name.localeCompare(b.team_name);
+  if (a.team_name !== b.team_name) return (a.team_name ?? '').localeCompare(b.team_name ?? '');
   return b.career.points - a.career.points;
 });
 

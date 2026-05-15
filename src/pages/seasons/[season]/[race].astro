@@ -14,25 +14,28 @@ import {
 } from '../../../lib/queries';
 import { orDash, formatPts, formatPos, formatGap, formatDelta } from '../../../lib/format';
 
-export function getStaticPaths() {
-  return getAllRaces().map((r) => ({
+export async function getStaticPaths() {
+  return (await getAllRaces()).map((r) => ({
     params: { season: String(r.season), race: r.race_slug },
   }));
 }
 
 const { season, race: raceSlug } = Astro.params;
 const fullSlug = `${season}-${raceSlug}`;
-const race = getRaceBySlug(fullSlug);
+const race = await getRaceBySlug(fullSlug);
 if (!race) throw new Error(`Race not found: ${fullSlug}`);
 
-const quali = getQualifyingResults(race.race_number);
-const sprintQuali = race.has_sprint ? getSprintQualifyingResults(race.race_number) : [];
-const sprint = race.has_sprint ? getSprintResults(race.race_number) : [];
-const results = getRaceResults(race.race_number);
-const driverChamp = getDriverStandings(race.race_number);
-const teamChamp = getTeamStandings(race.race_number);
-const preRaceDriverChamp = getDriverStandingsBeforeRace(race.race_number, race.season);
-const preRaceTeamChamp = getTeamStandingsBeforeRace(race.race_number, race.season);
+const [quali, sprintQuali, sprint, results, driverChamp, teamChamp, preRaceDriverChamp, preRaceTeamChamp] =
+  await Promise.all([
+    getQualifyingResults(race.race_number),
+    race.has_sprint ? getSprintQualifyingResults(race.race_number) : Promise.resolve([]),
+    race.has_sprint ? getSprintResults(race.race_number) : Promise.resolve([]),
+    getRaceResults(race.race_number),
+    getDriverStandings(race.race_number),
+    getTeamStandings(race.race_number),
+    getDriverStandingsBeforeRace(race.race_number, race.season),
+    getTeamStandingsBeforeRace(race.race_number, race.season),
+  ]);
 
 // Position lookups for delta columns
 const preRaceDriverPosById = new Map(preRaceDriverChamp.map((r) => [r.driver_id, r.position]));

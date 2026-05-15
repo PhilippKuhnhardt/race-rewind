@@ -10,25 +10,27 @@ import {
 } from '../../../../lib/queries';
 import { formatPts, stripYearPrefix } from '../../../../lib/format';
 
-export function getStaticPaths() {
-  return getAllDriverRacePairs().map((p) => ({
+export async function getStaticPaths() {
+  return (await getAllDriverRacePairs()).map((p) => ({
     params: { slug: p.driver_slug, season: String(p.season), race: p.race_slug },
   }));
 }
 
 const { slug, season, race: raceSlug } = Astro.params;
 
-const driver = getDriverBySlug(slug);
+const driver = await getDriverBySlug(slug);
 if (!driver) throw new Error(`Driver not found: ${slug}`);
 
 const fullSlug = `${season}-${raceSlug}`;
-const race = getRaceBySlug(fullSlug);
+const race = await getRaceBySlug(fullSlug);
 if (!race) throw new Error(`Race not found: ${fullSlug}`);
 
 const raceNavSlug = stripYearPrefix(race.slug, race.season);
-const stats = getDriverCareerStats(driver.id, race.race_number);
-const standing = getDriverStandingBeforeRace(driver.id, race.race_number, race.season);
-const seasonFirstRaces = getDriverSeasonFirstRaces(driver.id);
+const [stats, standing, seasonFirstRaces] = await Promise.all([
+  getDriverCareerStats(driver.id, race.race_number),
+  getDriverStandingBeforeRace(driver.id, race.race_number, race.season),
+  getDriverSeasonFirstRaces(driver.id),
+]);
 
 const title = `${driver.full_name} — ${race.season} ${race.name}`;
 const description = `${driver.full_name}'s career going into the ${race.season} ${race.name}: ${stats.wins} wins, ${stats.podiums} podiums, ${stats.championships} championship${stats.championships !== 1 ? 's' : ''}.`;
