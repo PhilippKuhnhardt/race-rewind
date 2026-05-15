@@ -19,7 +19,7 @@ const contextJson = context ? JSON.stringify(context) : 'null';
 ---
 
 <nav class="race-nav" aria-label="Season selector">
-  <select id="nav-season" aria-label="Season">
+  <select id="nav-season" aria-label="Season" data-season-nav-context={contextJson}>
     {
       seasons.map((y) => (
         <option value={y} selected={y === currentSeason}>
@@ -30,22 +30,11 @@ const contextJson = context ? JSON.stringify(context) : 'null';
   </select>
 </nav>
 
-<script define:vars={{ contextJson }}>
-  const ctx = JSON.parse(contextJson);
-  const seasonSel = document.getElementById('nav-season');
-
-  seasonSel.addEventListener('change', () => {
-    const season = seasonSel.value;
-
-    if (ctx && ctx.kind === 'driver' && ctx.entitySlug) {
-      const entitySeasons = ctx.entitySeasons ?? {};
-      if (entitySeasons[season] !== undefined) {
-        window.location.href = `/drivers/${ctx.entitySlug}/${season}/${entitySeasons[season]}/`;
-        return;
-      }
-    }
-    window.location.href = `/seasons/${season}/preseason/`;
-  });
+<script>
+  import { bindSeasonSelect } from '../scripts/season-nav';
+  const sel = document.getElementById('nav-season') as HTMLSelectElement;
+  const ctx = JSON.parse(sel.dataset.seasonNavContext ?? 'null');
+  bindSeasonSelect(sel, ctx);
 </script>
 
 <style>

@@ -1,0 +1,34 @@
+---
+import Base from '../layouts/Base.astro';
+import { getAllSeasons } from '../lib/queries';
+
+const seasons = await getAllSeasons();
+---
+
+<Base
+  title="F1 History — Race by race, 1950 to today"
+  description="Race-by-race timeline of Formula 1 history. Driver career snapshots, standings as of any race, 1950–2026."
+  canonical="/"
+  hideHeaderNav
+>
+  <div class="home-hero">
+    <h1>F1 <span>History</span></h1>
+    <p class="home-lead">
+      Race-by-race timeline of Formula 1 from 1950 to today. Explore driver career arcs, team
+      standings, and how the grid looked going into every round.
+    </p>
+    <div class="home-select-wrap">
+      <label for="home-season" class="home-select-label">Pick a season to start</label>
+      <select id="home-season" aria-label="Season" class="home-season-select">
+        <option value="" disabled selected></option>
+        {seasons.map((y) => <option value={y}>{y}</option>)}
+      </select>
+    </div>
+  </div>
+</Base>
+
+<script>
+  import { bindSeasonSelect } from '../scripts/season-nav';
+  const sel = document.getElementById('home-season') as HTMLSelectElement;
+  bindSeasonSelect(sel);
+</script>

@@ -23,13 +23,15 @@ interface Props {
   navSeason?: number;
   navContext?: NavContext;
   sidebar?: { season: number; current: SidebarCurrent };
+  hideHeaderNav?: boolean;
 }
 
-const { title, description, canonical, navSeason, navContext, sidebar } = Astro.props;
+const { title, description, canonical, navSeason, navContext, sidebar, hideHeaderNav } =
+  Astro.props;
 const canonicalURL = new URL(canonical, SITE_URL).href;
 
-const latest = navSeason == null ? await getLatestRace() : null;
-const effectiveNavSeason = navSeason ?? latest!.season;
+const latest = !hideHeaderNav && navSeason == null ? await getLatestRace() : null;
+const effectiveNavSeason = navSeason ?? latest?.season ?? 0;
 ---
 
 <!doctype html>
@@ -51,8 +53,8 @@ const effectiveNavSeason = navSeason ?? latest!.season;
   <body>
     <header>
       <div class="container site-header-row">
-        <span class="wordmark">F1 <span>History</span></span>
-        <RaceNav currentSeason={effectiveNavSeason} context={navContext} />
+        <a href="/" class="wordmark">F1 <span>History</span></a>
+        {!hideHeaderNav && <RaceNav currentSeason={effectiveNavSeason} context={navContext} />}
       </div>
     </header>
 

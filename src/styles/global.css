@@ -75,10 +75,77 @@ header .wordmark {
   font-size: 1.1rem;
   letter-spacing: -0.01em;
   color: var(--text);
+  text-decoration: none;
+}
+
+header .wordmark:hover {
+  text-decoration: none;
 }
 
 header .wordmark span {
   color: var(--red);
+}
+
+/* ---- Home hero ---- */
+.home-hero {
+  max-width: 36rem;
+  margin: 4rem auto 0;
+  text-align: center;
+}
+
+.home-hero h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.75rem;
+}
+
+.home-hero h1 span {
+  color: var(--red);
+}
+
+.home-lead {
+  color: var(--text-muted);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+}
+
+.home-select-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.home-select-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.home-season-select {
+  font-size: 1.25rem;
+  font-family: inherit;
+  font-weight: 700;
+  padding: 0.625rem 3rem 0.625rem 1.25rem;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: #fff
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")
+    no-repeat right 0.875rem center;
+  appearance: none;
+  cursor: pointer;
+  color: var(--text);
+  min-width: 8rem;
+}
+
+.home-season-select:focus {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+  border-color: var(--red);
 }
 
 main {
