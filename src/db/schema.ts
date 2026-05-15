@@ -1,8 +1,8 @@
-import { sqliteTable, integer, text, real, index, primaryKey } from "drizzle-orm/sqlite-core";
+import { sqliteTable, integer, text, real, index, primaryKey, unique } from "drizzle-orm/sqlite-core";
 
 export const championshipSystems = sqliteTable("championship_systems", {
 	id: integer().primaryKey(),
-	jolpicaApiId: text("jolpica_api_id").notNull(),
+	jolpicaApiId: text("jolpica_api_id").notNull().unique(),
 	name: text().notNull(),
 	reference: text(),
 	driverBestResults: integer("driver_best_results").default(0).notNull(),
@@ -15,7 +15,7 @@ export const championshipSystems = sqliteTable("championship_systems", {
 
 export const pointSystems = sqliteTable("point_systems", {
 	id: integer().primaryKey(),
-	jolpicaApiId: text("jolpica_api_id").notNull(),
+	jolpicaApiId: text("jolpica_api_id").notNull().unique(),
 	name: text().notNull(),
 	reference: text(),
 	partial: integer().default(0).notNull(),
@@ -29,15 +29,15 @@ export const pointSystems = sqliteTable("point_systems", {
 
 export const baseTeams = sqliteTable("base_teams", {
 	id: integer().primaryKey(),
-	jolpicaApiId: text("jolpica_api_id").notNull(),
+	jolpicaApiId: text("jolpica_api_id").notNull().unique(),
 	name: text(),
 });
 
 export const drivers = sqliteTable("drivers", {
 	id: integer().primaryKey({ autoIncrement: true }),
-	slug: text().notNull(),
-	jolpicaId: integer("jolpica_id").notNull(),
-	jolpicaApiId: text("jolpica_api_id").notNull(),
+	slug: text().notNull().unique(),
+	jolpicaId: integer("jolpica_id").notNull().unique(),
+	jolpicaApiId: text("jolpica_api_id").notNull().unique(),
 	forename: text().notNull(),
 	surname: text().notNull(),
 	fullName: text("full_name").notNull(),
@@ -52,9 +52,9 @@ export const drivers = sqliteTable("drivers", {
 
 export const teams = sqliteTable("teams", {
 	id: integer().primaryKey({ autoIncrement: true }),
-	slug: text().notNull(),
-	jolpicaId: integer("jolpica_id").notNull(),
-	jolpicaApiId: text("jolpica_api_id").notNull(),
+	slug: text().notNull().unique(),
+	jolpicaId: integer("jolpica_id").notNull().unique(),
+	jolpicaApiId: text("jolpica_api_id").notNull().unique(),
 	baseTeamId: integer("base_team_id").references(() => baseTeams.id),
 	name: text().notNull(),
 	countryCode: text("country_code"),
@@ -66,9 +66,9 @@ export const teams = sqliteTable("teams", {
 
 export const circuits = sqliteTable("circuits", {
 	id: integer().primaryKey({ autoIncrement: true }),
-	slug: text().notNull(),
-	jolpicaId: integer("jolpica_id").notNull(),
-	jolpicaApiId: text("jolpica_api_id").notNull(),
+	slug: text().notNull().unique(),
+	jolpicaId: integer("jolpica_id").notNull().unique(),
+	jolpicaApiId: text("jolpica_api_id").notNull().unique(),
 	name: text().notNull(),
 	locality: text(),
 	country: text(),
@@ -82,33 +82,37 @@ export const circuits = sqliteTable("circuits", {
 
 export const seasons = sqliteTable("seasons", {
 	year: integer().primaryKey(),
-	jolpicaId: integer("jolpica_id").notNull(),
-	jolpicaApiId: text("jolpica_api_id").notNull(),
+	jolpicaId: integer("jolpica_id").notNull().unique(),
+	jolpicaApiId: text("jolpica_api_id").notNull().unique(),
 	championshipSystemId: integer("championship_system_id").references(() => championshipSystems.id),
 	wikipedia: text(),
 });
 
 export const races = sqliteTable("races", {
 	raceNumber: integer("race_number").primaryKey(),
-	slug: text().notNull(),
-	jolpicaId: integer("jolpica_id").notNull(),
-	jolpicaApiId: text("jolpica_api_id").notNull(),
+	slug: text().notNull().unique(),
+	jolpicaId: integer("jolpica_id").notNull().unique(),
+	jolpicaApiId: text("jolpica_api_id").notNull().unique(),
 	season: integer().notNull().references(() => seasons.year),
 	round: integer().notNull(),
 	circuitId: integer("circuit_id").notNull().references(() => circuits.id),
 	name: text().notNull(),
 	date: text().notNull(),
 	hasSprint: integer("has_sprint").default(0).notNull(),
+	prevRaceInSeason: integer("prev_race_in_season"),
+	isFinalRound: integer("is_final_round").default(0).notNull(),
 	wikipedia: text(),
 },
 (table) => [
 	index("idx_races_season").on(table.season),
+	index("idx_races_final").on(table.isFinalRound),
+	unique("races_season_round_unique").on(table.season, table.round),
 ]);
 
 export const sessions = sqliteTable("sessions", {
 	id: integer().primaryKey({ autoIncrement: true }),
-	jolpicaId: integer("jolpica_id").notNull(),
-	jolpicaApiId: text("jolpica_api_id").notNull(),
+	jolpicaId: integer("jolpica_id").notNull().unique(),
+	jolpicaApiId: text("jolpica_api_id").notNull().unique(),
 	raceNumber: integer("race_number").notNull().references(() => races.raceNumber),
 	type: text().notNull(),
 	number: integer(),
@@ -125,8 +129,8 @@ export const sessions = sqliteTable("sessions", {
 
 export const roundEntries = sqliteTable("round_entries", {
 	id: integer().primaryKey({ autoIncrement: true }),
-	jolpicaId: integer("jolpica_id").notNull(),
-	jolpicaApiId: text("jolpica_api_id").notNull(),
+	jolpicaId: integer("jolpica_id").notNull().unique(),
+	jolpicaApiId: text("jolpica_api_id").notNull().unique(),
 	raceNumber: integer("race_number").notNull().references(() => races.raceNumber),
 	driverId: integer("driver_id").notNull().references(() => drivers.id),
 	teamId: integer("team_id").notNull().references(() => teams.id),
@@ -139,8 +143,8 @@ export const roundEntries = sqliteTable("round_entries", {
 
 export const sessionEntries = sqliteTable("session_entries", {
 	id: integer().primaryKey({ autoIncrement: true }),
-	jolpicaId: integer("jolpica_id").notNull(),
-	jolpicaApiId: text("jolpica_api_id").notNull(),
+	jolpicaId: integer("jolpica_id").notNull().unique(),
+	jolpicaApiId: text("jolpica_api_id").notNull().unique(),
 	sessionId: integer("session_id").notNull().references(() => sessions.id),
 	roundEntryId: integer("round_entry_id").notNull().references(() => roundEntries.id),
 	grid: integer(),
@@ -157,6 +161,7 @@ export const sessionEntries = sqliteTable("session_entries", {
 (table) => [
 	index("idx_session_entries_round_entry").on(table.roundEntryId),
 	index("idx_session_entries_session").on(table.sessionId),
+	unique("session_entries_session_round_entry_unique").on(table.sessionId, table.roundEntryId),
 ]);
 
 export const raceResults = sqliteTable("race_results", {
@@ -267,7 +272,7 @@ export const teamStandings = sqliteTable("team_standings", {
 
 export const championshipAdjustments = sqliteTable("championship_adjustments", {
 	id: integer().primaryKey(),
-	jolpicaApiId: text("jolpica_api_id").notNull(),
+	jolpicaApiId: text("jolpica_api_id").notNull().unique(),
 	adjustment: integer(),
 	points: real(),
 	driverId: integer("driver_id").references(() => drivers.id),
@@ -275,3 +280,19 @@ export const championshipAdjustments = sqliteTable("championship_adjustments", {
 	seasonId: integer("season_id").references(() => seasons.year),
 });
 
+export const driverCareerProgression = sqliteTable("driver_career_progression", {
+	driverId: integer("driver_id").notNull().references(() => drivers.id),
+	raceNumber: integer("race_number").notNull().references(() => races.raceNumber),
+	cumStarts: integer("cum_starts").notNull(),
+	cumWins: integer("cum_wins").notNull(),
+	cumPodiums: integer("cum_podiums").notNull(),
+	cumPoles: integer("cum_poles").notNull(),
+	cumFastestLaps: integer("cum_fastest_laps").notNull(),
+	cumPoints: real("cum_points").notNull(),
+	cumChampionships: integer("cum_championships").notNull(),
+},
+(table) => [
+	primaryKey({ columns: [table.driverId, table.raceNumber], name: "driver_career_progression_pk" }),
+	index("idx_driver_career_race").on(table.raceNumber),
+	index("idx_driver_career_driver").on(table.driverId, table.raceNumber),
+]);

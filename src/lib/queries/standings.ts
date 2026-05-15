@@ -1,9 +1,9 @@
 import { eq, sql } from 'drizzle-orm';
 import { db } from '../../db/client';
-import { driverStandings, teamStandings, drivers, teams } from '../../db/schema';
+import { driverStandings, teamStandings, drivers, teams, races } from '../../db/schema';
 
-const prevRaceInSeason = (season: number, raceNumber: number) =>
-  sql`(SELECT MAX(r.race_number) FROM races r WHERE r.season = ${season} AND r.race_number < ${raceNumber})`;
+// season is kept for API compatibility even though it's no longer needed
+// (prev_race_in_season is pre-computed on the races table)
 
 export async function getDriverStandingsAtRace(raceNumber: number) {
   return db
@@ -38,7 +38,13 @@ export async function getTeamStandingsAtRace(raceNumber: number) {
     .orderBy(sql`${teamStandings.position} ASC NULLS LAST`);
 }
 
-export async function getDriverStandingsBeforeRace(raceNumber: number, season: number) {
+export async function getDriverStandingsBeforeRace(raceNumber: number) {
+  const prevRace = await db
+    .select({ prevRn: races.prevRaceInSeason })
+    .from(races)
+    .where(eq(races.raceNumber, raceNumber))
+    .get();
+  if (!prevRace?.prevRn) return [];
   return db
     .select({
       driver_id: driverStandings.driverId,
@@ -52,11 +58,17 @@ export async function getDriverStandingsBeforeRace(raceNumber: number, season: n
     .from(driverStandings)
     .innerJoin(drivers, eq(drivers.id, driverStandings.driverId))
     .leftJoin(teams, eq(teams.id, driverStandings.teamId))
-    .where(sql`${driverStandings.raceNumber} = ${prevRaceInSeason(season, raceNumber)}`)
+    .where(eq(driverStandings.raceNumber, prevRace.prevRn))
     .orderBy(sql`${driverStandings.position} ASC NULLS LAST`);
 }
 
-export async function getTeamStandingsBeforeRace(raceNumber: number, season: number) {
+export async function getTeamStandingsBeforeRace(raceNumber: number) {
+  const prevRace = await db
+    .select({ prevRn: races.prevRaceInSeason })
+    .from(races)
+    .where(eq(races.raceNumber, raceNumber))
+    .get();
+  if (!prevRace?.prevRn) return [];
   return db
     .select({
       team_id: teamStandings.teamId,
@@ -67,6 +79,6 @@ export async function getTeamStandingsBeforeRace(raceNumber: number, season: num
     })
     .from(teamStandings)
     .innerJoin(teams, eq(teams.id, teamStandings.teamId))
-    .where(sql`${teamStandings.raceNumber} = ${prevRaceInSeason(season, raceNumber)}`)
+    .where(eq(teamStandings.raceNumber, prevRace.prevRn))
     .orderBy(sql`${teamStandings.position} ASC NULLS LAST`);
 }

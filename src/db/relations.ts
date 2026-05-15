@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm/relations";
-import { baseTeams, teams, championshipSystems, seasons, circuits, races, pointSystems, sessions, roundEntries, drivers, sessionEntries, raceResults, sprintResults, qualifyingResults, sprintQualifyingResults, driverStandings, teamStandings, championshipAdjustments } from "./schema";
+import { baseTeams, teams, championshipSystems, seasons, circuits, races, pointSystems, sessions, roundEntries, drivers, sessionEntries, raceResults, sprintResults, qualifyingResults, sprintQualifyingResults, driverStandings, teamStandings, championshipAdjustments, driverCareerProgression } from "./schema";
 
 export const teamsRelations = relations(teams, ({one, many}) => ({
 	baseTeam: one(baseTeams, {
@@ -50,6 +50,7 @@ export const racesRelations = relations(races, ({one, many}) => ({
 	sprintQualifyingResults: many(sprintQualifyingResults),
 	driverStandings: many(driverStandings),
 	teamStandings: many(teamStandings),
+	careerProgression: many(driverCareerProgression),
 }));
 
 export const circuitsRelations = relations(circuits, ({many}) => ({
@@ -96,6 +97,18 @@ export const driversRelations = relations(drivers, ({many}) => ({
 	sprintQualifyingResults: many(sprintQualifyingResults),
 	driverStandings: many(driverStandings),
 	championshipAdjustments: many(championshipAdjustments),
+	careerProgression: many(driverCareerProgression),
+}));
+
+export const driverCareerProgressionRelations = relations(driverCareerProgression, ({one}) => ({
+	driver: one(drivers, {
+		fields: [driverCareerProgression.driverId],
+		references: [drivers.id],
+	}),
+	race: one(races, {
+		fields: [driverCareerProgression.raceNumber],
+		references: [races.raceNumber],
+	}),
 }));
 
 export const sessionEntriesRelations = relations(sessionEntries, ({one}) => ({

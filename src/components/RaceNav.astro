@@ -13,7 +13,7 @@ interface Props {
 }
 
 const { currentSeason, context } = Astro.props;
-const { seasons, byseason } = await getAllRacesBySeason();
+const { seasons } = await getAllRacesBySeason();
 
 const contextJson = context ? JSON.stringify(context) : 'null';
 ---

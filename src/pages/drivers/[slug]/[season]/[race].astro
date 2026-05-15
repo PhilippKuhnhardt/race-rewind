@@ -28,7 +28,7 @@ if (!race) throw new Error(`Race not found: ${fullSlug}`);
 const raceNavSlug = stripYearPrefix(race.slug, race.season);
 const [stats, standing, seasonFirstRaces] = await Promise.all([
   getDriverCareerStats(driver.id, race.race_number),
-  getDriverStandingBeforeRace(driver.id, race.race_number, race.season),
+  getDriverStandingBeforeRace(driver.id, race.race_number),
   getDriverSeasonFirstRaces(driver.id),
 ]);
 
