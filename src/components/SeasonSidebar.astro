@@ -1,5 +1,6 @@
 ---
 import { getAllRacesBySeason } from '../lib/queries';
+import { raceLink, preseasonLink, postseasonLink } from '../lib/format';
 
 interface Current {
   kind: 'pre' | 'post' | 'race';
@@ -22,7 +23,7 @@ function shortName(name: string): string {
 
 <nav class="season-sidebar" aria-label="Season navigation">
   <a
-    href={`/seasons/${season}/preseason/`}
+    href={preseasonLink(season)}
     class:list={['sidebar-link', { 'sidebar-active': current.kind === 'pre' }]}
     aria-current={current.kind === 'pre' ? 'page' : undefined}
   >
@@ -38,7 +39,7 @@ function shortName(name: string): string {
           return (
             <li>
               <a
-                href={`/seasons/${season}/${r.slug}/`}
+                href={raceLink(season, r.slug)}
                 class:list={['sidebar-race-link', { 'sidebar-active': isActive }]}
                 aria-current={isActive ? 'page' : undefined}
               >
@@ -53,7 +54,7 @@ function shortName(name: string): string {
   </details>
 
   <a
-    href={`/seasons/${season}/postseason/`}
+    href={postseasonLink(season)}
     class:list={['sidebar-link', { 'sidebar-active': current.kind === 'post' }]}
     aria-current={current.kind === 'post' ? 'page' : undefined}
   >

@@ -11,7 +11,7 @@ import {
   getDriverBestChampionshipPos,
   getAllDriverCareerStatsAsOf,
 } from '../../../lib/queries';
-import { stripYearPrefix } from '../../../lib/format';
+import { stripYearPrefix, preseasonLink } from '../../../lib/format';
 
 export async function getStaticPaths() {
   return (await getAllSeasons()).map((s) => ({
@@ -61,7 +61,7 @@ const description = `${season} F1 season: the starting grid and career statistic
 <Base
   title={title}
   description={description}
-  canonical={`/seasons/${season}/preseason/`}
+  canonical={preseasonLink(season)}
   navSeason={season}
   sidebar={{ season, current: { kind: 'pre' } }}
 >

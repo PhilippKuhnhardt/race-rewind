@@ -15,7 +15,7 @@ import {
   getTeamStandingsBeforeRace,
   getSeasonBookends,
 } from '../../../lib/queries';
-import { orDash, formatPts, formatPos, formatGap } from '../../../lib/format';
+import { orDash, formatPts, formatPos, formatGap, driverLink, teamLink, raceLink } from '../../../lib/format';
 
 export async function getStaticPaths() {
   return (await getAllRaces()).map((r) => ({
@@ -58,14 +58,14 @@ const startingGrid =
 const title = `${race.season} ${race.name} — Results & Standings`;
 const description = `${race.season} ${race.name} at ${race.circuit_name}${race.circuit_locality ? ', ' + race.circuit_locality : ''}: ${race.has_sprint ? 'sprint, ' : ''}race results and championship standings.`;
 
-const driverLink = (driverSlug: string) =>
-  `/drivers/${driverSlug}/${race.season}/${raceSlug}/`;
+const mkDriverLink = (driverSlug: string) => driverLink(driverSlug, race.season, raceSlug);
+const mkTeamLink = (teamSlug: string) => teamLink(teamSlug, race.season, raceSlug);
 ---
 
 <Base
   title={title}
   description={description}
-  canonical={`/seasons/${season}/${raceSlug}/`}
+  canonical={raceLink(season, raceSlug)}
   navSeason={race.season}
   sidebar={{ season: race.season, current: { kind: 'race', raceSlug } }}
 >
@@ -118,9 +118,9 @@ const driverLink = (driverSlug: string) =>
                     <tr>
                       <td class="num pos">{row.position ?? '—'}</td>
                       <td>
-                        <a href={driverLink(row.driver_slug)}>{row.full_name}</a>
+                        <a href={mkDriverLink(row.driver_slug)}>{row.full_name}</a>
                       </td>
-                      <td>{row.team_name}</td>
+                      <td><a href={mkTeamLink(row.team_slug)}>{row.team_name}</a></td>
                       {isModernQuali ? (
                         <>
                           <td class="time">{orDash(row.q1_time)}</td>
@@ -159,9 +159,9 @@ const driverLink = (driverSlug: string) =>
                     <tr>
                       <td class="num pos">{row.grid}</td>
                       <td>
-                        <a href={driverLink(row.driver_slug)}>{row.full_name}</a>
+                        <a href={mkDriverLink(row.driver_slug)}>{row.full_name}</a>
                       </td>
-                      <td>{row.team_name}</td>
+                      <td><a href={mkTeamLink(row.team_slug)}>{row.team_name}</a></td>
                       <td class="num">{row.car_number ?? '—'}</td>
                     </tr>
                   ))}
@@ -194,9 +194,9 @@ const driverLink = (driverSlug: string) =>
                     <tr>
                       <td class="num pos">{row.position ?? '—'}</td>
                       <td>
-                        <a href={driverLink(row.driver_slug)}>{row.full_name}</a>
+                        <a href={mkDriverLink(row.driver_slug)}>{row.full_name}</a>
                       </td>
-                      <td>{row.team_name}</td>
+                      <td><a href={mkTeamLink(row.team_slug)}>{row.team_name}</a></td>
                       <td class="time">{orDash(row.sq1_time)}</td>
                       <td class="time">{orDash(row.sq2_time)}</td>
                       <td class="time">{orDash(row.sq3_time)}</td>
@@ -245,9 +245,9 @@ const driverLink = (driverSlug: string) =>
                     <tr>
                       <td class="num pos">{formatPos(row.position)}</td>
                       <td class:list={[{ fl: row.fastest_lap_rank === 1 }]}>
-                        <a href={driverLink(row.driver_slug)}>{row.full_name}</a>
+                        <a href={mkDriverLink(row.driver_slug)}>{row.full_name}</a>
                       </td>
-                      <td>{row.team_name}</td>
+                      <td><a href={mkTeamLink(row.team_slug)}>{row.team_name}</a></td>
                       <td class="num">{row.grid ? row.grid : '—'}</td>
                       <td class="num">{row.laps_completed ?? '—'}</td>
                       <td class="time">{orDash(row.time)}</td>
@@ -291,9 +291,9 @@ const driverLink = (driverSlug: string) =>
                       <tr>
                         <td class="num pos">{formatPos(row.position)}</td>
                         <td class:list={[{ fl: row.fastest_lap_rank === 1 }]}>
-                          <a href={driverLink(row.driver_slug)}>{row.full_name}</a>
+                          <a href={mkDriverLink(row.driver_slug)}>{row.full_name}</a>
                         </td>
-                        <td>{row.team_name}</td>
+                        <td><a href={mkTeamLink(row.team_slug)}>{row.team_name}</a></td>
                         <td class="num">{row.car_number ?? '—'}</td>
                         <td class="num">{row.grid ? row.grid : '—'}</td>
                         <td class="num">{row.laps_completed ?? '—'}</td>
@@ -325,6 +325,8 @@ const driverLink = (driverSlug: string) =>
       <TeamStandingsTable
         title="Constructors' Championship"
         rows={teamChamp}
+        season={race.season}
+        raceSlug={raceSlug}
         prevPositions={preRaceTeamPosById}
       />
     </div>

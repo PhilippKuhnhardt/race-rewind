@@ -296,3 +296,21 @@ export const driverCareerProgression = sqliteTable("driver_career_progression", 
 	index("idx_driver_career_race").on(table.raceNumber),
 	index("idx_driver_career_driver").on(table.driverId, table.raceNumber),
 ]);
+
+export const teamCareerProgression = sqliteTable("team_career_progression", {
+	teamId: integer("team_id").notNull().references(() => teams.id),
+	raceNumber: integer("race_number").notNull().references(() => races.raceNumber),
+	cumEntries: integer("cum_entries").notNull(),
+	cumWins: integer("cum_wins").notNull(),
+	cumPodiums: integer("cum_podiums").notNull(),
+	cumPoles: integer("cum_poles").notNull(),
+	cumFastestLaps: integer("cum_fastest_laps").notNull(),
+	cumPoints: real("cum_points").notNull(),
+	cumChampionships: integer("cum_championships").notNull(),
+	cumDriversFielded: integer("cum_drivers_fielded").notNull(),
+},
+(t) => [
+	primaryKey({ columns: [t.teamId, t.raceNumber], name: "team_career_progression_pk" }),
+	index("idx_team_career_race").on(t.raceNumber),
+	index("idx_team_career_team").on(t.teamId, t.raceNumber),
+]);

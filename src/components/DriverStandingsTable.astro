@@ -1,11 +1,12 @@
 ---
-import { formatPts, formatDelta } from '../lib/format';
+import { formatPts, formatDelta, driverLink, teamLink } from '../lib/format';
 
 interface DriverRow {
   driver_id: number;
   driver_slug: string;
   full_name: string;
   team_name: string | null;
+  team_slug: string | null;
   position: number | null;
   points: number;
   win_count: number;
@@ -59,11 +60,15 @@ const enriched = rows.map((row) => {
                 <td class="num pos">{row.position ?? '—'}</td>
                 {showDelta && <td class:list={['num', 'delta-col', row.deltaClass]}>{row.delta}</td>}
                 <td>
-                  <a href={`/drivers/${row.driver_slug}/${season}/${raceSlug}/`}>
+                  <a href={driverLink(row.driver_slug, season, raceSlug)}>
                     {row.full_name}
                   </a>
                 </td>
-                <td>{row.team_name ?? '—'}</td>
+                <td>
+                  {row.team_slug
+                    ? <a href={teamLink(row.team_slug!, season, raceSlug)}>{row.team_name}</a>
+                    : (row.team_name ?? '—')}
+                </td>
                 <td class="num">{formatPts(row.points)}</td>
                 <td class="num">{row.win_count}</td>
               </tr>

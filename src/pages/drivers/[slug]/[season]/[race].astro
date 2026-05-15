@@ -8,7 +8,7 @@ import {
   getDriverStandingBeforeRace,
   getDriverSeasonFirstRaces,
 } from '../../../../lib/queries';
-import { formatPts, stripYearPrefix } from '../../../../lib/format';
+import { formatPts, stripYearPrefix, driverLink, raceLink } from '../../../../lib/format';
 
 export async function getStaticPaths() {
   return (await getAllDriverRacePairs()).map((p) => ({
@@ -39,11 +39,11 @@ const description = `${driver.full_name}'s career going into the ${race.season} 
 <Base
   title={title}
   description={description}
-  canonical={`/drivers/${slug}/${season}/${raceSlug}/`}
+  canonical={driverLink(slug, season, raceSlug)}
   navSeason={race.season}
   navContext={{ kind: 'driver', entitySlug: slug, entitySeasons: seasonFirstRaces }}
 >
-  <a class="back-link" href={`/seasons/${race.season}/${raceNavSlug}/`}>
+  <a class="back-link" href={raceLink(race.season, raceNavSlug)}>
     &larr; {race.season}
     {race.name}
   </a>

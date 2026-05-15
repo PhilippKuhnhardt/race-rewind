@@ -1,0 +1,138 @@
+---
+import Base from '../../../../layouts/Base.astro';
+import {
+  getAllTeamRacePairs,
+  getTeamBySlug,
+  getRaceBySlug,
+  getTeamCareerStats,
+  getTeamStandingBeforeRace,
+  getTeamSeasonFirstRaces,
+} from '../../../../lib/queries';
+import { formatPts, stripYearPrefix, teamLink, raceLink } from '../../../../lib/format';
+
+export async function getStaticPaths() {
+  return (await getAllTeamRacePairs()).map((p) => ({
+    params: { slug: p.team_slug, season: String(p.season), race: p.race_slug },
+  }));
+}
+
+const { slug, season, race: raceSlug } = Astro.params;
+
+const team = await getTeamBySlug(slug);
+if (!team) throw new Error(`Team not found: ${slug}`);
+
+const fullSlug = `${season}-${raceSlug}`;
+const race = await getRaceBySlug(fullSlug);
+if (!race) throw new Error(`Race not found: ${fullSlug}`);
+
+const raceNavSlug = stripYearPrefix(race.slug, race.season);
+const [stats, standing, seasonFirstRaces] = await Promise.all([
+  getTeamCareerStats(team.id, race.race_number),
+  getTeamStandingBeforeRace(team.id, race.race_number),
+  getTeamSeasonFirstRaces(team.id),
+]);
+
+const title = `${team.name} — ${race.season} ${race.name}`;
+const description = `${team.name}'s career going into the ${race.season} ${race.name}: ${stats.wins} wins, ${stats.podiums} podiums, ${stats.championships} constructors' title${stats.championships !== 1 ? 's' : ''}.`;
+---
+
+<Base
+  title={title}
+  description={description}
+  canonical={teamLink(slug, season, raceSlug)}
+  navSeason={race.season}
+  navContext={{ kind: 'team', entitySlug: slug, entitySeasons: seasonFirstRaces }}
+>
+  <a class="back-link" href={raceLink(race.season, raceNavSlug)}>
+    &larr; {race.season}
+    {race.name}
+  </a>
+
+  <div class="page-header">
+    {team.primary_color && (
+      <div class="team-color-bar" style={`background:${team.primary_color}`} />
+    )}
+    <h1>{team.name}</h1>
+    <p class="meta">
+      {[team.nationality].filter(Boolean).join(' · ')}
+    </p>
+  </div>
+
+  {
+    standing ? (
+      <section class="section">
+        <h2>Going Into This Race</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="num">Championship Pos</th>
+                <th class="num">Points</th>
+                <th class="num">Wins</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="num pos">{standing.position ?? '—'}</td>
+                <td class="num">{formatPts(standing.points)}</td>
+                <td class="num">{standing.win_count}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    ) : (
+      <section class="section">
+        <h2>Going Into This Race</h2>
+        <p class="section-note">First race of the season — championship not yet started.</p>
+      </section>
+    )
+  }
+
+  <section class="section">
+    <h2>Career Going Into This Race</h2>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-label">Race Entries</div>
+        <div class="stat-value">{stats.entries}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Wins</div>
+        <div class="stat-value">{stats.wins}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Podiums</div>
+        <div class="stat-value">{stats.podiums}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Poles</div>
+        <div class="stat-value">{stats.poles}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Fastest Laps</div>
+        <div class="stat-value">{stats.fastest_laps}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Career Points</div>
+        <div class="stat-value">{formatPts(stats.points)}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Constructors' Titles</div>
+        <div class="stat-value">{stats.championships}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Drivers Fielded</div>
+        <div class="stat-value">{stats.drivers_fielded}</div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .team-color-bar {
+    height: 4px;
+    border-radius: 2px;
+    margin-bottom: 0.75rem;
+    width: 3rem;
+  }
+</style>

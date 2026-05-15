@@ -149,3 +149,38 @@ it('all drivers with round_entries have a driver_career_progression row', async 
   `);
   expect(result.rows[0].n).toBe(0);
 });
+
+// ---------------------------------------------------------------------------
+// team_career_progression
+// ---------------------------------------------------------------------------
+
+it('Ferrari at the 2000 Italian Grand Prix has 9 constructors titles and 131 wins', async () => {
+  // Ferrari's 9 titles by Monza 2000: 1961,1964,1975,1976,1977,1979,1982,1983,1999.
+  // This is a regression pin for the championship detection fix (teams may win at
+  // a final round they did not enter, so championships are counted via team_standings).
+  const skip = skipIfNoDb(); if (skip || !handle) return;
+
+  const race = await handle.db
+    .select({ raceNumber: schema.races.raceNumber })
+    .from(schema.races)
+    .where(eq(schema.races.slug, '2000-italian-grand-prix'))
+    .get();
+  if (!race) return;
+
+  const team = await handle.client.execute(
+    `SELECT id FROM teams WHERE slug = 'ferrari' LIMIT 1`
+  );
+  if (!team.rows.length) return;
+  const teamId = team.rows[0].id as number;
+
+  const row = await handle.db
+    .select()
+    .from(schema.teamCareerProgression)
+    .where(eq(schema.teamCareerProgression.teamId, teamId))
+    .all()
+    .then(rows => rows.find(r => r.raceNumber === race.raceNumber));
+
+  expect(row, 'No team_career_progression row at 2000 Italian GP for Ferrari').toBeDefined();
+  expect(row!.cumChampionships).toBe(9);
+  expect(row!.cumWins).toBe(132);
+});

@@ -1,6 +1,6 @@
 ---
 import type { getAllDriverCareerStatsAsOf } from '../lib/queries';
-import { formatPts } from '../lib/format';
+import { formatPts, driverLink } from '../lib/format';
 
 interface Props {
   drivers: Awaited<ReturnType<typeof getAllDriverCareerStatsAsOf>>;
@@ -38,7 +38,7 @@ function ordinal(n: number): string {
           {drivers.map((row) => (
             <tr>
               <td>
-                <a href={`/drivers/${row.driver_slug}/${season}/${raceSlug}/`}>
+                <a href={driverLink(row.driver_slug, season, raceSlug)}>
                   {row.full_name}
                 </a>
               </td>

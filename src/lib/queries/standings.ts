@@ -12,6 +12,7 @@ export async function getDriverStandingsAtRace(raceNumber: number) {
       driver_slug: drivers.slug,
       full_name: drivers.fullName,
       team_name: teams.name,
+      team_slug: teams.slug,
       position: driverStandings.position,
       points: driverStandings.points,
       win_count: driverStandings.winCount,
@@ -28,6 +29,7 @@ export async function getTeamStandingsAtRace(raceNumber: number) {
     .select({
       team_id: teamStandings.teamId,
       team_name: teams.name,
+      team_slug: teams.slug,
       position: teamStandings.position,
       points: teamStandings.points,
       win_count: teamStandings.winCount,
@@ -51,6 +53,7 @@ export async function getDriverStandingsBeforeRace(raceNumber: number) {
       driver_slug: drivers.slug,
       full_name: drivers.fullName,
       team_name: teams.name,
+      team_slug: teams.slug,
       position: driverStandings.position,
       points: driverStandings.points,
       win_count: driverStandings.winCount,
@@ -73,6 +76,7 @@ export async function getTeamStandingsBeforeRace(raceNumber: number) {
     .select({
       team_id: teamStandings.teamId,
       team_name: teams.name,
+      team_slug: teams.slug,
       position: teamStandings.position,
       points: teamStandings.points,
       win_count: teamStandings.winCount,

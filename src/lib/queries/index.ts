@@ -3,6 +3,7 @@ export * from './sessions';
 export * from './standings';
 export * from './drivers';
 export * from './seasons';
+export * from './teams';
 
 // Backwards-compat aliases for callers using the old names
 export { getDriverStandingsAtRace as getDriverStandings } from './standings';

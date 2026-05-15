@@ -6,7 +6,7 @@ import { getLatestRace } from '../lib/queries';
 import { SITE_URL } from '../lib/const';
 
 interface NavContext {
-  kind: 'season' | 'driver';
+  kind: 'season' | 'driver' | 'team';
   entitySlug?: string;
   entitySeasons?: Record<number, string>;
 }

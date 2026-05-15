@@ -63,6 +63,7 @@ export async function getSeasonGrid(raceNumber: number) {
       full_name: drivers.fullName,
       date_of_birth: drivers.dateOfBirth,
       team_name: min(teams.name),
+      team_slug: min(teams.slug),
       primary_color: min(teams.primaryColor),
     })
     .from(roundEntries)

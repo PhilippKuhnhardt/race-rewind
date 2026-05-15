@@ -2,7 +2,7 @@
 import { getAllRacesBySeason } from '../lib/queries';
 
 interface NavContext {
-  kind: 'season' | 'driver';
+  kind: 'season' | 'driver' | 'team';
   entitySlug?: string;
   entitySeasons?: Record<number, string>; // season → first race slug (stripped)
 }

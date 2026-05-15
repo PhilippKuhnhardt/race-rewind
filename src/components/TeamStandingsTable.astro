@@ -1,9 +1,10 @@
 ---
-import { formatPts, formatDelta } from '../lib/format';
+import { formatPts, formatDelta, teamLink } from '../lib/format';
 
 interface TeamRow {
   team_id: number;
   team_name: string;
+  team_slug: string;
   position: number | null;
   points: number;
   win_count: number;
@@ -12,10 +13,12 @@ interface TeamRow {
 interface Props {
   title: string;
   rows: TeamRow[];
+  season: number;
+  raceSlug: string;
   prevPositions?: Map<number, number | null>;
 }
 
-const { title, rows, prevPositions } = Astro.props;
+const { title, rows, season, raceSlug, prevPositions } = Astro.props;
 const showDelta = prevPositions != null;
 
 const enriched = rows.map((row) => {
@@ -49,7 +52,11 @@ const enriched = rows.map((row) => {
             <tr>
               <td class="num pos">{row.position ?? '—'}</td>
               {showDelta && <td class:list={['num', 'delta-col', row.deltaClass]}>{row.delta}</td>}
-              <td>{row.team_name}</td>
+              <td>
+                <a href={teamLink(row.team_slug, season, raceSlug)}>
+                  {row.team_name}
+                </a>
+              </td>
               <td class="num">{formatPts(row.points)}</td>
               <td class="num">{row.win_count}</td>
             </tr>

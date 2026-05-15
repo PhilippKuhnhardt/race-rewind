@@ -15,7 +15,7 @@ import {
   getDriverBestChampionshipPos,
   getAllDriverCareerStatsAsOf,
 } from '../../../lib/queries';
-import { stripYearPrefix } from '../../../lib/format';
+import { stripYearPrefix, postseasonLink } from '../../../lib/format';
 
 export async function getStaticPaths() {
   return (await getAllSeasons()).map((s) => ({
@@ -85,7 +85,7 @@ const description = isComplete
 <Base
   title={title}
   description={description}
-  canonical={`/seasons/${season}/postseason/`}
+  canonical={postseasonLink(season)}
   navSeason={season}
   sidebar={{ season, current: { kind: 'post' } }}
 >
@@ -117,7 +117,7 @@ const description = isComplete
     raceSlug={lastRaceSlug}
   />
 
-  <TeamStandingsTable title="Constructors' Championship" rows={teamChamp} />
+  <TeamStandingsTable title="Constructors' Championship" rows={teamChamp} season={season} raceSlug={lastRaceSlug} />
 
   <SeasonGridTable
     title="Career Totals After the Season"
