@@ -165,6 +165,38 @@ td {
   white-space: nowrap;
 }
 
+/* Sortable column headers */
+thead th[role='columnheader']:not([data-sort-method='none']) {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  padding-right: 1.5rem;
+}
+thead th[role='columnheader']:not([data-sort-method='none']):hover {
+  color: var(--text);
+}
+thead th[role='columnheader']:not([data-sort-method='none'])::after {
+  content: '⇅';
+  position: absolute;
+  right: 0.4rem;
+  opacity: 0.25;
+  font-size: 0.65rem;
+  font-weight: 400;
+}
+/* Match specificity of the base rule above so these overrides win */
+thead th[role='columnheader'][aria-sort='ascending'],
+thead th[role='columnheader'][aria-sort='descending'] {
+  color: var(--text);
+}
+thead th[role='columnheader'][aria-sort='ascending']::after {
+  content: '▲';
+  opacity: 1;
+}
+thead th[role='columnheader'][aria-sort='descending']::after {
+  content: '▼';
+  opacity: 1;
+}
+
 /* Position badge */
 .pos {
   font-weight: 700;
