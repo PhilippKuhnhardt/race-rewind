@@ -1,0 +1,76 @@
+---
+import { formatPts, formatDelta } from '../lib/format';
+
+interface DriverRow {
+  driver_id: number;
+  driver_slug: string;
+  full_name: string;
+  team_name: string | null;
+  position: number | null;
+  points: number;
+  win_count: number;
+}
+
+interface Props {
+  title: string;
+  rows: DriverRow[];
+  season: number;
+  raceSlug: string;
+  prevPositions?: Map<number, number | null>;
+  emptyNote?: string;
+}
+
+const { title, rows, season, raceSlug, prevPositions, emptyNote } = Astro.props;
+const showDelta = prevPositions != null;
+
+const enriched = rows.map((row) => {
+  const prevPos = prevPositions?.get(row.driver_id) ?? null;
+  const delta = showDelta ? formatDelta(prevPos, row.position) : null;
+  const deltaClass = delta?.startsWith('+')
+    ? 'delta-up'
+    : delta?.startsWith('-')
+      ? 'delta-down'
+      : 'delta-eq';
+  return { ...row, delta, deltaClass };
+});
+---
+
+{(rows.length > 0 || emptyNote) && (
+  <section class="section">
+    <h2>{title}</h2>
+    {rows.length === 0 ? (
+      <p class="section-note">{emptyNote}</p>
+    ) : (
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="num">Pos</th>
+              {showDelta && <th class="num delta-col">&Delta;</th>}
+              <th>Driver</th>
+              <th>Team</th>
+              <th class="num">Pts</th>
+              <th class="num">Wins</th>
+            </tr>
+          </thead>
+          <tbody>
+            {enriched.map((row) => (
+              <tr>
+                <td class="num pos">{row.position ?? '—'}</td>
+                {showDelta && <td class:list={['num', 'delta-col', row.deltaClass]}>{row.delta}</td>}
+                <td>
+                  <a href={`/drivers/${row.driver_slug}/${season}/${raceSlug}/`}>
+                    {row.full_name}
+                  </a>
+                </td>
+                <td>{row.team_name ?? '—'}</td>
+                <td class="num">{formatPts(row.points)}</td>
+                <td class="num">{row.win_count}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )}
+  </section>
+)}

@@ -1,4 +1,4 @@
-import { eq, and, lt, min } from 'drizzle-orm';
+import { eq, and, lt, min, max } from 'drizzle-orm';
 import { db } from '../../db/client';
 import { drivers, teams, races, raceResults, roundEntries, driverStandings, driverCareerProgression } from '../../db/schema';
 import { stripYearPrefix } from '../format';
@@ -157,4 +157,79 @@ export async function getDriverBestChampionshipPos(driverId: number, beforeRaceN
     ))
     .get();
   return row?.pos ?? null;
+}
+
+export async function getAllDriverCareerStatsAsOf(beforeRaceNumber: number) {
+  const latestRnSubq = db
+    .select({
+      driverId: driverCareerProgression.driverId,
+      maxRn: max(driverCareerProgression.raceNumber).as('max_rn'),
+    })
+    .from(driverCareerProgression)
+    .where(lt(driverCareerProgression.raceNumber, beforeRaceNumber))
+    .groupBy(driverCareerProgression.driverId)
+    .as('latest_rn');
+
+  const [careerRows, seasonDistinctRows, bestChampRows] = await Promise.all([
+    db
+      .select({
+        driver_id: drivers.id,
+        driver_slug: drivers.slug,
+        full_name: drivers.fullName,
+        starts: driverCareerProgression.cumStarts,
+        wins: driverCareerProgression.cumWins,
+        podiums: driverCareerProgression.cumPodiums,
+        points: driverCareerProgression.cumPoints,
+        championships: driverCareerProgression.cumChampionships,
+      })
+      .from(driverCareerProgression)
+      .innerJoin(latestRnSubq, and(
+        eq(driverCareerProgression.driverId, latestRnSubq.driverId),
+        eq(driverCareerProgression.raceNumber, latestRnSubq.maxRn),
+      ))
+      .innerJoin(drivers, eq(drivers.id, driverCareerProgression.driverId)),
+
+    db
+      .selectDistinct({ driverId: roundEntries.driverId, season: races.season })
+      .from(roundEntries)
+      .innerJoin(races, eq(races.raceNumber, roundEntries.raceNumber))
+      .where(lt(roundEntries.raceNumber, beforeRaceNumber)),
+
+    db
+      .select({ driverId: driverStandings.driverId, best: min(driverStandings.position) })
+      .from(driverStandings)
+      .innerJoin(races, and(
+        eq(races.raceNumber, driverStandings.raceNumber),
+        eq(races.isFinalRound, 1),
+      ))
+      .where(lt(driverStandings.raceNumber, beforeRaceNumber))
+      .groupBy(driverStandings.driverId),
+  ]);
+
+  const seasonCountMap = new Map<number, number>();
+  for (const row of seasonDistinctRows) {
+    seasonCountMap.set(row.driverId, (seasonCountMap.get(row.driverId) ?? 0) + 1);
+  }
+
+  const bestChampMap = new Map<number, number | null>();
+  for (const row of bestChampRows) {
+    bestChampMap.set(row.driverId, row.best);
+  }
+
+  const result = careerRows.map((row) => ({
+    ...row,
+    seasons: seasonCountMap.get(row.driver_id) ?? 0,
+    best_championship_pos: bestChampMap.get(row.driver_id) ?? null,
+  }));
+
+  result.sort((a, b) => {
+    if (b.championships !== a.championships) return b.championships - a.championships;
+    if (b.wins !== a.wins) return b.wins - a.wins;
+    if (b.podiums !== a.podiums) return b.podiums - a.podiums;
+    if (b.points !== a.points) return b.points - a.points;
+    if (b.starts !== a.starts) return b.starts - a.starts;
+    return a.full_name.localeCompare(b.full_name);
+  });
+
+  return result;
 }

@@ -1,0 +1,61 @@
+---
+import { formatPts, formatDelta } from '../lib/format';
+
+interface TeamRow {
+  team_id: number;
+  team_name: string;
+  position: number | null;
+  points: number;
+  win_count: number;
+}
+
+interface Props {
+  title: string;
+  rows: TeamRow[];
+  prevPositions?: Map<number, number | null>;
+}
+
+const { title, rows, prevPositions } = Astro.props;
+const showDelta = prevPositions != null;
+
+const enriched = rows.map((row) => {
+  const prevPos = prevPositions?.get(row.team_id) ?? null;
+  const delta = showDelta ? formatDelta(prevPos, row.position) : null;
+  const deltaClass = delta?.startsWith('+')
+    ? 'delta-up'
+    : delta?.startsWith('-')
+      ? 'delta-down'
+      : 'delta-eq';
+  return { ...row, delta, deltaClass };
+});
+---
+
+{rows.length > 0 && (
+  <section class="section">
+    <h2>{title}</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="num">Pos</th>
+            {showDelta && <th class="num delta-col">&Delta;</th>}
+            <th>Team</th>
+            <th class="num">Pts</th>
+            <th class="num">Wins</th>
+          </tr>
+        </thead>
+        <tbody>
+          {enriched.map((row) => (
+            <tr>
+              <td class="num pos">{row.position ?? '—'}</td>
+              {showDelta && <td class:list={['num', 'delta-col', row.deltaClass]}>{row.delta}</td>}
+              <td>{row.team_name}</td>
+              <td class="num">{formatPts(row.points)}</td>
+              <td class="num">{row.win_count}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+)}

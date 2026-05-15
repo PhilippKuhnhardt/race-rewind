@@ -1,5 +1,7 @@
 ---
 import Base from '../../../layouts/Base.astro';
+import DriverStandingsTable from '../../../components/DriverStandingsTable.astro';
+import TeamStandingsTable from '../../../components/TeamStandingsTable.astro';
 import {
   getAllRaces,
   getRaceBySlug,
@@ -11,8 +13,9 @@ import {
   getTeamStandings,
   getDriverStandingsBeforeRace,
   getTeamStandingsBeforeRace,
+  getSeasonBookends,
 } from '../../../lib/queries';
-import { orDash, formatPts, formatPos, formatGap, formatDelta } from '../../../lib/format';
+import { orDash, formatPts, formatPos, formatGap } from '../../../lib/format';
 
 export async function getStaticPaths() {
   return (await getAllRaces()).map((r) => ({
@@ -24,6 +27,8 @@ const { season, race: raceSlug } = Astro.params;
 const fullSlug = `${season}-${raceSlug}`;
 const race = await getRaceBySlug(fullSlug);
 if (!race) throw new Error(`Race not found: ${fullSlug}`);
+
+const { raceCount } = await getSeasonBookends(race.season);
 
 const [quali, sprintQuali, sprint, results, driverChamp, teamChamp, preRaceDriverChamp, preRaceTeamChamp] =
   await Promise.all([
@@ -37,7 +42,6 @@ const [quali, sprintQuali, sprint, results, driverChamp, teamChamp, preRaceDrive
     getTeamStandingsBeforeRace(race.race_number),
   ]);
 
-// Position lookups for delta columns
 const preRaceDriverPosById = new Map(preRaceDriverChamp.map((r) => [r.driver_id, r.position]));
 const preRaceTeamPosById = new Map(preRaceTeamChamp.map((r) => [r.team_id, r.position]));
 
@@ -71,7 +75,7 @@ const driverLink = (driverSlug: string) =>
       {race.circuit_name}{race.circuit_locality ? `, ${race.circuit_locality}` : ''} &mdash; {
         race.date
       }
-      &nbsp;&middot;&nbsp; Round {race.round}
+      &nbsp;&middot;&nbsp; Round {race.round} of {raceCount}
     </p>
   </div>
 
@@ -208,44 +212,13 @@ const driverLink = (driverSlug: string) =>
       }
 
       <!-- Pre-race championship standings -->
-      {
-        preRaceDriverChamp.length > 0 ? (
-          <section class="section">
-            <h2>Championship Going In</h2>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th class="num">Pos</th>
-                    <th>Driver</th>
-                    <th>Team</th>
-                    <th class="num">Pts</th>
-                    <th class="num">Wins</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {preRaceDriverChamp.map((row) => (
-                    <tr>
-                      <td class="num pos">{row.position ?? '—'}</td>
-                      <td>
-                        <a href={driverLink(row.driver_slug)}>{row.full_name}</a>
-                      </td>
-                      <td>{row.team_name ?? '—'}</td>
-                      <td class="num">{formatPts(row.points)}</td>
-                      <td class="num">{row.win_count}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        ) : (
-          <section class="section">
-            <h2>Championship Going In</h2>
-            <p class="section-note">First race of the season — championship not yet started.</p>
-          </section>
-        )
-      }
+      <DriverStandingsTable
+        title="Championship Going In"
+        rows={preRaceDriverChamp}
+        season={race.season}
+        raceSlug={raceSlug}
+        emptyNote="First race of the season — championship not yet started."
+      />
     </div>
 
     <!-- POST-RACE PANEL -->
@@ -342,94 +315,20 @@ const driverLink = (driverSlug: string) =>
       }
 
       <!-- Drivers' Championship (post-race with position deltas) -->
-      {
-        driverChamp.length > 0 && (
-          <section class="section">
-            <h2>Drivers&rsquo; Championship</h2>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th class="num">Pos</th>
-                    <th class="num delta-col">&Delta;</th>
-                    <th>Driver</th>
-                    <th>Team</th>
-                    <th class="num">Pts</th>
-                    <th class="num">Wins</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {driverChamp.map((row) => {
-                    const prevPos = preRaceDriverPosById.get(row.driver_id) ?? null;
-                    const delta = formatDelta(prevPos, row.position);
-                    const deltaClass =
-                      delta.startsWith('+')
-                        ? 'delta-up'
-                        : delta.startsWith('-')
-                          ? 'delta-down'
-                          : 'delta-eq';
-                    return (
-                      <tr>
-                        <td class="num pos">{row.position ?? '—'}</td>
-                        <td class:list={['num', 'delta-col', deltaClass]}>{delta}</td>
-                        <td>
-                          <a href={driverLink(row.driver_slug)}>{row.full_name}</a>
-                        </td>
-                        <td>{row.team_name ?? '—'}</td>
-                        <td class="num">{formatPts(row.points)}</td>
-                        <td class="num">{row.win_count}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        )
-      }
+      <DriverStandingsTable
+        title="Drivers' Championship"
+        rows={driverChamp}
+        season={race.season}
+        raceSlug={raceSlug}
+        prevPositions={preRaceDriverPosById}
+      />
 
       <!-- Constructors' Championship -->
-      {
-        teamChamp.length > 0 && (
-          <section class="section">
-            <h2>Constructors&rsquo; Championship</h2>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th class="num">Pos</th>
-                    <th class="num delta-col">&Delta;</th>
-                    <th>Team</th>
-                    <th class="num">Pts</th>
-                    <th class="num">Wins</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {teamChamp.map((row) => {
-                    const prevPos = preRaceTeamPosById.get(row.team_id) ?? null;
-                    const delta = formatDelta(prevPos, row.position);
-                    const deltaClass =
-                      delta.startsWith('+')
-                        ? 'delta-up'
-                        : delta.startsWith('-')
-                          ? 'delta-down'
-                          : 'delta-eq';
-                    return (
-                      <tr>
-                        <td class="num pos">{row.position ?? '—'}</td>
-                        <td class:list={['num', 'delta-col', deltaClass]}>{delta}</td>
-                        <td>{row.team_name}</td>
-                        <td class="num">{formatPts(row.points)}</td>
-                        <td class="num">{row.win_count}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        )
-      }
+      <TeamStandingsTable
+        title="Constructors' Championship"
+        rows={teamChamp}
+        prevPositions={preRaceTeamPosById}
+      />
     </div>
   </div>
 </Base>

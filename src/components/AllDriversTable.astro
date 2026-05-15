@@ -1,0 +1,58 @@
+---
+import type { getAllDriverCareerStatsAsOf } from '../lib/queries';
+import { formatPts } from '../lib/format';
+
+interface Props {
+  drivers: Awaited<ReturnType<typeof getAllDriverCareerStatsAsOf>>;
+  season: number;
+  raceSlug: string;
+}
+
+const { drivers, season, raceSlug } = Astro.props;
+
+function ordinal(n: number): string {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+---
+
+{drivers.length > 0 && (
+  <section class="section">
+    <h2>All Drivers with at Least One Start</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Driver</th>
+            <th class="num">Seasons</th>
+            <th class="num">Starts</th>
+            <th class="num">Wins</th>
+            <th class="num">Podiums</th>
+            <th class="num">Points</th>
+            <th class="num">Best</th>
+            <th class="num">Champs</th>
+          </tr>
+        </thead>
+        <tbody>
+          {drivers.map((row) => (
+            <tr>
+              <td>
+                <a href={`/drivers/${row.driver_slug}/${season}/${raceSlug}/`}>
+                  {row.full_name}
+                </a>
+              </td>
+              <td class="num">{row.seasons}</td>
+              <td class="num">{row.starts}</td>
+              <td class="num">{row.wins}</td>
+              <td class="num">{row.podiums}</td>
+              <td class="num">{formatPts(row.points)}</td>
+              <td class="num">{row.best_championship_pos != null ? ordinal(row.best_championship_pos) : '—'}</td>
+              <td class="num">{row.championships}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+)}

@@ -1,5 +1,9 @@
 ---
 import Base from '../../../layouts/Base.astro';
+import AllDriversTable from '../../../components/AllDriversTable.astro';
+import SeasonGridTable from '../../../components/SeasonGridTable.astro';
+import DriverStandingsTable from '../../../components/DriverStandingsTable.astro';
+import TeamStandingsTable from '../../../components/TeamStandingsTable.astro';
 import {
   getAllSeasons,
   getSeasonBookends,
@@ -9,8 +13,9 @@ import {
   getDriverCareerStats,
   getDriverPriorSeasons,
   getDriverBestChampionshipPos,
+  getAllDriverCareerStatsAsOf,
 } from '../../../lib/queries';
-import { stripYearPrefix, formatPts } from '../../../lib/format';
+import { stripYearPrefix } from '../../../lib/format';
 
 export async function getStaticPaths() {
   return (await getAllSeasons()).map((s) => ({
@@ -26,12 +31,6 @@ function computeAge(dob: string | null, atDate: string): number | null {
   const m = r.getMonth() - d.getMonth();
   if (m < 0 || (m === 0 && r.getDate() < d.getDate())) age--;
   return age;
-}
-
-function ordinal(n: number): string {
-  const s = ['th', 'st', 'nd', 'rd'];
-  const v = n % 100;
-  return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
 
 const { season: seasonStr } = Astro.params;
@@ -57,17 +56,20 @@ const lastRaceSlug = stripYearPrefix(bookends.lastSlug, season);
 // Career totals including the as-of race: pass asOfRaceNumber + 1 (strict-less-than logic)
 const careerRefRaceNumber = hasData ? asOfRaceNumber + 1 : bookends.firstRaceNumber;
 
-const driverCareerRows = await Promise.all(
-  grid.map(async (d) => {
-    const [career, seasons, bestChamp] = await Promise.all([
-      getDriverCareerStats(d.driver_id, careerRefRaceNumber),
-      getDriverPriorSeasons(d.driver_id, careerRefRaceNumber),
-      getDriverBestChampionshipPos(d.driver_id, careerRefRaceNumber),
-    ]);
-    const age = computeAge(d.date_of_birth, asOfDate);
-    return { ...d, career, seasons, bestChamp, age };
-  })
-);
+const [driverCareerRows, allDrivers] = await Promise.all([
+  Promise.all(
+    grid.map(async (d) => {
+      const [career, seasons, bestChamp] = await Promise.all([
+        getDriverCareerStats(d.driver_id, careerRefRaceNumber),
+        getDriverPriorSeasons(d.driver_id, careerRefRaceNumber),
+        getDriverBestChampionshipPos(d.driver_id, careerRefRaceNumber),
+      ]);
+      const age = computeAge(d.date_of_birth, asOfDate);
+      return { ...d, career, seasons, bestChamp, age };
+    })
+  ),
+  getAllDriverCareerStatsAsOf(careerRefRaceNumber),
+]);
 
 driverCareerRows.sort((a, b) => {
   if (a.team_name !== b.team_name) return (a.team_name ?? '').localeCompare(b.team_name ?? '');
@@ -108,113 +110,21 @@ const description = isComplete
     )
   }
 
-  {
-    driverChamp.length > 0 && (
-      <section class="section">
-        <h2>Drivers&rsquo; Championship</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th class="num">Pos</th>
-                <th>Driver</th>
-                <th>Team</th>
-                <th class="num">Wins</th>
-                <th class="num">Points</th>
-              </tr>
-            </thead>
-            <tbody>
-              {driverChamp.map((row) => (
-                <tr>
-                  <td class="num pos">{row.position ?? '—'}</td>
-                  <td>
-                    <a href={`/drivers/${row.driver_slug}/${season}/${lastRaceSlug}/`}>
-                      {row.full_name}
-                    </a>
-                  </td>
-                  <td>{row.team_name ?? '—'}</td>
-                  <td class="num">{row.win_count}</td>
-                  <td class="num">{formatPts(row.points)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    )
-  }
+  <DriverStandingsTable
+    title="Drivers' Championship"
+    rows={driverChamp}
+    season={season}
+    raceSlug={lastRaceSlug}
+  />
 
-  {
-    teamChamp.length > 0 && (
-      <section class="section">
-        <h2>Constructors&rsquo; Championship</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th class="num">Pos</th>
-                <th>Team</th>
-                <th class="num">Wins</th>
-                <th class="num">Points</th>
-              </tr>
-            </thead>
-            <tbody>
-              {teamChamp.map((row) => (
-                <tr>
-                  <td class="num pos">{row.position ?? '—'}</td>
-                  <td>{row.team_name}</td>
-                  <td class="num">{row.win_count}</td>
-                  <td class="num">{formatPts(row.points)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    )
-  }
+  <TeamStandingsTable title="Constructors' Championship" rows={teamChamp} />
 
-  <section class="section">
-    <h2>Career Totals After the Season</h2>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Driver</th>
-            <th>Team</th>
-            <th class="num">Age</th>
-            <th class="num">Seasons</th>
-            <th class="num">Starts</th>
-            <th class="num">Wins</th>
-            <th class="num">Podiums</th>
-            <th class="num">Points</th>
-            <th class="num">Best</th>
-            <th class="num">Champs</th>
-          </tr>
-        </thead>
-        <tbody>
-          {
-            driverCareerRows.map((row) => (
-              <tr>
-                <td>
-                  <a href={`/drivers/${row.driver_slug}/${season}/${lastRaceSlug}/`}>
-                    {row.full_name}
-                  </a>
-                </td>
-                <td>{row.team_name}</td>
-                <td class="num">{row.age ?? '—'}</td>
-                <td class="num">{row.seasons}</td>
-                <td class="num">{row.career.starts}</td>
-                <td class="num">{row.career.wins}</td>
-                <td class="num">{row.career.podiums}</td>
-                <td class="num">{formatPts(row.career.points)}</td>
-                <td class="num">{row.bestChamp != null ? ordinal(row.bestChamp) : '—'}</td>
-                <td class="num">{row.career.championships}</td>
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
-    </div>
-  </section>
+  <SeasonGridTable
+    title="Career Totals After the Season"
+    drivers={driverCareerRows}
+    season={season}
+    raceSlug={lastRaceSlug}
+  />
+
+  <AllDriversTable drivers={allDrivers} season={season} raceSlug={lastRaceSlug} />
 </Base>

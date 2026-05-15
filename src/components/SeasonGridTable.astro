@@ -1,0 +1,79 @@
+---
+import { formatPts } from '../lib/format';
+
+interface DriverRow {
+  car_number: number | null;
+  driver_slug: string;
+  full_name: string;
+  team_name: string | null;
+  age: number | null;
+  seasons: number;
+  career: {
+    starts: number;
+    wins: number;
+    podiums: number;
+    points: number;
+    championships: number;
+  };
+  bestChamp: number | null;
+}
+
+interface Props {
+  title: string;
+  drivers: DriverRow[];
+  season: number;
+  raceSlug: string;
+}
+
+const { title, drivers, season, raceSlug } = Astro.props;
+
+function ordinal(n: number): string {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+---
+
+<section class="section">
+  <h2>{title}</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="num">No.</th>
+          <th>Driver</th>
+          <th>Team</th>
+          <th class="num">Age</th>
+          <th class="num">Seasons</th>
+          <th class="num">Starts</th>
+          <th class="num">Wins</th>
+          <th class="num">Podiums</th>
+          <th class="num">Points</th>
+          <th class="num">Best</th>
+          <th class="num">Champs</th>
+        </tr>
+      </thead>
+      <tbody>
+        {drivers.map((row) => (
+          <tr>
+            <td class="num">{row.car_number ?? '—'}</td>
+            <td>
+              <a href={`/drivers/${row.driver_slug}/${season}/${raceSlug}/`}>
+                {row.full_name}
+              </a>
+            </td>
+            <td>{row.team_name ?? '—'}</td>
+            <td class="num">{row.age ?? '—'}</td>
+            <td class="num">{row.seasons}</td>
+            <td class="num">{row.career.starts}</td>
+            <td class="num">{row.career.wins}</td>
+            <td class="num">{row.career.podiums}</td>
+            <td class="num">{formatPts(row.career.points)}</td>
+            <td class="num">{row.bestChamp != null ? ordinal(row.bestChamp) : '—'}</td>
+            <td class="num">{row.career.championships}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</section>
