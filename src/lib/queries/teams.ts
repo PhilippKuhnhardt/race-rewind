@@ -1,7 +1,7 @@
-import { eq, and, lt, min } from 'drizzle-orm';
+import { eq, and, lt, min, count, sum, sql } from 'drizzle-orm';
 import { db } from '../../db/client';
-import { teams, races, roundEntries, teamStandings, teamCareerProgression } from '../../db/schema';
-import { stripYearPrefix } from '../format';
+import { teams, races, roundEntries, raceResults, teamStandings, teamCareerProgression, driverStandings, drivers } from '../../db/schema';
+import { stripYearPrefix, formatYearRanges } from '../format';
 
 export async function getTeamBySlug(slug: string) {
   const row = await db
@@ -115,4 +115,96 @@ export async function getTeamSeasonFirstRaces(teamId: number): Promise<Record<nu
     result[row.season] = stripYearPrefix(row.race_slug, row.season);
   }
   return result;
+}
+
+export interface TeamDriverRecord {
+  driver_slug: string;
+  full_name: string;
+  years: string;
+  starts: number;
+  wins: number;
+  points: number;
+  driver_championships: number;
+  team_championships: number;
+}
+
+export async function getTeamDriversFielded(teamId: number, beforeRaceNumber: number): Promise<TeamDriverRecord[]> {
+  const [seasonRows, statsRows, wdcRows, wccRows] = await Promise.all([
+    db
+      .selectDistinct({
+        driver_id: drivers.id,
+        driver_slug: drivers.slug,
+        full_name: drivers.fullName,
+        season: races.season,
+      })
+      .from(roundEntries)
+      .innerJoin(races, eq(races.raceNumber, roundEntries.raceNumber))
+      .innerJoin(drivers, eq(drivers.id, roundEntries.driverId))
+      .where(and(eq(roundEntries.teamId, teamId), lt(roundEntries.raceNumber, beforeRaceNumber))),
+
+    db
+      .select({
+        driver_id: raceResults.driverId,
+        starts: count(),
+        wins: sql<number>`SUM(CASE WHEN ${raceResults.position} = 1 THEN 1 ELSE 0 END)`,
+        points: sum(raceResults.points),
+      })
+      .from(raceResults)
+      .where(and(eq(raceResults.teamId, teamId), lt(raceResults.raceNumber, beforeRaceNumber)))
+      .groupBy(raceResults.driverId),
+
+    db
+      .select({ driver_id: driverStandings.driverId, season: races.season })
+      .from(driverStandings)
+      .innerJoin(races, and(eq(races.raceNumber, driverStandings.raceNumber), eq(races.isFinalRound, 1)))
+      .where(and(eq(driverStandings.position, 1), lt(driverStandings.raceNumber, beforeRaceNumber))),
+
+    db
+      .select({ season: races.season })
+      .from(teamStandings)
+      .innerJoin(races, and(eq(races.raceNumber, teamStandings.raceNumber), eq(races.isFinalRound, 1)))
+      .where(and(eq(teamStandings.teamId, teamId), eq(teamStandings.position, 1), lt(teamStandings.raceNumber, beforeRaceNumber))),
+  ]);
+
+  const statsMap = new Map<number, { starts: number; wins: number; points: number }>();
+  for (const row of statsRows) {
+    statsMap.set(row.driver_id, { starts: row.starts, wins: Number(row.wins ?? 0), points: Number(row.points ?? 0) });
+  }
+
+  const wdcMap = new Map<number, Set<number>>();
+  for (const row of wdcRows) {
+    if (!wdcMap.has(row.driver_id)) wdcMap.set(row.driver_id, new Set());
+    wdcMap.get(row.driver_id)!.add(row.season);
+  }
+
+  const wccSeasons = new Set(wccRows.map((r) => r.season));
+
+  const driverMap = new Map<number, { driver_slug: string; full_name: string; seasons: number[] }>();
+  for (const row of seasonRows) {
+    if (!driverMap.has(row.driver_id)) {
+      driverMap.set(row.driver_id, { driver_slug: row.driver_slug, full_name: row.full_name, seasons: [] });
+    }
+    driverMap.get(row.driver_id)!.seasons.push(row.season);
+  }
+
+  return Array.from(driverMap.entries())
+    .map(([driverId, { driver_slug, full_name, seasons }]) => {
+      const stats = statsMap.get(driverId) ?? { starts: 0, wins: 0, points: 0 };
+      const driverChamps = seasons.filter((s) => wdcMap.get(driverId)?.has(s)).length;
+      const teamChamps = seasons.filter((s) => wccSeasons.has(s)).length;
+      return {
+        driver_slug,
+        full_name,
+        first_season: Math.min(...seasons),
+        years: formatYearRanges(seasons),
+        starts: stats.starts,
+        wins: stats.wins,
+        points: stats.points,
+        driver_championships: driverChamps,
+        team_championships: teamChamps,
+      };
+    })
+    .sort((a, b) => a.first_season - b.first_season || a.full_name.localeCompare(b.full_name))
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    .map(({ first_season: _, ...rest }) => rest);
 }

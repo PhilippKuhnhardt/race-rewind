@@ -7,6 +7,7 @@ import {
   getTeamCareerStats,
   getTeamStandingBeforeRace,
   getTeamSeasonFirstRaces,
+  getTeamDriversFielded,
 } from '../../../../lib/queries';
 import { formatPts, stripYearPrefix, teamLink, raceLink } from '../../../../lib/format';
 
@@ -26,10 +27,11 @@ const race = await getRaceBySlug(fullSlug);
 if (!race) throw new Error(`Race not found: ${fullSlug}`);
 
 const raceNavSlug = stripYearPrefix(race.slug, race.season);
-const [stats, standing, seasonFirstRaces] = await Promise.all([
+const [stats, standing, seasonFirstRaces, driversFielded] = await Promise.all([
   getTeamCareerStats(team.id, race.race_number),
   getTeamStandingBeforeRace(team.id, race.race_number),
   getTeamSeasonFirstRaces(team.id),
+  getTeamDriversFielded(team.id, race.race_number),
 ]);
 
 const title = `${team.name} — ${race.season} ${race.name}`;
@@ -89,6 +91,42 @@ const description = `${team.name}'s career going into the ${race.season} ${race.
     )
   }
 
+  {
+    driversFielded.length > 0 && (
+      <section class="section">
+        <h2>Drivers Fielded</h2>
+        <div class="table-wrap">
+          <table class="tablesort">
+            <thead>
+              <tr>
+                <th>Driver</th>
+                <th>Years</th>
+                <th class="num">Starts</th>
+                <th class="num">Wins</th>
+                <th class="num">Points</th>
+                <th class="num">WDC</th>
+                <th class="num">WCC</th>
+              </tr>
+            </thead>
+            <tbody>
+              {driversFielded.map((d) => (
+                <tr>
+                  <td>{d.full_name}</td>
+                  <td class="year-ranges">{d.years}</td>
+                  <td class="num">{d.starts}</td>
+                  <td class="num">{d.wins}</td>
+                  <td class="num">{formatPts(d.points)}</td>
+                  <td class="num">{d.driver_championships || '—'}</td>
+                  <td class="num">{d.team_championships || '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    )
+  }
+
   <section class="section">
     <h2>Career Going Into This Race</h2>
     <div class="stat-grid">
@@ -134,5 +172,9 @@ const description = `${team.name}'s career going into the ${race.season} ${race.
     border-radius: 2px;
     margin-bottom: 0.75rem;
     width: 3rem;
+  }
+
+  .year-ranges {
+    white-space: nowrap;
   }
 </style>
