@@ -187,7 +187,6 @@ const driverLink = (driverSlug: string) =>
                     <th class="time">SQ1</th>
                     <th class="time">SQ2</th>
                     <th class="time">SQ3</th>
-                    <th>Out</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -201,7 +200,6 @@ const driverLink = (driverSlug: string) =>
                       <td class="time">{orDash(row.sq1_time)}</td>
                       <td class="time">{orDash(row.sq2_time)}</td>
                       <td class="time">{orDash(row.sq3_time)}</td>
-                      <td>{row.knocked_out_in ?? '—'}</td>
                     </tr>
                   ))}
                 </tbody>
