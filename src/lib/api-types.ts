@@ -1,0 +1,62 @@
+export interface DriverAtRacePayload {
+  driver: {
+    slug: string;
+    full_name: string;
+    abbreviation: string | null;
+    nationality: string | null;
+    date_of_birth: string | null;
+    permanent_car_number: number | null;
+  };
+  race: {
+    slug: string;
+    season: number;
+    round: number;
+    name: string;
+    date: string;
+    race_number: number;
+  };
+  team_at_race: {
+    slug: string;
+    name: string;
+    primary_color: string | null;
+  } | null;
+  standing_going_in: {
+    position: number;
+    points: number;
+    win_count: number;
+  } | null;
+  career_going_in: {
+    starts: number;
+    wins: number;
+    podiums: number;
+    poles: number;
+    fastest_laps: number;
+    points: number;
+    championships: number;
+  };
+  result_this_race: {
+    grid: number | null;
+    position: number | null;
+    status: string | null;
+    detail: string | null;
+    time: string | null;
+    points: number | null;
+    is_classified: boolean | null;
+    fastest_lap_rank: number | null;
+  } | null;
+}
+
+export interface DriverIndexEntry {
+  slug: string;
+  full_name: string;
+  abbreviation: string | null;
+  nationality: string | null;
+}
+
+export interface RaceIndexEntry {
+  slug: string;
+  season: number;
+  round: number;
+  name: string;
+  race_number: number;
+}

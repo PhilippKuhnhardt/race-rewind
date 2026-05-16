@@ -1,0 +1,76 @@
+---
+import '../styles/app.css';
+import TopNav from '../components/layout/TopNav.astro';
+import TimeTravelBar from '../components/layout/TimeTravelBar.astro';
+import Footer from '../components/layout/Footer.astro';
+import { getAllRacesBySeason, getLatestRace } from '../lib/queries';
+import { SITE_URL } from '../lib/const';
+import type { PageContext } from '../lib/types';
+
+interface Props {
+  title: string;
+  description: string;
+  canonical: string;
+  pageContext?: PageContext;
+}
+
+const { title, description, canonical, pageContext } = Astro.props;
+const canonicalURL = new URL(canonical, SITE_URL).href;
+
+const [{ seasons, byseason }, latest] = await Promise.all([
+  getAllRacesBySeason(),
+  getLatestRace(),
+]);
+
+const currentSeason =
+  pageContext && 'season' in pageContext ? pageContext.season : latest.season;
+
+const currentRaceSlug =
+  pageContext?.kind === 'race' || pageContext?.kind === 'driver-race' || pageContext?.kind === 'team-race'
+    ? pageContext.raceSlug
+    : undefined;
+---
+
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Anti-flash: read theme from localStorage before first paint -->
+    <script is:inline>
+      try {
+        const t = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (_) {}
+    </script>
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:type" content="website" />
+  </head>
+  <body class="min-h-screen bg-bg font-sans text-fg antialiased">
+    <div class="flex min-h-screen flex-col">
+      <TopNav
+        {seasons}
+        {byseason}
+        {currentSeason}
+        {currentRaceSlug}
+      />
+
+      {pageContext && <TimeTravelBar {pageContext} />}
+
+      <main class="mx-auto w-full max-w-[var(--container-narrow)] flex-1 px-4 py-8 sm:px-6">
+        <slot />
+      </main>
+
+      <Footer />
+    </div>
+  </body>
+</html>
