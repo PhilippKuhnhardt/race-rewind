@@ -1,15 +1,12 @@
 ---
-import Base from '../../../../layouts/Base.astro';
-import RaceHeroCard from '../../../../components/race/RaceHeroCard.astro';
-import RaceSubNav from '../../../../components/race/RaceSubNav.astro';
+import RaceSessionLayout from '../../../../layouts/RaceSessionLayout.astro';
 import QualifyingTable from '../../../../components/race/QualifyingTable.astro';
 import { db } from '../../../../db/client';
 import { qualifyingResults, races } from '../../../../db/schema';
 import { eq } from 'drizzle-orm';
-import { stripYearPrefix } from '../../../../lib/format';
+import { stripYearPrefix, raceLink } from '../../../../lib/format';
 import { getQualifyingResults } from '../../../../lib/queries';
 import { getRacePageBase } from '../../../../lib/race-page';
-import { raceLink } from '../../../../lib/format';
 
 export async function getStaticPaths() {
   const rows = await db
@@ -25,7 +22,7 @@ export async function getStaticPaths() {
 const { season, race: raceSlug } = Astro.params;
 const base = await getRacePageBase(season, raceSlug);
 if (!base) throw new Error(`Race not found: ${season}-${raceSlug}`);
-const { race, raceCount, pageContext } = base;
+const { race, raceCount, pageContext, hasQuali } = base;
 
 const quali = await getQualifyingResults(race.race_number);
 
@@ -33,28 +30,9 @@ const title = `${race.season} ${race.name} — Qualifying`;
 const description = `${race.season} ${race.name} qualifying results at ${race.circuit_name}.`;
 ---
 
-<Base title={title} description={description} canonical={`${raceLink(season, raceSlug)}qualifying/`} {pageContext}>
-  <RaceHeroCard
-    name={race.name}
-    season={race.season}
-    round={race.round}
-    raceCount={raceCount}
-    date={race.date}
-    circuitName={race.circuit_name}
-    circuitLocality={race.circuit_locality}
-    circuitCountry={race.circuit_country}
-  />
-
-  <RaceSubNav
-    season={race.season}
-    raceSlug={raceSlug}
-    hasQuali={true}
-    hasSprint={!!race.has_sprint}
-    activeId="qualifying"
-  />
-
+<RaceSessionLayout {race} {raceCount} {raceSlug} {hasQuali} {pageContext} {title} {description} canonical={`${raceLink(season, raceSlug)}qualifying/`} activeId="qualifying">
   <section>
     <h2 class="mb-4 text-lg font-semibold text-fg">Qualifying</h2>
     <QualifyingTable {quali} season={race.season} {raceSlug} />
   </section>
-</Base>
+</RaceSessionLayout>

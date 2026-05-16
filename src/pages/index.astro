@@ -1,9 +1,11 @@
 ---
 import Base from '../layouts/Base.astro';
-import { getAllSeasons } from '../lib/queries';
+import { getAllSeasons, getLatestRace } from '../lib/queries';
+import { stripYearPrefix } from '../lib/format';
 
-const seasons = await getAllSeasons();
+const [seasons, latest] = await Promise.all([getAllSeasons(), getLatestRace()]);
 const recentSeasons = [...seasons].reverse().slice(0, 8);
+const latestRaceSlug = stripYearPrefix(latest.slug, latest.season);
 ---
 
 <Base
@@ -56,7 +58,7 @@ const recentSeasons = [...seasons].reverse().slice(0, 8);
   <!-- Feature links -->
   <section class="mt-12 grid gap-4 sm:grid-cols-3">
     <a
-      href="/drivers/"
+      href={`/seasons/${latest.season}/${latestRaceSlug}/drivers/`}
       class="flex flex-col gap-2 rounded-xl border border-border bg-bg-alt p-5 no-underline transition-all hover:border-accent hover:bg-bg-hover group"
     >
       <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 text-accent">
@@ -67,7 +69,7 @@ const recentSeasons = [...seasons].reverse().slice(0, 8);
     </a>
 
     <a
-      href="/teams/"
+      href={`/seasons/${latest.season}/${latestRaceSlug}/teams/`}
       class="flex flex-col gap-2 rounded-xl border border-border bg-bg-alt p-5 no-underline transition-all hover:border-accent hover:bg-bg-hover group"
     >
       <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 text-accent">

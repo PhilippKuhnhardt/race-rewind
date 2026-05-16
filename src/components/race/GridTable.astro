@@ -1,0 +1,43 @@
+---
+import { driverLink, teamLink } from '../../lib/format';
+import type { getGridOrder } from '../../lib/queries';
+
+interface Props {
+  grid: Awaited<ReturnType<typeof getGridOrder>>;
+  season: number;
+  raceSlug: string;
+}
+
+const { grid, season, raceSlug } = Astro.props;
+---
+
+{grid.length > 0 ? (
+  <div class="overflow-x-auto rounded-lg border border-border">
+    <table class="w-full border-collapse text-sm">
+      <thead>
+        <tr>
+          <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap w-10">Grid</th>
+          <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Driver</th>
+          <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Team</th>
+          <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">No.</th>
+        </tr>
+      </thead>
+      <tbody>
+        {grid.map((row) => (
+          <tr class="border-b border-border last:border-0 hover:bg-bg-hover transition-colors">
+            <td class="px-3 py-2.5 text-right tabular-nums font-bold text-fg">{row.grid ?? '—'}</td>
+            <td class="px-3 py-2.5">
+              <a href={driverLink(row.driver_slug, season, raceSlug)} class="text-accent hover:underline font-medium">{row.full_name}</a>
+            </td>
+            <td class="px-3 py-2.5 text-fg-muted">
+              <a href={teamLink(row.team_slug, season, raceSlug)} class="text-fg-muted hover:text-accent hover:underline">{row.team_name}</a>
+            </td>
+            <td class="px-3 py-2.5 text-right tabular-nums text-fg-muted">{row.car_number ?? '—'}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+) : (
+  <p class="text-sm text-fg-muted">No grid data available for this race.</p>
+)}

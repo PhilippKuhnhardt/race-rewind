@@ -1,7 +1,5 @@
 ---
-import Base from '../../../../layouts/Base.astro';
-import RaceHeroCard from '../../../../components/race/RaceHeroCard.astro';
-import RaceSubNav from '../../../../components/race/RaceSubNav.astro';
+import RaceSessionLayout from '../../../../layouts/RaceSessionLayout.astro';
 import { getAllRaces, getRaceResults, getDriverStandings } from '../../../../lib/queries';
 import { getRacePageBase } from '../../../../lib/race-page';
 import { formatPts, driverLink, teamLink, raceLink } from '../../../../lib/format';
@@ -15,7 +13,7 @@ export async function getStaticPaths() {
 const { season, race: raceSlug } = Astro.params;
 const base = await getRacePageBase(season, raceSlug);
 if (!base) throw new Error(`Race not found: ${season}-${raceSlug}`);
-const { race, raceCount, pageContext } = base;
+const { race, raceCount, pageContext, hasQuali } = base;
 
 const [results, driverChamp] = await Promise.all([
   getRaceResults(race.race_number),
@@ -25,31 +23,13 @@ const [results, driverChamp] = await Promise.all([
 const podium = results.filter((r) => r.position != null && r.position <= 3)
   .sort((a, b) => (a.position ?? 99) - (b.position ?? 99));
 const hasResults = results.length > 0;
-const hasQuali = race.season >= 1994;
+const hasGrid = !hasQuali;
 
 const title = `${race.season} ${race.name}`;
 const description = `${race.season} ${race.name} at ${race.circuit_name}${race.circuit_locality ? ', ' + race.circuit_locality : ''}: results, standings and session details.`;
 ---
 
-<Base title={title} description={description} canonical={raceLink(season, raceSlug)} {pageContext}>
-  <RaceHeroCard
-    name={race.name}
-    season={race.season}
-    round={race.round}
-    raceCount={raceCount}
-    date={race.date}
-    circuitName={race.circuit_name}
-    circuitLocality={race.circuit_locality}
-    circuitCountry={race.circuit_country}
-  />
-
-  <RaceSubNav
-    season={race.season}
-    raceSlug={raceSlug}
-    hasQuali={hasQuali}
-    hasSprint={!!race.has_sprint}
-    activeId="overview"
-  />
+<RaceSessionLayout {race} {raceCount} {raceSlug} {hasQuali} {pageContext} {title} {description} canonical={raceLink(season, raceSlug)} activeId="overview">
 
   {hasResults ? (
     <div class="space-y-8">
@@ -81,7 +61,7 @@ const description = `${race.season} ${race.name} at ${race.circuit_name}${race.c
         <section>
           <div class="flex items-baseline justify-between mb-4">
             <h2 class="text-lg font-semibold text-fg">Championship After This Race</h2>
-            <a href={`/seasons/${race.season}/${raceSlug}/standings/`} class="text-sm text-accent hover:underline">Full standings →</a>
+            <a href={`/seasons/${race.season}/${raceSlug}/drivers/`} class="text-sm text-accent hover:underline">Full standings →</a>
           </div>
           <div class="overflow-x-auto rounded-lg border border-border">
             <table class="w-full border-collapse text-sm">
@@ -118,6 +98,12 @@ const description = `${race.season} ${race.name} at ${race.circuit_name}${race.c
               <span class="mt-0.5 text-xs text-fg-muted">Grid order</span>
             </a>
           )}
+          {hasGrid && (
+            <a href={`/seasons/${race.season}/${raceSlug}/grid/`} class="group flex flex-col rounded-xl border border-border bg-bg-alt p-4 no-underline transition-all hover:border-accent hover:bg-bg-hover">
+              <span class="text-sm font-semibold text-fg group-hover:text-accent transition-colors">Starting Grid</span>
+              <span class="mt-0.5 text-xs text-fg-muted">Grid order</span>
+            </a>
+          )}
           {(!!race.has_sprint) && (
             <>
               <a href={`/seasons/${race.season}/${raceSlug}/sprint-qualifying/`} class="group flex flex-col rounded-xl border border-border bg-bg-alt p-4 no-underline transition-all hover:border-accent hover:bg-bg-hover">
@@ -134,14 +120,6 @@ const description = `${race.season} ${race.name} at ${race.circuit_name}${race.c
             <span class="text-sm font-semibold text-fg group-hover:text-accent transition-colors">Race</span>
             <span class="mt-0.5 text-xs text-fg-muted">Full results</span>
           </a>
-          <a href={`/seasons/${race.season}/${raceSlug}/standings/`} class="group flex flex-col rounded-xl border border-border bg-bg-alt p-4 no-underline transition-all hover:border-accent hover:bg-bg-hover">
-            <span class="text-sm font-semibold text-fg group-hover:text-accent transition-colors">Standings</span>
-            <span class="mt-0.5 text-xs text-fg-muted">Championship tables</span>
-          </a>
-          <a href={`/seasons/${race.season}/${raceSlug}/drivers/`} class="group flex flex-col rounded-xl border border-border bg-bg-alt p-4 no-underline transition-all hover:border-accent hover:bg-bg-hover">
-            <span class="text-sm font-semibold text-fg group-hover:text-accent transition-colors">Grid</span>
-            <span class="mt-0.5 text-xs text-fg-muted">Driver &amp; team lineup</span>
-          </a>
         </div>
       </section>
     </div>
@@ -150,4 +128,4 @@ const description = `${race.season} ${race.name} at ${race.circuit_name}${race.c
       No results available yet for this race.
     </div>
   )}
-</Base>
+</RaceSessionLayout>

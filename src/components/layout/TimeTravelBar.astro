@@ -10,19 +10,37 @@ const { pageContext } = Astro.props;
 let label = '';
 let detail = '';
 let compareHref: string | undefined;
+let prevHref: string | undefined;
+let nextHref: string | undefined;
 
-if (pageContext.kind === 'race') {
+if (pageContext.kind === 'preseason') {
+  label = `${pageContext.season} Season`;
+  detail = `Start of season · ${pageContext.raceCount} rounds`;
+  nextHref = `/seasons/${pageContext.season}/${pageContext.firstRaceSlug}/`;
+} else if (pageContext.kind === 'race') {
   const d = new Date(pageContext.raceDate);
   const month = d.toLocaleString('en-GB', { month: 'long', year: 'numeric' });
   label = `As of ${month}`;
   detail = `Round ${pageContext.round} of ${pageContext.raceCount}`;
+  if (pageContext.prevRaceSlug) prevHref = `/seasons/${pageContext.season}/${pageContext.prevRaceSlug}/`;
+  if (pageContext.nextRaceSlug) nextHref = `/seasons/${pageContext.season}/${pageContext.nextRaceSlug}/`;
+} else if (pageContext.kind === 'postseason') {
+  label = `${pageContext.season} Season`;
+  detail = pageContext.inProgressRound != null
+    ? `In progress · Round ${pageContext.inProgressRound} / ${pageContext.raceCount}`
+    : `End of season · ${pageContext.raceCount} rounds`;
+  prevHref = `/seasons/${pageContext.season}/${pageContext.prevRaceSlug}/`;
 } else if (pageContext.kind === 'driver-race') {
   label = pageContext.driverName;
   detail = `career as of ${pageContext.raceName} ${pageContext.season}`;
   compareHref = `/compare/?a=${pageContext.driverSlug}&race=${pageContext.season}-${pageContext.raceSlug}`;
+  if (pageContext.prevRaceSlug) prevHref = `/drivers/${pageContext.driverSlug}/${pageContext.season}/${pageContext.prevRaceSlug}/`;
+  if (pageContext.nextRaceSlug) nextHref = `/drivers/${pageContext.driverSlug}/${pageContext.season}/${pageContext.nextRaceSlug}/`;
 } else if (pageContext.kind === 'team-race') {
   label = pageContext.teamName;
   detail = `stats as of ${pageContext.raceName} ${pageContext.season}`;
+  if (pageContext.prevRaceSlug) prevHref = `/teams/${pageContext.teamSlug}/${pageContext.season}/${pageContext.prevRaceSlug}/`;
+  if (pageContext.nextRaceSlug) nextHref = `/teams/${pageContext.teamSlug}/${pageContext.season}/${pageContext.nextRaceSlug}/`;
 }
 ---
 
@@ -49,37 +67,34 @@ if (pageContext.kind === 'race') {
     <span class="font-semibold text-fg">{label}</span>
     {detail && <span class="text-fg-muted hidden sm:inline">— {detail}</span>}
 
-    {pageContext.kind === 'race' && (
-      <div class="ml-auto flex items-center gap-1">
-        {pageContext.prevRaceSlug && (
-          <a
-            href={`/seasons/${pageContext.season}/${pageContext.prevRaceSlug}/`}
-            class="flex h-7 w-7 items-center justify-center rounded text-fg-muted hover:bg-bg-hover hover:text-fg transition-colors no-underline"
-            aria-label="Previous race"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
-          </a>
-        )}
-        {pageContext.nextRaceSlug && (
-          <a
-            href={`/seasons/${pageContext.season}/${pageContext.nextRaceSlug}/`}
-            class="flex h-7 w-7 items-center justify-center rounded text-fg-muted hover:bg-bg-hover hover:text-fg transition-colors no-underline"
-            aria-label="Next race"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
-          </a>
-        )}
-      </div>
-    )}
-
-    {compareHref && (
-      <a
-        href={compareHref}
-        class="ml-auto flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs font-medium text-fg-muted hover:border-accent hover:text-accent transition-colors no-underline"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l5.1 5.1M4 4l5 5"/></svg>
-        Compare with…
-      </a>
-    )}
+    <div class="ml-auto flex items-center gap-1">
+      {compareHref && (
+        <a
+          href={compareHref}
+          class="mr-1 flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs font-medium text-fg-muted hover:border-accent hover:text-accent transition-colors no-underline"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l5.1 5.1M4 4l5 5"/></svg>
+          Compare with…
+        </a>
+      )}
+      {prevHref && (
+        <a
+          href={prevHref}
+          class="flex h-7 w-7 items-center justify-center rounded text-fg-muted hover:bg-bg-hover hover:text-fg transition-colors no-underline"
+          aria-label="Previous race"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+        </a>
+      )}
+      {nextHref && (
+        <a
+          href={nextHref}
+          class="flex h-7 w-7 items-center justify-center rounded text-fg-muted hover:bg-bg-hover hover:text-fg transition-colors no-underline"
+          aria-label="Next race"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+      )}
+    </div>
   </div>
 </div>

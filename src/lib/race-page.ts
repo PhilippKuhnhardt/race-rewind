@@ -1,12 +1,13 @@
-import { getAllRacesBySeason, getRaceBySlug, getSeasonBookends } from './queries';
+import { getAllRacesBySeason, getRaceBySlug, getSeasonBookends, getRaceNumbersWithQualifying } from './queries';
 import type { PageContext } from './types';
 
 export async function getRacePageBase(season: string, raceSlug: string) {
   const fullSlug = `${season}-${raceSlug}`;
 
-  const [race, { byseason }] = await Promise.all([
+  const [race, { byseason }, qualiSet] = await Promise.all([
     getRaceBySlug(fullSlug),
     getAllRacesBySeason(),
+    getRaceNumbersWithQualifying(),
   ]);
 
   if (!race) return undefined;
@@ -15,8 +16,8 @@ export async function getRacePageBase(season: string, raceSlug: string) {
 
   const seasonRaces = byseason[race.season] ?? [];
   const idx = seasonRaces.findIndex((r) => r.slug === raceSlug);
-  const prevRaceSlug = idx > 0 ? seasonRaces[idx - 1].slug : undefined;
-  const nextRaceSlug = idx < seasonRaces.length - 1 ? seasonRaces[idx + 1].slug : undefined;
+  const prevRaceSlug = idx > 0 ? seasonRaces[idx - 1].slug : 'preseason';
+  const nextRaceSlug = idx < seasonRaces.length - 1 ? seasonRaces[idx + 1].slug : 'postseason';
 
   const pageContext: PageContext = {
     kind: 'race',
@@ -30,5 +31,7 @@ export async function getRacePageBase(season: string, raceSlug: string) {
     nextRaceSlug,
   };
 
-  return { race, raceCount, prevRaceSlug, nextRaceSlug, pageContext };
+  const hasQuali = qualiSet.has(race.race_number);
+
+  return { race, raceCount, prevRaceSlug, nextRaceSlug, pageContext, hasQuali };
 }

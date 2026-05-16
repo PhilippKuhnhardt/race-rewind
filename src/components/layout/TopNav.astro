@@ -1,6 +1,7 @@
 ---
 import ThemeToggle from '../primitives/ThemeToggle.svelte';
-import SeasonDrawer from './SeasonDrawer.svelte';
+import YearPicker from './YearPicker.svelte';
+import RacePicker from './RacePicker.svelte';
 import type { RaceNavEntry } from '../../lib/queries/races';
 
 interface Props {
@@ -8,18 +9,31 @@ interface Props {
   byseason: Record<number, RaceNavEntry[]>;
   currentSeason: number;
   currentRaceSlug?: string;
+  currentChainSlug?: string;
 }
 
-const { seasons, byseason, currentSeason, currentRaceSlug } = Astro.props;
+const { seasons, byseason, currentSeason, currentRaceSlug, currentChainSlug } = Astro.props;
+
+const raceBase = currentRaceSlug ? `/seasons/${currentSeason}/${currentRaceSlug}` : '';
 
 const navLinks = [
-  { href: '/seasons/', label: 'Seasons' },
-  { href: '/drivers/', label: 'Drivers' },
-  { href: '/teams/', label: 'Teams' },
-  { href: '/compare/', label: 'Compare' },
+  { id: 'season',  href: raceBase ? `${raceBase}/`          : '/',         label: 'Race' },
+  { id: 'drivers', href: raceBase ? `${raceBase}/drivers/`   : '/',         label: 'Drivers' },
+  { id: 'teams',   href: raceBase ? `${raceBase}/teams/`     : '/',         label: 'Teams' },
+  { id: 'compare', href: '/compare/',                                        label: 'Compare' },
 ];
 
-const current = Astro.url.pathname;
+const pathname = Astro.url.pathname;
+const lastSeg = pathname.replace(/\/$/, '').split('/').at(-1) ?? '';
+const firstSeg = pathname.split('/').filter(Boolean).at(0) ?? '';
+
+function isActive(id: string): boolean {
+  if (id === 'compare') return firstSeg === 'compare';
+  if (id === 'drivers') return firstSeg === 'seasons' && lastSeg === 'drivers';
+  if (id === 'teams')   return firstSeg === 'seasons' && lastSeg === 'teams';
+  if (id === 'season')  return firstSeg === 'seasons' && !['drivers', 'teams'].includes(lastSeg);
+  return false;
+}
 ---
 
 <header class="sticky top-0 z-40 border-b border-border bg-bg/90 backdrop-blur-sm">
@@ -31,13 +45,13 @@ const current = Astro.url.pathname;
 
     <!-- Primary nav (md+) -->
     <nav class="ml-6 hidden items-center gap-1 md:flex" aria-label="Primary">
-      {navLinks.map(({ href, label }) => {
-        const isActive = current.startsWith(href) && href !== '/';
+      {navLinks.map(({ id, href, label }) => {
+        const active = isActive(id);
         return (
           <a
             href={href}
-            class={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors no-underline ${isActive ? 'bg-bg-alt text-fg' : 'text-fg-muted hover:bg-bg-hover hover:text-fg'}`}
-            aria-current={isActive ? 'page' : undefined}
+            class={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors no-underline ${active ? 'bg-bg-alt text-fg' : 'text-fg-muted hover:bg-bg-hover hover:text-fg'}`}
+            aria-current={active ? 'page' : undefined}
           >
             {label}
           </a>
@@ -48,13 +62,8 @@ const current = Astro.url.pathname;
     <!-- Right side controls -->
     <div class="ml-auto flex items-center gap-1">
       <ThemeToggle client:idle />
-      <SeasonDrawer
-        {seasons}
-        {byseason}
-        {currentSeason}
-        {currentRaceSlug}
-        client:idle
-      />
+      <YearPicker {seasons} {currentSeason} client:load />
+      <RacePicker {byseason} {currentSeason} currentChainSlug={currentChainSlug ?? ''} client:load />
     </div>
   </div>
 </header>

@@ -31,6 +31,7 @@ export async function getSeasonBookends(season: number) {
       round: races.round,
       name: races.name,
       date: races.date,
+      slug: races.slug,
     })
     .from(raceResults)
     .innerJoin(races, eq(races.raceNumber, raceResults.raceNumber))
@@ -51,6 +52,7 @@ export async function getSeasonBookends(season: number) {
     latestCompletedRound: completed?.round ?? null,
     latestCompletedName: completed?.name ?? null,
     latestCompletedDate: completed?.date ?? null,
+    latestCompletedSlug: completed?.slug ?? null,
   };
 }
 

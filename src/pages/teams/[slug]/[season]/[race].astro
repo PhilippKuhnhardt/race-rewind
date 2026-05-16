@@ -2,6 +2,7 @@
 import Base from '../../../../layouts/Base.astro';
 import {
   getAllTeamRacePairs,
+  getAllRacesBySeason,
   getTeamBySlug,
   getRaceBySlug,
   getTeamCareerStats,
@@ -27,11 +28,17 @@ const race = await getRaceBySlug(fullSlug);
 if (!race) throw new Error(`Race not found: ${fullSlug}`);
 
 const raceNavSlug = stripYearPrefix(race.slug, race.season);
-const [stats, standing, driversFielded] = await Promise.all([
+const [stats, standing, driversFielded, { byseason }] = await Promise.all([
   getTeamCareerStats(team.id, race.race_number),
   getTeamStandingBeforeRace(team.id, race.race_number),
   getTeamDriversFielded(team.id, race.race_number),
+  getAllRacesBySeason(),
 ]);
+
+const seasonRaces = byseason[race.season] ?? [];
+const idx = seasonRaces.findIndex((r) => r.slug === raceNavSlug);
+const prevRaceSlug = idx > 0 ? seasonRaces[idx - 1].slug : undefined;
+const nextRaceSlug = idx < seasonRaces.length - 1 ? seasonRaces[idx + 1].slug : undefined;
 
 const pageContext: PageContext = {
   kind: 'team-race',
@@ -40,6 +47,8 @@ const pageContext: PageContext = {
   raceSlug: raceNavSlug,
   teamName: team.name,
   teamSlug: slug,
+  prevRaceSlug,
+  nextRaceSlug,
 };
 
 const title = `${team.name} — ${race.season} ${race.name}`;

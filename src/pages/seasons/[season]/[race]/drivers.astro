@@ -1,8 +1,13 @@
 ---
 import Base from '../../../../layouts/Base.astro';
 import RaceHeroCard from '../../../../components/race/RaceHeroCard.astro';
-import RaceSubNav from '../../../../components/race/RaceSubNav.astro';
-import { getAllRaces, getSeasonGrid } from '../../../../lib/queries';
+import DriverStandingsTable from '../../../../components/standings/DriverStandingsTable.astro';
+import {
+  getAllRaces,
+  getSeasonGrid,
+  getDriverStandings,
+  getDriverStandingsBeforeRace,
+} from '../../../../lib/queries';
 import { getRacePageBase } from '../../../../lib/race-page';
 import { raceLink, driverLink, teamLink } from '../../../../lib/format';
 
@@ -17,10 +22,16 @@ const base = await getRacePageBase(season, raceSlug);
 if (!base) throw new Error(`Race not found: ${season}-${raceSlug}`);
 const { race, raceCount, pageContext } = base;
 
-const grid = await getSeasonGrid(race.race_number);
+const [grid, driverChamp, preRaceDriverChamp] = await Promise.all([
+  getSeasonGrid(race.race_number),
+  getDriverStandings(race.race_number),
+  getDriverStandingsBeforeRace(race.race_number),
+]);
 
-const title = `${race.season} ${race.name} — Grid`;
-const description = `Driver and team lineup for the ${race.season} ${race.name}.`;
+const preRaceDriverPosById = new Map(preRaceDriverChamp.map((r) => [r.driver_id, r.position]));
+
+const title = `${race.season} ${race.name} — Drivers`;
+const description = `Driver championship standings and lineup for the ${race.season} ${race.name}.`;
 ---
 
 <Base title={title} description={description} canonical={`${raceLink(season, raceSlug)}drivers/`} {pageContext}>
@@ -35,16 +46,26 @@ const description = `Driver and team lineup for the ${race.season} ${race.name}.
     circuitCountry={race.circuit_country}
   />
 
-  <RaceSubNav
+  <DriverStandingsTable
+    title="Drivers' Championship — After This Race"
+    rows={driverChamp}
     season={race.season}
     raceSlug={raceSlug}
-    hasQuali={race.season >= 1994}
-    hasSprint={!!race.has_sprint}
-    activeId="grid"
+    prevPositions={preRaceDriverPosById}
+    emptyNote="First race of the season — championship not yet started."
   />
 
-  <section>
-    <h2 class="mb-4 text-lg font-semibold text-fg">Driver &amp; Team Lineup</h2>
+  {preRaceDriverChamp.length > 0 && (
+    <DriverStandingsTable
+      title="Drivers' Championship — Going Into This Race"
+      rows={preRaceDriverChamp}
+      season={race.season}
+      raceSlug={raceSlug}
+    />
+  )}
+
+  <section class="mt-10">
+    <h2 class="mb-3 border-b border-border pb-2 text-lg font-semibold text-fg">Driver &amp; Team Lineup</h2>
     {grid.length > 0 ? (
       <div class="overflow-x-auto rounded-lg border border-border">
         <table class="w-full border-collapse text-sm">

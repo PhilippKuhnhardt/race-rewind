@@ -15,7 +15,8 @@ import {
   getDriverBestChampionshipPos,
   getAllDriverCareerStatsAsOf,
 } from '../../../lib/queries';
-import { stripYearPrefix, postseasonLink, preseasonLink } from '../../../lib/format';
+import { stripYearPrefix, postseasonLink } from '../../../lib/format';
+import type { PageContext } from '../../../lib/types';
 
 export async function getStaticPaths() {
   return (await getAllSeasons()).map((s) => ({
@@ -51,6 +52,17 @@ const [driverChamp, teamChamp, grid] = await Promise.all([
   getSeasonGrid(asOfRaceNumber),
 ]);
 const lastRaceSlug = stripYearPrefix(bookends.lastSlug, season);
+const prevRaceSlug = !isComplete && hasData && bookends.latestCompletedSlug
+  ? stripYearPrefix(bookends.latestCompletedSlug, season)
+  : lastRaceSlug;
+
+const pageContext: PageContext = {
+  kind: 'postseason',
+  season,
+  raceCount: bookends.raceCount,
+  prevRaceSlug,
+  inProgressRound: !isComplete && hasData ? bookends.latestCompletedRound : null,
+};
 
 const careerRefRaceNumber = hasData ? asOfRaceNumber + 1 : bookends.firstRaceNumber;
 
@@ -84,16 +96,13 @@ const description = isComplete
   title={title}
   description={description}
   canonical={postseasonLink(season)}
+  {pageContext}
 >
   <div class="mb-8 border-b border-border pb-6">
     <h1 class="text-3xl font-bold tracking-tight text-fg sm:text-4xl">{season} Season</h1>
-    <p class="mt-2 text-lg text-fg-muted">
+    <p class="mt-2 text-fg-muted">
       {bookends.raceCount} rounds &middot; {bookends.firstDate} &ndash; {bookends.lastDate}
     </p>
-    <nav class="mt-4 flex gap-3 text-sm" aria-label="Season sections">
-      <a href={preseasonLink(season)} class="text-fg-muted hover:text-fg transition-colors">Start of season</a>
-      <a href={postseasonLink(season)} class="font-semibold text-accent border-b-2 border-accent pb-0.5">End of season</a>
-    </nav>
   </div>
 
   {!isComplete && hasData && (

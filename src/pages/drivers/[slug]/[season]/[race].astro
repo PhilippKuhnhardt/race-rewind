@@ -2,11 +2,12 @@
 import Base from '../../../../layouts/Base.astro';
 import {
   getAllDriverRacePairs,
+  getAllRacesBySeason,
   getDriverBySlug,
   getDriverCareerStats,
   getDriverStandingBeforeRace,
+  getRaceBySlug,
 } from '../../../../lib/queries';
-import { getRaceBySlug } from '../../../../lib/queries';
 import { formatPts, stripYearPrefix, driverLink, raceLink } from '../../../../lib/format';
 import type { PageContext } from '../../../../lib/types';
 
@@ -26,10 +27,16 @@ const race = await getRaceBySlug(fullSlug);
 if (!race) throw new Error(`Race not found: ${fullSlug}`);
 
 const raceNavSlug = stripYearPrefix(race.slug, race.season);
-const [stats, standing] = await Promise.all([
+const [stats, standing, { byseason }] = await Promise.all([
   getDriverCareerStats(driver.id, race.race_number),
   getDriverStandingBeforeRace(driver.id, race.race_number),
+  getAllRacesBySeason(),
 ]);
+
+const seasonRaces = byseason[race.season] ?? [];
+const idx = seasonRaces.findIndex((r) => r.slug === raceNavSlug);
+const prevRaceSlug = idx > 0 ? seasonRaces[idx - 1].slug : undefined;
+const nextRaceSlug = idx < seasonRaces.length - 1 ? seasonRaces[idx + 1].slug : undefined;
 
 const pageContext: PageContext = {
   kind: 'driver-race',
@@ -38,6 +45,8 @@ const pageContext: PageContext = {
   raceSlug: raceNavSlug,
   driverName: driver.full_name,
   driverSlug: slug,
+  prevRaceSlug,
+  nextRaceSlug,
 };
 
 const title = `${driver.full_name} — ${race.season} ${race.name}`;

@@ -12,6 +12,7 @@ import {
   getAllDriverCareerStatsAsOf,
 } from '../../../lib/queries';
 import { stripYearPrefix, preseasonLink } from '../../../lib/format';
+import type { PageContext } from '../../../lib/types';
 
 export async function getStaticPaths() {
   return (await getAllSeasons()).map((s) => ({
@@ -36,6 +37,13 @@ const bookends = await getSeasonBookends(season);
 const grid = await getSeasonGrid(bookends.firstRaceNumber);
 const allDrivers = await getAllDriverCareerStatsAsOf(bookends.firstRaceNumber);
 const firstRaceSlug = stripYearPrefix(bookends.firstSlug, season);
+
+const pageContext: PageContext = {
+  kind: 'preseason',
+  season,
+  raceCount: bookends.raceCount,
+  firstRaceSlug,
+};
 
 const driverStats = await Promise.all(
   grid.map(async (d) => {
@@ -62,16 +70,13 @@ const description = `${season} F1 season: the starting grid and career statistic
   title={title}
   description={description}
   canonical={preseasonLink(season)}
+  {pageContext}
 >
   <div class="mb-8 border-b border-border pb-6">
     <h1 class="text-3xl font-bold tracking-tight text-fg sm:text-4xl">{season} Season</h1>
     <p class="mt-2 text-lg text-fg-muted">
       {bookends.raceCount} rounds &middot; {bookends.firstDate} &ndash; {bookends.lastDate}
     </p>
-    <nav class="mt-4 flex gap-3 text-sm" aria-label="Season sections">
-      <a href={preseasonLink(season)} class="font-semibold text-accent border-b-2 border-accent pb-0.5">Start of season</a>
-      <a href={`/seasons/${season}/postseason/`} class="text-fg-muted hover:text-fg transition-colors">End of season</a>
-    </nav>
   </div>
 
   <SeasonGridTable

@@ -2,6 +2,13 @@ import { eq, sql } from 'drizzle-orm';
 import { db } from '../../db/client';
 import { qualifyingResults, sprintQualifyingResults, raceResults, sprintResults, drivers, teams } from '../../db/schema';
 
+export async function getRaceNumbersWithQualifying(): Promise<Set<number>> {
+  const rows = await db
+    .selectDistinct({ raceNumber: qualifyingResults.raceNumber })
+    .from(qualifyingResults);
+  return new Set(rows.map((r) => r.raceNumber));
+}
+
 export async function getQualifyingResults(raceNumber: number) {
   return db
     .select({
@@ -69,6 +76,24 @@ export async function getRaceResults(raceNumber: number) {
     .innerJoin(teams, eq(teams.id, raceResults.teamId))
     .where(eq(raceResults.raceNumber, raceNumber))
     .orderBy(sql`${raceResults.position} ASC NULLS LAST`);
+}
+
+export async function getGridOrder(raceNumber: number) {
+  return db
+    .select({
+      grid: raceResults.grid,
+      driver_id: raceResults.driverId,
+      driver_slug: drivers.slug,
+      full_name: drivers.fullName,
+      team_name: teams.name,
+      team_slug: teams.slug,
+      car_number: raceResults.carNumber,
+    })
+    .from(raceResults)
+    .innerJoin(drivers, eq(drivers.id, raceResults.driverId))
+    .innerJoin(teams, eq(teams.id, raceResults.teamId))
+    .where(eq(raceResults.raceNumber, raceNumber))
+    .orderBy(sql`${raceResults.grid} ASC NULLS LAST`);
 }
 
 export async function getSprintResults(raceNumber: number) {

@@ -4,6 +4,7 @@ import TopNav from '../components/layout/TopNav.astro';
 import TimeTravelBar from '../components/layout/TimeTravelBar.astro';
 import Footer from '../components/layout/Footer.astro';
 import { getAllRacesBySeason, getLatestRace } from '../lib/queries';
+import { stripYearPrefix } from '../lib/format';
 import { SITE_URL } from '../lib/const';
 import type { PageContext } from '../lib/types';
 
@@ -22,13 +23,23 @@ const [{ seasons, byseason }, latest] = await Promise.all([
   getLatestRace(),
 ]);
 
-const currentSeason =
-  pageContext && 'season' in pageContext ? pageContext.season : latest.season;
+const currentSeason = pageContext && 'season' in pageContext ? pageContext.season : latest.season;
 
-const currentRaceSlug =
-  pageContext?.kind === 'race' || pageContext?.kind === 'driver-race' || pageContext?.kind === 'team-race'
-    ? pageContext.raceSlug
-    : undefined;
+const currentRaceSlug = (() => {
+  if (!pageContext) return stripYearPrefix(latest.slug, latest.season);
+  switch (pageContext.kind) {
+    case 'race':
+    case 'driver-race':
+    case 'team-race':  return pageContext.raceSlug;
+    case 'preseason':  return pageContext.firstRaceSlug;
+    case 'postseason': return pageContext.prevRaceSlug;
+  }
+})();
+
+const currentChainSlug =
+  pageContext?.kind === 'preseason'  ? 'preseason'
+  : pageContext?.kind === 'postseason' ? 'postseason'
+  : currentRaceSlug;
 ---
 
 <!doctype html>
@@ -63,6 +74,7 @@ const currentRaceSlug =
         {byseason}
         {currentSeason}
         {currentRaceSlug}
+        {currentChainSlug}
       />
 
       {pageContext && <TimeTravelBar {pageContext} />}

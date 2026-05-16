@@ -6,11 +6,12 @@ interface Props {
   raceSlug: string;
   hasQuali: boolean;
   hasSprint: boolean;
+  hasGrid?: boolean;
   activeId: string;
 }
 
-const { season, raceSlug, hasQuali, hasSprint, activeId } = Astro.props;
-const items = raceSubNavItems(season, raceSlug, hasQuali, hasSprint);
+const { season, raceSlug, hasQuali, hasSprint, hasGrid = false, activeId } = Astro.props;
+const items = raceSubNavItems(season, raceSlug, hasQuali, hasSprint, hasGrid);
 ---
 
 <nav class="mb-8 -mx-4 sm:-mx-6 border-b border-border" aria-label="Race sections">

@@ -1,0 +1,33 @@
+---
+import RaceSessionLayout from '../../../../layouts/RaceSessionLayout.astro';
+import GridTable from '../../../../components/race/GridTable.astro';
+import { getAllRaces, getGridOrder, getRaceNumbersWithQualifying } from '../../../../lib/queries';
+import { raceLink } from '../../../../lib/format';
+import { getRacePageBase } from '../../../../lib/race-page';
+
+export async function getStaticPaths() {
+  const [allRaces, qualiSet] = await Promise.all([getAllRaces(), getRaceNumbersWithQualifying()]);
+  return allRaces
+    .filter((r) => !qualiSet.has(r.race_number))
+    .map((r) => ({
+      params: { season: String(r.season), race: r.race_slug },
+    }));
+}
+
+const { season, race: raceSlug } = Astro.params;
+const base = await getRacePageBase(season, raceSlug);
+if (!base) throw new Error(`Race not found: ${season}-${raceSlug}`);
+const { race, raceCount, pageContext, hasQuali } = base;
+
+const grid = await getGridOrder(race.race_number);
+
+const title = `${race.season} ${race.name} — Starting Grid`;
+const description = `${race.season} ${race.name} starting grid at ${race.circuit_name}.`;
+---
+
+<RaceSessionLayout {race} {raceCount} {raceSlug} {hasQuali} {pageContext} {title} {description} canonical={`${raceLink(season, raceSlug)}grid/`} activeId="grid">
+  <section>
+    <h2 class="mb-4 text-lg font-semibold text-fg">Starting Grid</h2>
+    <GridTable {grid} season={race.season} {raceSlug} />
+  </section>
+</RaceSessionLayout>

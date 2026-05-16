@@ -1,4 +1,4 @@
-import { eq, desc, asc } from 'drizzle-orm';
+import { eq, desc, asc, lte } from 'drizzle-orm';
 import { db } from '../../db/client';
 import { races, circuits } from '../../db/schema';
 import { stripYearPrefix } from '../format';
@@ -32,12 +32,12 @@ export async function getAllRacesBySeason(): Promise<{
   return { seasons: seasonList, byseason };
 }
 
-export async function getAllRaces(): Promise<{ season: number; race_slug: string }[]> {
+export async function getAllRaces(): Promise<{ season: number; race_slug: string; race_number: number }[]> {
   const rows = await db
-    .select({ season: races.season, slug: races.slug })
+    .select({ season: races.season, slug: races.slug, raceNumber: races.raceNumber })
     .from(races)
     .orderBy(asc(races.raceNumber));
-  return rows.map((r) => ({ season: r.season, race_slug: stripYearPrefix(r.slug, r.season) }));
+  return rows.map((r) => ({ season: r.season, race_slug: stripYearPrefix(r.slug, r.season), race_number: r.raceNumber }));
 }
 
 export async function getRaceBySlug(slug: string) {
@@ -62,9 +62,11 @@ export async function getRaceBySlug(slug: string) {
 }
 
 export async function getLatestRace(): Promise<LatestRace> {
+  const today = new Date().toISOString().slice(0, 10);
   const row = await db
     .select({ season: races.season, slug: races.slug })
     .from(races)
+    .where(lte(races.date, today))
     .orderBy(desc(races.raceNumber))
     .limit(1)
     .get();

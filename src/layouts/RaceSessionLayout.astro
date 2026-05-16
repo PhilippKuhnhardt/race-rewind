@@ -1,0 +1,53 @@
+---
+import Base from './Base.astro';
+import RaceHeroCard from '../components/race/RaceHeroCard.astro';
+import RaceSubNav from '../components/race/RaceSubNav.astro';
+import type { PageContext } from '../lib/types';
+
+interface Props {
+  race: {
+    name: string;
+    season: number;
+    round: number;
+    date: string;
+    circuit_name: string;
+    circuit_locality: string | null;
+    circuit_country: string | null;
+    has_sprint: number | null;
+  };
+  raceCount: number;
+  raceSlug: string;
+  hasQuali: boolean;
+  pageContext: PageContext;
+  title: string;
+  description: string;
+  canonical: string;
+  activeId: 'overview' | 'qualifying' | 'sprint-qualifying' | 'sprint' | 'grid' | 'race';
+}
+
+const { race, raceCount, raceSlug, hasQuali, pageContext, title, description, canonical, activeId } = Astro.props;
+---
+
+<Base {title} {description} {canonical} {pageContext}>
+  <RaceHeroCard
+    name={race.name}
+    season={race.season}
+    round={race.round}
+    {raceCount}
+    date={race.date}
+    circuitName={race.circuit_name}
+    circuitLocality={race.circuit_locality}
+    circuitCountry={race.circuit_country}
+  />
+
+  <RaceSubNav
+    season={race.season}
+    {raceSlug}
+    {hasQuali}
+    hasSprint={!!race.has_sprint}
+    hasGrid={!hasQuali}
+    {activeId}
+  />
+
+  <slot />
+</Base>

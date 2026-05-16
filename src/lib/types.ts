@@ -1,5 +1,11 @@
 export type PageContext =
   | {
+      kind: 'preseason';
+      season: number;
+      raceCount: number;
+      firstRaceSlug: string;
+    }
+  | {
       kind: 'race';
       season: number;
       round: number;
@@ -11,12 +17,23 @@ export type PageContext =
       nextRaceSlug?: string;
     }
   | {
+      kind: 'postseason';
+      season: number;
+      raceCount: number;
+      /** Latest completed race slug (in-progress) or last race slug (complete). Back-arrow target. */
+      prevRaceSlug: string;
+      /** Round number shown when in-progress; null when complete or no data. */
+      inProgressRound: number | null;
+    }
+  | {
       kind: 'driver-race';
       season: number;
       raceName: string;
       raceSlug: string;
       driverName: string;
       driverSlug: string;
+      prevRaceSlug?: string;
+      nextRaceSlug?: string;
     }
   | {
       kind: 'team-race';
@@ -25,4 +42,6 @@ export type PageContext =
       raceSlug: string;
       teamName: string;
       teamSlug: string;
+      prevRaceSlug?: string;
+      nextRaceSlug?: string;
     };
