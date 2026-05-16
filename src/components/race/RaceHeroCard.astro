@@ -1,0 +1,27 @@
+---
+interface Props {
+  name: string;
+  season: number;
+  round: number;
+  raceCount: number;
+  date: string;
+  circuitName: string;
+  circuitLocality: string | null;
+  circuitCountry: string | null;
+}
+
+const { name, season, round, raceCount, date, circuitName, circuitLocality, circuitCountry } = Astro.props;
+---
+
+<div class="mb-6">
+  <h1 class="text-3xl font-bold tracking-tight text-fg sm:text-4xl">
+    {season} {name}
+  </h1>
+  <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-fg-muted text-sm">
+    <span>{circuitName}{circuitLocality ? `, ${circuitLocality}` : ''}{circuitCountry ? `, ${circuitCountry}` : ''}</span>
+    <span aria-hidden="true">·</span>
+    <time datetime={date}>{date}</time>
+    <span aria-hidden="true">·</span>
+    <span>Round {round} of {raceCount}</span>
+  </div>
+</div>

@@ -1,45 +1,51 @@
 ---
-import '../styles/global.css';
-import RaceNav from '../components/RaceNav.astro';
-import SeasonSidebar from '../components/SeasonSidebar.astro';
-import { getLatestRace } from '../lib/queries';
+import '../styles/app.css';
+import TopNav from '../components/layout/TopNav.astro';
+import TimeTravelBar from '../components/layout/TimeTravelBar.astro';
+import Footer from '../components/layout/Footer.astro';
+import { getAllRacesBySeason, getLatestRace } from '../lib/queries';
 import { SITE_URL } from '../lib/const';
-
-interface NavContext {
-  kind: 'season' | 'driver' | 'team';
-  entitySlug?: string;
-  entitySeasons?: Record<number, string>;
-}
-
-interface SidebarCurrent {
-  kind: 'pre' | 'post' | 'race';
-  raceSlug?: string;
-}
+import type { PageContext } from '../lib/types';
 
 interface Props {
   title: string;
   description: string;
   canonical: string;
-  navSeason?: number;
-  navContext?: NavContext;
-  sidebar?: { season: number; current: SidebarCurrent };
-  hideHeaderNav?: boolean;
+  pageContext?: PageContext;
 }
 
-const { title, description, canonical, navSeason, navContext, sidebar, hideHeaderNav } =
-  Astro.props;
+const { title, description, canonical, pageContext } = Astro.props;
 const canonicalURL = new URL(canonical, SITE_URL).href;
 
-const latest = !hideHeaderNav && navSeason == null ? await getLatestRace() : null;
-const effectiveNavSeason = navSeason ?? latest?.season ?? 0;
+const [{ seasons, byseason }, latest] = await Promise.all([
+  getAllRacesBySeason(),
+  getLatestRace(),
+]);
+
+const currentSeason =
+  pageContext && 'season' in pageContext ? pageContext.season : latest.season;
+
+const currentRaceSlug =
+  pageContext?.kind === 'race' || pageContext?.kind === 'driver-race' || pageContext?.kind === 'team-race'
+    ? pageContext.raceSlug
+    : undefined;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Anti-flash: read theme from localStorage before first paint -->
+    <script is:inline>
+      try {
+        const t = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', t);
+      // eslint-disable-next-line no-empty
+      } catch {}
+    </script>
 
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -50,37 +56,22 @@ const effectiveNavSeason = navSeason ?? latest?.season ?? 0;
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:type" content="website" />
   </head>
-  <body>
-    <header>
-      <div class="container site-header-row">
-        <a href="/" class="wordmark">F1 <span>History</span></a>
-        {!hideHeaderNav && <RaceNav currentSeason={effectiveNavSeason} context={navContext} />}
-      </div>
-    </header>
+  <body class="min-h-screen bg-bg font-sans text-fg antialiased">
+    <div class="flex min-h-screen flex-col">
+      <TopNav
+        {seasons}
+        {byseason}
+        {currentSeason}
+        {currentRaceSlug}
+      />
 
-    <main class="container">
-      {
-        sidebar ? (
-          <div class="layout-sidebar">
-            <SeasonSidebar season={sidebar.season} current={sidebar.current} />
-            <div>
-              <slot />
-            </div>
-          </div>
-        ) : (
-          <slot />
-        )
-      }
-    </main>
+      {pageContext && <TimeTravelBar {pageContext} />}
 
-    <footer>
-      <div class="container">
-        Independent fan site — not affiliated with Formula One Group, FIA, or any team.
-      </div>
-    </footer>
+      <main class="mx-auto w-full max-w-[var(--container-narrow)] flex-1 px-4 py-8 sm:px-6">
+        <slot />
+      </main>
+
+      <Footer />
+    </div>
   </body>
 </html>
-
-<script>
-  import '../scripts/sortable-tables.ts';
-</script>

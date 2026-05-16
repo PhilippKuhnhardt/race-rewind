@@ -1,12 +1,12 @@
 ---
-import BaseV2 from '../layouts/BaseV2.astro';
+import Base from '../layouts/Base.astro';
 import { getAllSeasons } from '../lib/queries';
 
 const seasons = await getAllSeasons();
 const recentSeasons = [...seasons].reverse().slice(0, 8);
 ---
 
-<BaseV2
+<Base
   title="F1 History — Race by race, 1950 to today"
   description="Race-by-race timeline of Formula 1 history. Driver career snapshots, standings as of any race, 1950–2026."
   canonical="/"
@@ -88,7 +88,7 @@ const recentSeasons = [...seasons].reverse().slice(0, 8);
       <span class="text-sm text-fg-muted">Any two drivers, at any race in history</span>
     </a>
   </section>
-</BaseV2>
+</Base>
 
 <script>
   document.getElementById('home-season')!.addEventListener('change', (e) => {

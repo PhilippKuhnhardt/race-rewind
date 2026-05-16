@@ -205,6 +205,5 @@ export async function getTeamDriversFielded(teamId: number, beforeRaceNumber: nu
       };
     })
     .sort((a, b) => a.first_season - b.first_season || a.full_name.localeCompare(b.full_name))
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    .map(({ first_season: _, ...rest }) => rest);
+    .map(({ first_season: _fs, ...rest }) => rest);
 }

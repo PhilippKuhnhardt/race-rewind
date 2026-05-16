@@ -1,0 +1,133 @@
+---
+import Base from '../../../layouts/Base.astro';
+import {
+  getAllTeamRacePairs,
+  getTeamBySlug,
+  getTeamCareerStats,
+  getTeamSeasonFirstRaces,
+  getTeamDriversFielded,
+} from '../../../lib/queries';
+import { formatPts, teamLink } from '../../../lib/format';
+
+export async function getStaticPaths() {
+  const pairs = await getAllTeamRacePairs();
+  const slugs = [...new Set(pairs.map((p) => p.team_slug))];
+  return slugs.map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+
+const team = await getTeamBySlug(slug);
+if (!team) throw new Error(`Team not found: ${slug}`);
+
+const [stats, seasonFirstRaces, driversFielded] = await Promise.all([
+  getTeamCareerStats(team.id, 999999),
+  getTeamSeasonFirstRaces(team.id),
+  getTeamDriversFielded(team.id, 999999),
+]);
+
+const seasons = Object.keys(seasonFirstRaces)
+  .map(Number)
+  .sort((a, b) => b - a);
+
+const title = `${team.name} — Team Overview`;
+const description = `${team.name}: ${stats.entries} race entries, ${stats.wins} wins, ${stats.championships} constructors' title${stats.championships !== 1 ? 's' : ''}.`;
+---
+
+<Base title={title} description={description} canonical={`/teams/${slug}/`}>
+  <div class="mb-6">
+    {team.primary_color && (
+      <div class="h-1 w-12 rounded-full mb-3" style={`background:${team.primary_color}`} />
+    )}
+    <h1 class="text-2xl font-bold text-fg">{team.name}</h1>
+    {team.nationality && (
+      <p class="text-sm text-fg-muted mt-1">{team.nationality}</p>
+    )}
+  </div>
+
+  <section class="mb-6">
+    <h2 class="mb-4 text-lg font-semibold text-fg">Career Statistics</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+      {[
+        { label: 'Race Entries', value: stats.entries },
+        { label: 'Wins', value: stats.wins },
+        { label: 'Podiums', value: stats.podiums },
+        { label: 'Poles', value: stats.poles },
+        { label: 'Fastest Laps', value: stats.fastest_laps },
+        { label: 'Career Points', value: formatPts(stats.points) },
+        { label: "Constructors' Titles", value: stats.championships },
+        { label: 'Seasons', value: seasons.length },
+      ].map(({ label, value }) => (
+        <div class="rounded-lg border border-border bg-bg-alt p-3">
+          <div class="text-xs text-fg-muted uppercase tracking-wide">{label}</div>
+          <div class={`text-xl font-bold mt-1 ${label === "Constructors' Titles" && Number(value) > 0 ? 'text-accent' : 'text-fg'}`}>{value}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  {driversFielded.length > 0 && (
+    <section class="mb-6">
+      <h2 class="mb-4 text-lg font-semibold text-fg">Drivers Fielded</h2>
+      <div class="overflow-x-auto rounded-lg border border-border">
+        <table class="w-full border-collapse text-sm">
+          <thead>
+            <tr>
+              <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Driver</th>
+              <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Years</th>
+              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Starts</th>
+              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Wins</th>
+              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Points</th>
+              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">WDC</th>
+              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">WCC</th>
+            </tr>
+          </thead>
+          <tbody>
+            {driversFielded.map((d) => (
+              <tr class="border-b border-border last:border-0 hover:bg-bg-hover transition-colors">
+                <td class="px-3 py-2.5">
+                  <a href={`/drivers/${d.driver_slug}/`} class="text-accent hover:underline font-medium">
+                    {d.full_name}
+                  </a>
+                </td>
+                <td class="px-3 py-2.5 text-fg-muted whitespace-nowrap">{d.years}</td>
+                <td class="px-3 py-2.5 text-right tabular-nums text-fg">{d.starts}</td>
+                <td class="px-3 py-2.5 text-right tabular-nums text-fg">{d.wins}</td>
+                <td class="px-3 py-2.5 text-right tabular-nums text-fg">{formatPts(d.points)}</td>
+                <td class="px-3 py-2.5 text-right tabular-nums text-fg-muted">{d.driver_championships || '—'}</td>
+                <td class="px-3 py-2.5 text-right tabular-nums text-fg-muted">{d.team_championships || '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  )}
+
+  <section>
+    <h2 class="mb-4 text-lg font-semibold text-fg">Seasons</h2>
+    <div class="overflow-x-auto rounded-lg border border-border">
+      <table class="w-full border-collapse text-sm">
+        <thead>
+          <tr>
+            <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Season</th>
+          </tr>
+        </thead>
+        <tbody>
+          {seasons.map((season) => {
+            const firstRaceSlug = seasonFirstRaces[season];
+            return (
+              <tr class="border-b border-border last:border-0 hover:bg-bg-hover transition-colors">
+                <td class="px-3 py-2.5">
+                  <a href={teamLink(slug, String(season), firstRaceSlug)} class="text-accent hover:underline font-medium">
+                    {season}
+                  </a>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</Base>

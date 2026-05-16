@@ -1,0 +1,62 @@
+---
+import { orDash, driverLink, teamLink } from '../../lib/format';
+import type { getQualifyingResults } from '../../lib/queries';
+
+interface Props {
+  quali: Awaited<ReturnType<typeof getQualifyingResults>>;
+  season: number;
+  raceSlug: string;
+}
+
+const { quali, season, raceSlug } = Astro.props;
+
+const isModernQuali = quali.length > 0 && (quali[0].q1_time != null || quali[0].q2_time != null);
+
+---
+
+{quali.length > 0 ? (
+  <div class="overflow-x-auto rounded-lg border border-border">
+    <table class="w-full border-collapse text-sm">
+      <thead>
+        <tr>
+          <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap w-10">Pos</th>
+          <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Driver</th>
+          <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Team</th>
+          {isModernQuali ? (
+            <>
+              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap font-mono">Q1</th>
+              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap font-mono">Q2</th>
+              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap font-mono">Q3</th>
+            </>
+          ) : (
+            <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap font-mono">Time</th>
+          )}
+        </tr>
+      </thead>
+      <tbody>
+        {quali.map((row) => (
+          <tr class="border-b border-border last:border-0 hover:bg-bg-hover transition-colors">
+            <td class="px-3 py-2.5 text-right tabular-nums font-bold text-fg">{row.position ?? '—'}</td>
+            <td class="px-3 py-2.5">
+              <a href={driverLink(row.driver_slug, season, raceSlug)} class="text-accent hover:underline font-medium">{row.full_name}</a>
+            </td>
+            <td class="px-3 py-2.5 text-fg-muted">
+              <a href={teamLink(row.team_slug, season, raceSlug)} class="text-fg-muted hover:text-accent hover:underline">{row.team_name}</a>
+            </td>
+            {isModernQuali ? (
+              <>
+                <td class="px-3 py-2.5 text-right font-mono text-xs tabular-nums">{orDash(row.q1_time)}</td>
+                <td class="px-3 py-2.5 text-right font-mono text-xs tabular-nums">{orDash(row.q2_time)}</td>
+                <td class="px-3 py-2.5 text-right font-mono text-xs tabular-nums">{orDash(row.q3_time)}</td>
+              </>
+            ) : (
+              <td class="px-3 py-2.5 text-right font-mono text-xs tabular-nums">{orDash(row.qualifying_time)}</td>
+            )}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+) : (
+  <p class="text-sm text-fg-muted">No qualifying data available for this race.</p>
+)}

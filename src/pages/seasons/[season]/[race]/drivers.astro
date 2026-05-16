@@ -1,0 +1,94 @@
+---
+import Base from '../../../../layouts/Base.astro';
+import RaceHeroCard from '../../../../components/race/RaceHeroCard.astro';
+import RaceSubNav from '../../../../components/race/RaceSubNav.astro';
+import { getAllRaces, getSeasonGrid } from '../../../../lib/queries';
+import { getRacePageBase } from '../../../../lib/race-page';
+import { raceLink, driverLink, teamLink } from '../../../../lib/format';
+
+export async function getStaticPaths() {
+  return (await getAllRaces()).map((r) => ({
+    params: { season: String(r.season), race: r.race_slug },
+  }));
+}
+
+const { season, race: raceSlug } = Astro.params;
+const base = await getRacePageBase(season, raceSlug);
+if (!base) throw new Error(`Race not found: ${season}-${raceSlug}`);
+const { race, raceCount, pageContext } = base;
+
+const grid = await getSeasonGrid(race.race_number);
+
+const title = `${race.season} ${race.name} — Grid`;
+const description = `Driver and team lineup for the ${race.season} ${race.name}.`;
+---
+
+<Base title={title} description={description} canonical={`${raceLink(season, raceSlug)}drivers/`} {pageContext}>
+  <RaceHeroCard
+    name={race.name}
+    season={race.season}
+    round={race.round}
+    raceCount={raceCount}
+    date={race.date}
+    circuitName={race.circuit_name}
+    circuitLocality={race.circuit_locality}
+    circuitCountry={race.circuit_country}
+  />
+
+  <RaceSubNav
+    season={race.season}
+    raceSlug={raceSlug}
+    hasQuali={race.season >= 1994}
+    hasSprint={!!race.has_sprint}
+    activeId="grid"
+  />
+
+  <section>
+    <h2 class="mb-4 text-lg font-semibold text-fg">Driver &amp; Team Lineup</h2>
+    {grid.length > 0 ? (
+      <div class="overflow-x-auto rounded-lg border border-border">
+        <table class="w-full border-collapse text-sm">
+          <thead>
+            <tr>
+              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">No.</th>
+              <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Driver</th>
+              <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Team</th>
+            </tr>
+          </thead>
+          <tbody>
+            {grid.map((row) => (
+              <tr class="border-b border-border last:border-0 hover:bg-bg-hover transition-colors">
+                <td class="px-3 py-2.5 text-right tabular-nums text-fg-muted">{row.car_number ?? '—'}</td>
+                <td class="px-3 py-2.5">
+                  <div class="flex items-center gap-2">
+                    {row.primary_color && (
+                      <span
+                        class="inline-block h-3 w-1 shrink-0 rounded-full"
+                        style={`background:${row.primary_color}`}
+                        aria-hidden="true"
+                      />
+                    )}
+                    <a href={driverLink(row.driver_slug, race.season, raceSlug)} class="text-accent hover:underline font-medium">
+                      {row.full_name}
+                    </a>
+                  </div>
+                </td>
+                <td class="px-3 py-2.5 text-fg-muted">
+                  {row.team_slug ? (
+                    <a href={teamLink(row.team_slug, race.season, raceSlug)} class="text-fg-muted hover:text-accent hover:underline">
+                      {row.team_name}
+                    </a>
+                  ) : (
+                    <span>{row.team_name}</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    ) : (
+      <p class="text-sm text-fg-muted">No grid data available for this race.</p>
+    )}
+  </section>
+</Base>

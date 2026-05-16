@@ -1,0 +1,32 @@
+---
+import { raceSubNavItems } from '../../lib/race-subnav';
+
+interface Props {
+  season: number;
+  raceSlug: string;
+  hasQuali: boolean;
+  hasSprint: boolean;
+  activeId: string;
+}
+
+const { season, raceSlug, hasQuali, hasSprint, activeId } = Astro.props;
+const items = raceSubNavItems(season, raceSlug, hasQuali, hasSprint);
+---
+
+<nav class="mb-8 -mx-4 sm:-mx-6 border-b border-border" aria-label="Race sections">
+  <div class="flex gap-0 overflow-x-auto px-4 sm:px-6 scrollbar-none">
+    {items.map((item) => (
+      <a
+        href={item.href}
+        aria-current={item.id === activeId ? 'page' : undefined}
+        class={`shrink-0 border-b-2 px-3 py-3 text-sm font-medium transition-colors no-underline whitespace-nowrap ${
+          item.id === activeId
+            ? 'border-accent text-accent'
+            : 'border-transparent text-fg-muted hover:border-border hover:text-fg'
+        }`}
+      >
+        {item.label}
+      </a>
+    ))}
+  </div>
+</nav>

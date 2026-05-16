@@ -1,0 +1,59 @@
+---
+import Base from '../../../../layouts/Base.astro';
+import RaceHeroCard from '../../../../components/race/RaceHeroCard.astro';
+import RaceSubNav from '../../../../components/race/RaceSubNav.astro';
+import SprintQualifyingTable from '../../../../components/race/SprintQualifyingTable.astro';
+import { db } from '../../../../db/client';
+import { races } from '../../../../db/schema';
+import { eq } from 'drizzle-orm';
+import { stripYearPrefix, raceLink } from '../../../../lib/format';
+import { getSprintQualifyingResults } from '../../../../lib/queries';
+import { getRacePageBase } from '../../../../lib/race-page';
+
+export async function getStaticPaths() {
+  const rows = await db
+    .select({ season: races.season, slug: races.slug })
+    .from(races)
+    .where(eq(races.hasSprint, 1));
+
+  return rows.map((r) => ({
+    params: { season: String(r.season), race: stripYearPrefix(r.slug, r.season) },
+  }));
+}
+
+const { season, race: raceSlug } = Astro.params;
+const base = await getRacePageBase(season, raceSlug);
+if (!base) throw new Error(`Race not found: ${season}-${raceSlug}`);
+const { race, raceCount, pageContext } = base;
+
+const sprintQuali = await getSprintQualifyingResults(race.race_number);
+
+const title = `${race.season} ${race.name} — Sprint Qualifying`;
+const description = `${race.season} ${race.name} sprint qualifying results at ${race.circuit_name}.`;
+---
+
+<Base title={title} description={description} canonical={`${raceLink(season, raceSlug)}sprint-qualifying/`} {pageContext}>
+  <RaceHeroCard
+    name={race.name}
+    season={race.season}
+    round={race.round}
+    raceCount={raceCount}
+    date={race.date}
+    circuitName={race.circuit_name}
+    circuitLocality={race.circuit_locality}
+    circuitCountry={race.circuit_country}
+  />
+
+  <RaceSubNav
+    season={race.season}
+    raceSlug={raceSlug}
+    hasQuali={race.season >= 1994}
+    hasSprint={true}
+    activeId="sprint-qualifying"
+  />
+
+  <section>
+    <h2 class="mb-4 text-lg font-semibold text-fg">Sprint Qualifying</h2>
+    <SprintQualifyingTable {sprintQuali} season={race.season} {raceSlug} />
+  </section>
+</Base>

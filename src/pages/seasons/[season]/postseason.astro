@@ -1,9 +1,9 @@
 ---
 import Base from '../../../layouts/Base.astro';
-import AllDriversTable from '../../../components/AllDriversTable.astro';
-import SeasonGridTable from '../../../components/SeasonGridTable.astro';
-import DriverStandingsTable from '../../../components/DriverStandingsTable.astro';
-import TeamStandingsTable from '../../../components/TeamStandingsTable.astro';
+import AllDriversTable from '../../../components/driver/AllDriversTable.astro';
+import SeasonGridTable from '../../../components/driver/SeasonGridTable.astro';
+import DriverStandingsTable from '../../../components/standings/DriverStandingsTable.astro';
+import TeamStandingsTable from '../../../components/standings/TeamStandingsTable.astro';
 import {
   getAllSeasons,
   getSeasonBookends,
@@ -15,7 +15,7 @@ import {
   getDriverBestChampionshipPos,
   getAllDriverCareerStatsAsOf,
 } from '../../../lib/queries';
-import { stripYearPrefix, postseasonLink } from '../../../lib/format';
+import { stripYearPrefix, postseasonLink, preseasonLink } from '../../../lib/format';
 
 export async function getStaticPaths() {
   return (await getAllSeasons()).map((s) => ({
@@ -42,7 +42,6 @@ const hasData = bookends.latestCompletedRaceNumber != null;
 const isComplete =
   hasData && bookends.latestCompletedRaceNumber === bookends.lastRaceNumber;
 
-// asOfRaceNumber is the latest race with results, or the first race if none yet.
 const asOfRaceNumber = bookends.latestCompletedRaceNumber ?? bookends.firstRaceNumber;
 const asOfDate = bookends.latestCompletedDate ?? bookends.firstDate;
 
@@ -53,7 +52,6 @@ const [driverChamp, teamChamp, grid] = await Promise.all([
 ]);
 const lastRaceSlug = stripYearPrefix(bookends.lastSlug, season);
 
-// Career totals including the as-of race: pass asOfRaceNumber + 1 (strict-less-than logic)
 const careerRefRaceNumber = hasData ? asOfRaceNumber + 1 : bookends.firstRaceNumber;
 
 const [driverCareerRows, allDrivers] = await Promise.all([
@@ -76,7 +74,7 @@ driverCareerRows.sort((a, b) => {
   return b.career.points - a.career.points;
 });
 
-const title = `${season} Season — Postseason`;
+const title = `${season} Season — End of Season`;
 const description = isComplete
   ? `${season} F1 season final standings: drivers' and constructors' championships and career totals.`
   : `${season} F1 season in progress — standings as of round ${bookends.latestCompletedRound}.`;
@@ -86,29 +84,29 @@ const description = isComplete
   title={title}
   description={description}
   canonical={postseasonLink(season)}
-  navSeason={season}
-  sidebar={{ season, current: { kind: 'post' } }}
 >
-  <div class="page-header">
-    <h1>{season} Season</h1>
-    <p class="meta">
+  <div class="mb-8 border-b border-border pb-6">
+    <h1 class="text-3xl font-bold tracking-tight text-fg sm:text-4xl">{season} Season</h1>
+    <p class="mt-2 text-lg text-fg-muted">
       {bookends.raceCount} rounds &middot; {bookends.firstDate} &ndash; {bookends.lastDate}
     </p>
+    <nav class="mt-4 flex gap-3 text-sm" aria-label="Season sections">
+      <a href={preseasonLink(season)} class="text-fg-muted hover:text-fg transition-colors">Start of season</a>
+      <a href={postseasonLink(season)} class="font-semibold text-accent border-b-2 border-accent pb-0.5">End of season</a>
+    </nav>
   </div>
 
-  {
-    !isComplete && hasData && (
-      <div class="season-in-progress">
-        Season in progress &mdash; standings as of round {bookends.latestCompletedRound} / {bookends.raceCount}
-        ({bookends.latestCompletedName}).
-      </div>
-    )
-  }
-  {
-    !hasData && (
-      <div class="season-in-progress">No results available yet for this season.</div>
-    )
-  }
+  {!isComplete && hasData && (
+    <div class="mb-6 rounded-lg border border-border bg-bg-alt px-4 py-3 text-sm text-fg-muted">
+      Season in progress — standings as of round {bookends.latestCompletedRound} / {bookends.raceCount}
+      ({bookends.latestCompletedName}).
+    </div>
+  )}
+  {!hasData && (
+    <div class="mb-6 rounded-lg border border-border bg-bg-alt px-4 py-3 text-sm text-fg-muted">
+      No results available yet for this season.
+    </div>
+  )}
 
   <DriverStandingsTable
     title="Drivers' Championship"

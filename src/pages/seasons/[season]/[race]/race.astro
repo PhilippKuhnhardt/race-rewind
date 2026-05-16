@@ -1,0 +1,51 @@
+---
+import Base from '../../../../layouts/Base.astro';
+import RaceHeroCard from '../../../../components/race/RaceHeroCard.astro';
+import RaceSubNav from '../../../../components/race/RaceSubNav.astro';
+import RaceResultsTable from '../../../../components/race/RaceResultsTable.astro';
+import { getAllRaces, getRaceResults } from '../../../../lib/queries';
+import { getRacePageBase } from '../../../../lib/race-page';
+import { raceLink } from '../../../../lib/format';
+
+export async function getStaticPaths() {
+  return (await getAllRaces()).map((r) => ({
+    params: { season: String(r.season), race: r.race_slug },
+  }));
+}
+
+const { season, race: raceSlug } = Astro.params;
+const base = await getRacePageBase(season, raceSlug);
+if (!base) throw new Error(`Race not found: ${season}-${raceSlug}`);
+const { race, raceCount, pageContext } = base;
+
+const results = await getRaceResults(race.race_number);
+
+const title = `${race.season} ${race.name} — Race Results`;
+const description = `${race.season} ${race.name} race results at ${race.circuit_name}${race.circuit_locality ? ', ' + race.circuit_locality : ''}.`;
+---
+
+<Base title={title} description={description} canonical={`${raceLink(season, raceSlug)}race/`} {pageContext}>
+  <RaceHeroCard
+    name={race.name}
+    season={race.season}
+    round={race.round}
+    raceCount={raceCount}
+    date={race.date}
+    circuitName={race.circuit_name}
+    circuitLocality={race.circuit_locality}
+    circuitCountry={race.circuit_country}
+  />
+
+  <RaceSubNav
+    season={race.season}
+    raceSlug={raceSlug}
+    hasQuali={race.season >= 1994}
+    hasSprint={!!race.has_sprint}
+    activeId="race"
+  />
+
+  <section>
+    <h2 class="mb-4 text-lg font-semibold text-fg">Race</h2>
+    <RaceResultsTable {results} season={race.season} {raceSlug} />
+  </section>
+</Base>

@@ -3,12 +3,12 @@ import Base from '../../../../layouts/Base.astro';
 import {
   getAllDriverRacePairs,
   getDriverBySlug,
-  getRaceBySlug,
   getDriverCareerStats,
   getDriverStandingBeforeRace,
-  getDriverSeasonFirstRaces,
 } from '../../../../lib/queries';
+import { getRaceBySlug } from '../../../../lib/queries';
 import { formatPts, stripYearPrefix, driverLink, raceLink } from '../../../../lib/format';
+import type { PageContext } from '../../../../lib/types';
 
 export async function getStaticPaths() {
   return (await getAllDriverRacePairs()).map((p) => ({
@@ -26,31 +26,34 @@ const race = await getRaceBySlug(fullSlug);
 if (!race) throw new Error(`Race not found: ${fullSlug}`);
 
 const raceNavSlug = stripYearPrefix(race.slug, race.season);
-const [stats, standing, seasonFirstRaces] = await Promise.all([
+const [stats, standing] = await Promise.all([
   getDriverCareerStats(driver.id, race.race_number),
   getDriverStandingBeforeRace(driver.id, race.race_number),
-  getDriverSeasonFirstRaces(driver.id),
 ]);
+
+const pageContext: PageContext = {
+  kind: 'driver-race',
+  season: race.season,
+  raceName: race.name,
+  raceSlug: raceNavSlug,
+  driverName: driver.full_name,
+  driverSlug: slug,
+};
 
 const title = `${driver.full_name} — ${race.season} ${race.name}`;
 const description = `${driver.full_name}'s career going into the ${race.season} ${race.name}: ${stats.wins} wins, ${stats.podiums} podiums, ${stats.championships} championship${stats.championships !== 1 ? 's' : ''}.`;
 ---
 
-<Base
-  title={title}
-  description={description}
-  canonical={driverLink(slug, season, raceSlug)}
-  navSeason={race.season}
-  navContext={{ kind: 'driver', entitySlug: slug, entitySeasons: seasonFirstRaces }}
->
-  <a class="back-link" href={raceLink(race.season, raceNavSlug)}>
-    &larr; {race.season}
-    {race.name}
-  </a>
+<Base title={title} description={description} canonical={driverLink(slug, season, raceSlug)} {pageContext}>
+  <div class="mb-4">
+    <a href={raceLink(race.season, raceNavSlug)} class="text-sm text-fg-muted hover:text-accent transition-colors">
+      &larr; {race.season} {race.name}
+    </a>
+  </div>
 
-  <div class="page-header">
-    <h1>{driver.full_name}</h1>
-    <p class="meta">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-fg">{driver.full_name}</h1>
+    <p class="text-sm text-fg-muted mt-1">
       {
         [
           driver.nationality,
@@ -64,68 +67,49 @@ const description = `${driver.full_name}'s career going into the ${race.season} 
     </p>
   </div>
 
-  {
-    standing ? (
-      <section class="section">
-        <h2>Going Into This Race</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th class="num">Championship Pos</th>
-                <th class="num">Points</th>
-                <th class="num">Wins</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="num pos">{standing.position ?? '—'}</td>
-                <td class="num">{formatPts(standing.points)}</td>
-                <td class="num">{standing.win_count}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
+  <section class="mb-6">
+    <h2 class="mb-4 text-lg font-semibold text-fg">Going Into This Race</h2>
+    {standing ? (
+      <div class="overflow-x-auto rounded-lg border border-border">
+        <table class="w-full border-collapse text-sm">
+          <thead>
+            <tr>
+              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Championship Pos</th>
+              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Points</th>
+              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Wins</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="px-3 py-2.5 text-right tabular-nums font-semibold text-accent">{standing.position ?? '—'}</td>
+              <td class="px-3 py-2.5 text-right tabular-nums text-fg">{formatPts(standing.points)}</td>
+              <td class="px-3 py-2.5 text-right tabular-nums text-fg">{standing.win_count}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     ) : (
-      <section class="section">
-        <h2>Going Into This Race</h2>
-        <p class="section-note">First race of the season — championship not yet started.</p>
-      </section>
-    )
-  }
+      <p class="text-sm text-fg-muted">First race of the season — championship not yet started.</p>
+    )}
+  </section>
 
-  <section class="section">
-    <h2>Career Going Into This Race</h2>
-    <div class="stat-grid">
-      <div class="stat-card">
-        <div class="stat-label">Starts</div>
-        <div class="stat-value">{stats.starts}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Wins</div>
-        <div class="stat-value">{stats.wins}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Podiums</div>
-        <div class="stat-value">{stats.podiums}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Poles</div>
-        <div class="stat-value">{stats.poles}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Fastest Laps</div>
-        <div class="stat-value">{stats.fastest_laps}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Career Points</div>
-        <div class="stat-value">{formatPts(stats.points)}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Championships</div>
-        <div class="stat-value">{stats.championships}</div>
-      </div>
+  <section>
+    <h2 class="mb-4 text-lg font-semibold text-fg">Career Going Into This Race</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+      {[
+        { label: 'Starts', value: stats.starts },
+        { label: 'Wins', value: stats.wins },
+        { label: 'Podiums', value: stats.podiums },
+        { label: 'Poles', value: stats.poles },
+        { label: 'Fastest Laps', value: stats.fastest_laps },
+        { label: 'Career Points', value: formatPts(stats.points) },
+        { label: 'Championships', value: stats.championships },
+      ].map(({ label, value }) => (
+        <div class="rounded-lg border border-border bg-bg-alt p-3">
+          <div class="text-xs text-fg-muted uppercase tracking-wide">{label}</div>
+          <div class={`text-xl font-bold mt-1 ${label === 'Championships' && Number(value) > 0 ? 'text-accent' : 'text-fg'}`}>{value}</div>
+        </div>
+      ))}
     </div>
   </section>
 </Base>

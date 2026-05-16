@@ -1,0 +1,70 @@
+---
+import { formatPts, formatPos, formatGap, driverLink, teamLink } from '../../lib/format';
+import type { getRaceResults } from '../../lib/queries';
+
+interface Props {
+  results: Awaited<ReturnType<typeof getRaceResults>>;
+  season: number;
+  raceSlug: string;
+  isSprint?: boolean;
+}
+
+const { results, season, raceSlug, isSprint = false } = Astro.props;
+const winnerTime = results.find((r) => r.position === 1)?.time ?? null;
+---
+
+{results.length > 0 ? (
+  <div>
+    <div class="overflow-x-auto rounded-lg border border-border">
+      <table class="w-full border-collapse text-sm">
+        <thead>
+          <tr>
+            <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap w-10">Pos</th>
+            <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Driver</th>
+            <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Team</th>
+            {!isSprint && <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">No.</th>}
+            <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Grid</th>
+            <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Laps</th>
+            <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap font-mono">Time / Gap</th>
+            <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Status</th>
+            {!isSprint && <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Stops</th>}
+            <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Pts</th>
+          </tr>
+        </thead>
+        <tbody>
+          {results.map((row) => {
+            const gap = formatGap(winnerTime, row);
+            const status = row.is_classified ? 'Finished' : (row.detail ?? '—');
+            const isFl = row.fastest_lap_rank === 1;
+            return (
+              <tr class="border-b border-border last:border-0 hover:bg-bg-hover transition-colors">
+                <td class="px-3 py-2.5 text-right tabular-nums font-bold text-fg">{formatPos(row.position)}</td>
+                <td class="px-3 py-2.5">
+                  <a
+                    href={driverLink(row.driver_slug, season, raceSlug)}
+                    class={`font-medium hover:underline ${isFl ? 'text-fl' : 'text-accent'}`}
+                  >
+                    {row.full_name}
+                  </a>
+                </td>
+                <td class="px-3 py-2.5 text-fg-muted">
+                  <a href={teamLink(row.team_slug, season, raceSlug)} class="text-fg-muted hover:text-accent hover:underline">{row.team_name}</a>
+                </td>
+                {!isSprint && <td class="px-3 py-2.5 text-right tabular-nums text-fg-muted">{row.car_number ?? '—'}</td>}
+                <td class="px-3 py-2.5 text-right tabular-nums text-fg-muted">{row.grid ?? '—'}</td>
+                <td class="px-3 py-2.5 text-right tabular-nums text-fg-muted">{row.laps_completed ?? '—'}</td>
+                <td class="px-3 py-2.5 text-right font-mono text-xs tabular-nums">{gap}</td>
+                <td class={`px-3 py-2.5 text-sm ${!row.is_classified ? 'text-fg-muted italic' : 'text-fg'}`}>{status}</td>
+                {!isSprint && <td class="px-3 py-2.5 text-right tabular-nums text-fg-muted">{row.pit_stop_count ?? '—'}</td>}
+                <td class="px-3 py-2.5 text-right tabular-nums font-medium">{formatPts(row.points)}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+    <p class="mt-2 text-xs text-fg-muted"><span class="text-fl font-medium">Purple</span> driver name = set fastest lap of the race.</p>
+  </div>
+) : (
+  <p class="text-sm text-fg-muted">No results available yet.</p>
+)}

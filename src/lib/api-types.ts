@@ -21,7 +21,7 @@ export interface DriverAtRacePayload {
     primary_color: string | null;
   } | null;
   standing_going_in: {
-    position: number;
+    position: number | null;
     points: number;
     win_count: number;
   } | null;
@@ -37,26 +37,23 @@ export interface DriverAtRacePayload {
   result_this_race: {
     grid: number | null;
     position: number | null;
-    status: string | null;
+    status: number | null;
     detail: string | null;
     time: string | null;
     points: number | null;
-    is_classified: boolean | null;
+    is_classified: number | null;
     fastest_lap_rank: number | null;
   } | null;
 }
 
-export interface DriverIndexEntry {
+export interface DriverPickerEntry {
   slug: string;
   full_name: string;
-  abbreviation: string | null;
   nationality: string | null;
 }
 
-export interface RaceIndexEntry {
+export interface RacePickerEntry {
   slug: string;
   season: number;
-  round: number;
   name: string;
-  race_number: number;
 }

@@ -6,10 +6,10 @@ import {
   getRaceBySlug,
   getTeamCareerStats,
   getTeamStandingBeforeRace,
-  getTeamSeasonFirstRaces,
   getTeamDriversFielded,
 } from '../../../../lib/queries';
-import { formatPts, stripYearPrefix, teamLink, raceLink } from '../../../../lib/format';
+import { formatPts, stripYearPrefix, teamLink, raceLink, driverLink } from '../../../../lib/format';
+import type { PageContext } from '../../../../lib/types';
 
 export async function getStaticPaths() {
   return (await getAllTeamRacePairs()).map((p) => ({
@@ -27,154 +27,124 @@ const race = await getRaceBySlug(fullSlug);
 if (!race) throw new Error(`Race not found: ${fullSlug}`);
 
 const raceNavSlug = stripYearPrefix(race.slug, race.season);
-const [stats, standing, seasonFirstRaces, driversFielded] = await Promise.all([
+const [stats, standing, driversFielded] = await Promise.all([
   getTeamCareerStats(team.id, race.race_number),
   getTeamStandingBeforeRace(team.id, race.race_number),
-  getTeamSeasonFirstRaces(team.id),
   getTeamDriversFielded(team.id, race.race_number),
 ]);
+
+const pageContext: PageContext = {
+  kind: 'team-race',
+  season: race.season,
+  raceName: race.name,
+  raceSlug: raceNavSlug,
+  teamName: team.name,
+  teamSlug: slug,
+};
 
 const title = `${team.name} — ${race.season} ${race.name}`;
 const description = `${team.name}'s career going into the ${race.season} ${race.name}: ${stats.wins} wins, ${stats.podiums} podiums, ${stats.championships} constructors' title${stats.championships !== 1 ? 's' : ''}.`;
 ---
 
-<Base
-  title={title}
-  description={description}
-  canonical={teamLink(slug, season, raceSlug)}
-  navSeason={race.season}
-  navContext={{ kind: 'team', entitySlug: slug, entitySeasons: seasonFirstRaces }}
->
-  <a class="back-link" href={raceLink(race.season, raceNavSlug)}>
-    &larr; {race.season}
-    {race.name}
-  </a>
-
-  <div class="page-header">
-    {team.primary_color && (
-      <div class="team-color-bar" style={`background:${team.primary_color}`} />
-    )}
-    <h1>{team.name}</h1>
-    <p class="meta">
-      {[team.nationality].filter(Boolean).join(' · ')}
-    </p>
+<Base title={title} description={description} canonical={teamLink(slug, season, raceSlug)} {pageContext}>
+  <div class="mb-4">
+    <a href={raceLink(race.season, raceNavSlug)} class="text-sm text-fg-muted hover:text-accent transition-colors">
+      &larr; {race.season} {race.name}
+    </a>
   </div>
 
-  {
-    standing ? (
-      <section class="section">
-        <h2>Going Into This Race</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th class="num">Championship Pos</th>
-                <th class="num">Points</th>
-                <th class="num">Wins</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="num pos">{standing.position ?? '—'}</td>
-                <td class="num">{formatPts(standing.points)}</td>
-                <td class="num">{standing.win_count}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
+  <div class="mb-6">
+    {team.primary_color && (
+      <div class="h-1 w-12 rounded-full mb-3" style={`background:${team.primary_color}`} />
+    )}
+    <h1 class="text-2xl font-bold text-fg">{team.name}</h1>
+    {team.nationality && (
+      <p class="text-sm text-fg-muted mt-1">{team.nationality}</p>
+    )}
+  </div>
+
+  <section class="mb-6">
+    <h2 class="mb-4 text-lg font-semibold text-fg">Going Into This Race</h2>
+    {standing ? (
+      <div class="overflow-x-auto rounded-lg border border-border">
+        <table class="w-full border-collapse text-sm">
+          <thead>
+            <tr>
+              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Championship Pos</th>
+              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Points</th>
+              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Wins</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="px-3 py-2.5 text-right tabular-nums font-semibold text-accent">{standing.position ?? '—'}</td>
+              <td class="px-3 py-2.5 text-right tabular-nums text-fg">{formatPts(standing.points)}</td>
+              <td class="px-3 py-2.5 text-right tabular-nums text-fg">{standing.win_count}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     ) : (
-      <section class="section">
-        <h2>Going Into This Race</h2>
-        <p class="section-note">First race of the season — championship not yet started.</p>
-      </section>
-    )
-  }
+      <p class="text-sm text-fg-muted">First race of the season — championship not yet started.</p>
+    )}
+  </section>
 
-  {
-    driversFielded.length > 0 && (
-      <section class="section">
-        <h2>Drivers Fielded</h2>
-        <div class="table-wrap">
-          <table class="tablesort">
-            <thead>
-              <tr>
-                <th>Driver</th>
-                <th>Years</th>
-                <th class="num">Starts</th>
-                <th class="num">Wins</th>
-                <th class="num">Points</th>
-                <th class="num">WDC</th>
-                <th class="num">WCC</th>
+  {driversFielded.length > 0 && (
+    <section class="mb-6">
+      <h2 class="mb-4 text-lg font-semibold text-fg">Drivers Fielded</h2>
+      <div class="overflow-x-auto rounded-lg border border-border">
+        <table class="w-full border-collapse text-sm">
+          <thead>
+            <tr>
+              <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Driver</th>
+              <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Years</th>
+              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Starts</th>
+              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Wins</th>
+              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Points</th>
+              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">WDC</th>
+              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">WCC</th>
+            </tr>
+          </thead>
+          <tbody>
+            {driversFielded.map((d) => (
+              <tr class="border-b border-border last:border-0 hover:bg-bg-hover transition-colors">
+                <td class="px-3 py-2.5">
+                  <a href={driverLink(d.driver_slug, race.season, raceNavSlug)} class="text-accent hover:underline font-medium">
+                      {d.full_name}
+                    </a>
+                </td>
+                <td class="px-3 py-2.5 text-fg-muted whitespace-nowrap">{d.years}</td>
+                <td class="px-3 py-2.5 text-right tabular-nums text-fg">{d.starts}</td>
+                <td class="px-3 py-2.5 text-right tabular-nums text-fg">{d.wins}</td>
+                <td class="px-3 py-2.5 text-right tabular-nums text-fg">{formatPts(d.points)}</td>
+                <td class="px-3 py-2.5 text-right tabular-nums text-fg-muted">{d.driver_championships || '—'}</td>
+                <td class="px-3 py-2.5 text-right tabular-nums text-fg-muted">{d.team_championships || '—'}</td>
               </tr>
-            </thead>
-            <tbody>
-              {driversFielded.map((d) => (
-                <tr>
-                  <td>{d.full_name}</td>
-                  <td class="year-ranges">{d.years}</td>
-                  <td class="num">{d.starts}</td>
-                  <td class="num">{d.wins}</td>
-                  <td class="num">{formatPts(d.points)}</td>
-                  <td class="num">{d.driver_championships || '—'}</td>
-                  <td class="num">{d.team_championships || '—'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    )
-  }
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  )}
 
-  <section class="section">
-    <h2>Career Going Into This Race</h2>
-    <div class="stat-grid">
-      <div class="stat-card">
-        <div class="stat-label">Race Entries</div>
-        <div class="stat-value">{stats.entries}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Wins</div>
-        <div class="stat-value">{stats.wins}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Podiums</div>
-        <div class="stat-value">{stats.podiums}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Poles</div>
-        <div class="stat-value">{stats.poles}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Fastest Laps</div>
-        <div class="stat-value">{stats.fastest_laps}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Career Points</div>
-        <div class="stat-value">{formatPts(stats.points)}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Constructors' Titles</div>
-        <div class="stat-value">{stats.championships}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Drivers Fielded</div>
-        <div class="stat-value">{stats.drivers_fielded}</div>
-      </div>
+  <section>
+    <h2 class="mb-4 text-lg font-semibold text-fg">Career Going Into This Race</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+      {[
+        { label: 'Race Entries', value: stats.entries },
+        { label: 'Wins', value: stats.wins },
+        { label: 'Podiums', value: stats.podiums },
+        { label: 'Poles', value: stats.poles },
+        { label: 'Fastest Laps', value: stats.fastest_laps },
+        { label: 'Career Points', value: formatPts(stats.points) },
+        { label: "Constructors' Titles", value: stats.championships },
+        { label: 'Drivers Fielded', value: stats.drivers_fielded },
+      ].map(({ label, value }) => (
+        <div class="rounded-lg border border-border bg-bg-alt p-3">
+          <div class="text-xs text-fg-muted uppercase tracking-wide">{label}</div>
+          <div class={`text-xl font-bold mt-1 ${label === "Constructors' Titles" && Number(value) > 0 ? 'text-accent' : 'text-fg'}`}>{value}</div>
+        </div>
+      ))}
     </div>
   </section>
 </Base>
-
-<style>
-  .team-color-bar {
-    height: 4px;
-    border-radius: 2px;
-    margin-bottom: 0.75rem;
-    width: 3rem;
-  }
-
-  .year-ranges {
-    white-space: nowrap;
-  }
-</style>
