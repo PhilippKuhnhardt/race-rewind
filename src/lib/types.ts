@@ -44,4 +44,13 @@ export type PageContext =
       teamSlug: string;
       prevRaceSlug?: string;
       nextRaceSlug?: string;
+    }
+  | {
+      kind: 'stats';
+      season: number;
+      raceCount: number;
+      chainSlug: string;
+      raceName: string | null;
+      prevChainSlug?: string;
+      nextChainSlug?: string;
     };

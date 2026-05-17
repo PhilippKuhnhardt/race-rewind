@@ -1,19 +1,12 @@
 ---
 import Base from '../../../layouts/Base.astro';
-import AllDriversTable from '../../../components/driver/AllDriversTable.astro';
-import SeasonGridTable from '../../../components/driver/SeasonGridTable.astro';
 import DriverStandingsTable from '../../../components/standings/DriverStandingsTable.astro';
 import TeamStandingsTable from '../../../components/standings/TeamStandingsTable.astro';
 import {
   getAllSeasons,
   getSeasonBookends,
-  getSeasonGrid,
   getDriverStandings,
   getTeamStandings,
-  getDriverCareerStats,
-  getDriverPriorSeasons,
-  getDriverBestChampionshipPos,
-  getAllDriverCareerStatsAsOf,
 } from '../../../lib/queries';
 import { stripYearPrefix, postseasonLink } from '../../../lib/format';
 import type { PageContext } from '../../../lib/types';
@@ -22,16 +15,6 @@ export async function getStaticPaths() {
   return (await getAllSeasons()).map((s) => ({
     params: { season: String(s) },
   }));
-}
-
-function computeAge(dob: string | null, atDate: string): number | null {
-  if (!dob) return null;
-  const d = new Date(dob);
-  const r = new Date(atDate);
-  let age = r.getFullYear() - d.getFullYear();
-  const m = r.getMonth() - d.getMonth();
-  if (m < 0 || (m === 0 && r.getDate() < d.getDate())) age--;
-  return age;
 }
 
 const { season: seasonStr } = Astro.params;
@@ -44,13 +27,7 @@ const isComplete =
   hasData && bookends.latestCompletedRaceNumber === bookends.lastRaceNumber;
 
 const asOfRaceNumber = bookends.latestCompletedRaceNumber ?? bookends.firstRaceNumber;
-const asOfDate = bookends.latestCompletedDate ?? bookends.firstDate;
 
-const [driverChamp, teamChamp, grid] = await Promise.all([
-  hasData ? getDriverStandings(asOfRaceNumber) : Promise.resolve([]),
-  hasData ? getTeamStandings(asOfRaceNumber) : Promise.resolve([]),
-  getSeasonGrid(asOfRaceNumber),
-]);
 const lastRaceSlug = stripYearPrefix(bookends.lastSlug, season);
 const prevRaceSlug = !isComplete && hasData && bookends.latestCompletedSlug
   ? stripYearPrefix(bookends.latestCompletedSlug, season)
@@ -64,31 +41,14 @@ const pageContext: PageContext = {
   inProgressRound: !isComplete && hasData ? bookends.latestCompletedRound : null,
 };
 
-const careerRefRaceNumber = hasData ? asOfRaceNumber + 1 : bookends.firstRaceNumber;
-
-const [driverCareerRows, allDrivers] = await Promise.all([
-  Promise.all(
-    grid.map(async (d) => {
-      const [career, seasons, bestChamp] = await Promise.all([
-        getDriverCareerStats(d.driver_id, careerRefRaceNumber),
-        getDriverPriorSeasons(d.driver_id, careerRefRaceNumber),
-        getDriverBestChampionshipPos(d.driver_id, careerRefRaceNumber),
-      ]);
-      const age = computeAge(d.date_of_birth, asOfDate);
-      return { ...d, career, seasons, bestChamp, age };
-    })
-  ),
-  getAllDriverCareerStatsAsOf(careerRefRaceNumber),
+const [driverChamp, teamChamp] = await Promise.all([
+  hasData ? getDriverStandings(asOfRaceNumber) : Promise.resolve([]),
+  hasData ? getTeamStandings(asOfRaceNumber) : Promise.resolve([]),
 ]);
-
-driverCareerRows.sort((a, b) => {
-  if (a.team_name !== b.team_name) return (a.team_name ?? '').localeCompare(b.team_name ?? '');
-  return b.career.points - a.career.points;
-});
 
 const title = `${season} Season — End of Season`;
 const description = isComplete
-  ? `${season} F1 season final standings: drivers' and constructors' championships and career totals.`
+  ? `${season} F1 season final standings: drivers' and constructors' championships.`
   : `${season} F1 season in progress — standings as of round ${bookends.latestCompletedRound}.`;
 ---
 
@@ -125,13 +85,4 @@ const description = isComplete
   />
 
   <TeamStandingsTable title="Constructors' Championship" rows={teamChamp} season={season} raceSlug={lastRaceSlug} />
-
-  <SeasonGridTable
-    title="Career Totals After the Season"
-    drivers={driverCareerRows}
-    season={season}
-    raceSlug={lastRaceSlug}
-  />
-
-  <AllDriversTable drivers={allDrivers} season={season} raceSlug={lastRaceSlug} />
 </Base>

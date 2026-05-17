@@ -1,0 +1,53 @@
+---
+import { formatPts } from '../../lib/format';
+import type { getTeamDriversFielded } from '../../lib/queries';
+
+interface Props {
+  drivers: Awaited<ReturnType<typeof getTeamDriversFielded>>;
+  driverHref?: (slug: string) => string;
+}
+
+const { drivers, driverHref = (slug) => `/drivers/${slug}/` } = Astro.props;
+---
+
+{drivers.length > 0 && (
+  <section class="mb-6">
+    <h2 class="mb-4 text-lg font-semibold text-fg">Drivers Fielded</h2>
+    <div class="overflow-x-auto rounded-lg border border-border">
+      <table class="w-full border-collapse text-sm" data-sortable>
+        <thead>
+          <tr>
+            <th data-sort-key="driver" class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Driver</th>
+            <th data-sort-key="years" class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Years</th>
+            <th data-sort-key="starts" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Starts</th>
+            <th data-sort-key="wins" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Wins</th>
+            <th data-sort-key="points" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Points</th>
+            <th data-sort-key="wdc" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">WDC</th>
+            <th data-sort-key="wcc" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">WCC</th>
+          </tr>
+        </thead>
+        <tbody>
+          {drivers.map((d) => (
+            <tr class="border-b border-border last:border-0 hover:bg-bg-hover transition-colors">
+              <td class="px-3 py-2.5">
+                <a href={driverHref(d.driver_slug)} class="text-accent hover:underline font-medium">
+                  {d.full_name}
+                </a>
+              </td>
+              <td class="px-3 py-2.5 text-fg-muted whitespace-nowrap">{d.years}</td>
+              <td class="px-3 py-2.5 text-right tabular-nums text-fg">{d.starts}</td>
+              <td class="px-3 py-2.5 text-right tabular-nums text-fg">{d.wins}</td>
+              <td class="px-3 py-2.5 text-right tabular-nums text-fg">{formatPts(d.points)}</td>
+              <td class="px-3 py-2.5 text-right tabular-nums text-fg-muted">{d.driver_championships || '—'}</td>
+              <td class="px-3 py-2.5 text-right tabular-nums text-fg-muted">{d.team_championships || '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+)}
+
+<script>
+  import '../../scripts/sortable-table.ts';
+</script>

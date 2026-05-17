@@ -33,13 +33,17 @@ const currentRaceSlug = (() => {
     case 'team-race':  return pageContext.raceSlug;
     case 'preseason':  return pageContext.firstRaceSlug;
     case 'postseason': return pageContext.prevRaceSlug;
+    case 'stats':      return pageContext.chainSlug;
   }
 })();
 
 const currentChainSlug =
   pageContext?.kind === 'preseason'  ? 'preseason'
   : pageContext?.kind === 'postseason' ? 'postseason'
+  : pageContext?.kind === 'stats'    ? pageContext.chainSlug
   : currentRaceSlug;
+
+const section: 'seasons' | 'stats' = pageContext?.kind === 'stats' ? 'stats' : 'seasons';
 ---
 
 <!doctype html>
@@ -75,6 +79,7 @@ const currentChainSlug =
         {currentSeason}
         {currentRaceSlug}
         {currentChainSlug}
+        {section}
       />
 
       {pageContext && <TimeTravelBar {pageContext} />}

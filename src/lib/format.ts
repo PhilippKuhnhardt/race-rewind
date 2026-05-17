@@ -70,6 +70,13 @@ export const preseasonLink = (season: number | string): string =>
 export const postseasonLink = (season: number | string): string =>
   `/seasons/${season}/postseason/`;
 
+/** Format an integer as an ordinal string: 1 → "1st", 2 → "2nd", etc. */
+export function ordinal(n: number): string {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
 /** Collapse a sorted list of years into compact ranges, e.g. [1961,1962,1963,1971] → "1961–1963, 1971". */
 export function formatYearRanges(years: number[]): string {
   if (years.length === 0) return '';

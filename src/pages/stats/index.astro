@@ -1,0 +1,18 @@
+---
+import { getLatestRace } from '../../lib/queries';
+
+const r = await getLatestRace();
+const target = `/stats/${r.season}/${r.slug.slice(String(r.season).length + 1)}/`;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content={`0; url=${target}`} />
+    <link rel="canonical" href={target} />
+    <title>Driver Stats</title>
+  </head>
+  <body>
+    <p>Redirecting to <a href={target}>{target}</a></p>
+  </body>
+</html>

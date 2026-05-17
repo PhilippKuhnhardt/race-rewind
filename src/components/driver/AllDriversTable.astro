@@ -1,37 +1,32 @@
 ---
 import type { getAllDriverCareerStatsAsOf } from '../../lib/queries';
-import { formatPts, driverLink } from '../../lib/format';
+import { formatPts, driverLink, ordinal } from '../../lib/format';
 
 interface Props {
   drivers: Awaited<ReturnType<typeof getAllDriverCareerStatsAsOf>>;
   season: number;
   raceSlug: string;
+  title?: string;
 }
 
-const { drivers, season, raceSlug } = Astro.props;
-
-function ordinal(n: number): string {
-  const s = ['th', 'st', 'nd', 'rd'];
-  const v = n % 100;
-  return n + (s[(v - 20) % 10] || s[v] || s[0]);
-}
+const { drivers, season, raceSlug, title = 'All Drivers with at Least One Start' } = Astro.props;
 ---
 
 {drivers.length > 0 && (
   <section class="mt-10">
-    <h2 class="mb-3 border-b border-border pb-2 text-lg font-semibold text-fg">All Drivers with at Least One Start</h2>
+    <h2 class="mb-3 border-b border-border pb-2 text-lg font-semibold text-fg">{title}</h2>
     <div class="overflow-x-auto rounded-lg border border-border">
-      <table class="w-full border-collapse text-sm">
+      <table class="w-full border-collapse text-sm" data-sortable>
         <thead>
           <tr>
-            <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Driver</th>
-            <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Seasons</th>
-            <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Starts</th>
-            <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Wins</th>
-            <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Podiums</th>
-            <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Points</th>
-            <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Best</th>
-            <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Champs</th>
+            <th data-sort-key="driver" class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Driver</th>
+            <th data-sort-key="seasons" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Seasons</th>
+            <th data-sort-key="starts" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Starts</th>
+            <th data-sort-key="wins" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Wins</th>
+            <th data-sort-key="podiums" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Podiums</th>
+            <th data-sort-key="points" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Points</th>
+            <th data-sort-key="best" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Best</th>
+            <th data-sort-key="champs" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Champs</th>
           </tr>
         </thead>
         <tbody>
@@ -47,7 +42,7 @@ function ordinal(n: number): string {
               <td class="px-3 py-2.5 text-right tabular-nums font-medium">{row.wins}</td>
               <td class="px-3 py-2.5 text-right tabular-nums">{row.podiums}</td>
               <td class="px-3 py-2.5 text-right tabular-nums">{formatPts(row.points)}</td>
-              <td class="px-3 py-2.5 text-right tabular-nums text-fg-muted text-xs">{row.best_championship_pos != null ? ordinal(row.best_championship_pos) : '—'}</td>
+              <td class="px-3 py-2.5 text-right tabular-nums text-fg-muted text-xs" data-sort-value={row.best_championship_pos ?? ''}>{row.best_championship_pos != null ? ordinal(row.best_championship_pos) : '—'}</td>
               <td class="px-3 py-2.5 text-right tabular-nums font-semibold {row.championships > 0 ? 'text-accent' : ''}">{row.championships}</td>
             </tr>
           ))}
@@ -56,3 +51,7 @@ function ordinal(n: number): string {
     </div>
   </section>
 )}
+
+<script>
+  import '../../scripts/sortable-table.ts';
+</script>

@@ -13,13 +13,13 @@ const { grid, season, raceSlug } = Astro.props;
 
 {grid.length > 0 ? (
   <div class="overflow-x-auto rounded-lg border border-border">
-    <table class="w-full border-collapse text-sm">
+    <table class="w-full border-collapse text-sm" data-sortable>
       <thead>
         <tr>
-          <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap w-10">Grid</th>
-          <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Driver</th>
-          <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Team</th>
-          <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">No.</th>
+          <th data-sort-key="grid" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap w-10">Grid</th>
+          <th data-sort-key="driver" class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Driver</th>
+          <th data-sort-key="team" class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Team</th>
+          <th data-sort-key="no" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">No.</th>
         </tr>
       </thead>
       <tbody>
@@ -41,3 +41,7 @@ const { grid, season, raceSlug } = Astro.props;
 ) : (
   <p class="text-sm text-fg-muted">No grid data available for this race.</p>
 )}
+
+<script>
+  import '../../scripts/sortable-table.ts';
+</script>

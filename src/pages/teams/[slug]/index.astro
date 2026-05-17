@@ -1,5 +1,6 @@
 ---
 import Base from '../../../layouts/Base.astro';
+import DriversFieldedTable from '../../../components/driver/DriversFieldedTable.astro';
 import {
   getAllTeamRacePairs,
   getTeamBySlug,
@@ -66,43 +67,7 @@ const description = `${team.name}: ${stats.entries} race entries, ${stats.wins} 
     </div>
   </section>
 
-  {driversFielded.length > 0 && (
-    <section class="mb-6">
-      <h2 class="mb-4 text-lg font-semibold text-fg">Drivers Fielded</h2>
-      <div class="overflow-x-auto rounded-lg border border-border">
-        <table class="w-full border-collapse text-sm">
-          <thead>
-            <tr>
-              <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Driver</th>
-              <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Years</th>
-              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Starts</th>
-              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Wins</th>
-              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Points</th>
-              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">WDC</th>
-              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">WCC</th>
-            </tr>
-          </thead>
-          <tbody>
-            {driversFielded.map((d) => (
-              <tr class="border-b border-border last:border-0 hover:bg-bg-hover transition-colors">
-                <td class="px-3 py-2.5">
-                  <a href={`/drivers/${d.driver_slug}/`} class="text-accent hover:underline font-medium">
-                    {d.full_name}
-                  </a>
-                </td>
-                <td class="px-3 py-2.5 text-fg-muted whitespace-nowrap">{d.years}</td>
-                <td class="px-3 py-2.5 text-right tabular-nums text-fg">{d.starts}</td>
-                <td class="px-3 py-2.5 text-right tabular-nums text-fg">{d.wins}</td>
-                <td class="px-3 py-2.5 text-right tabular-nums text-fg">{formatPts(d.points)}</td>
-                <td class="px-3 py-2.5 text-right tabular-nums text-fg-muted">{d.driver_championships || '—'}</td>
-                <td class="px-3 py-2.5 text-right tabular-nums text-fg-muted">{d.team_championships || '—'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </section>
-  )}
+  <DriversFieldedTable drivers={driversFielded} />
 
   <section>
     <h2 class="mb-4 text-lg font-semibold text-fg">Seasons</h2>

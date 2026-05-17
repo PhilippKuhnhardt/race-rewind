@@ -10,16 +10,19 @@ interface Props {
   currentSeason: number;
   currentRaceSlug?: string;
   currentChainSlug?: string;
+  section?: 'seasons' | 'stats';
 }
 
-const { seasons, byseason, currentSeason, currentRaceSlug, currentChainSlug } = Astro.props;
+const { seasons, byseason, currentSeason, currentRaceSlug, currentChainSlug, section = 'seasons' } = Astro.props;
 
 const raceBase = currentRaceSlug ? `/seasons/${currentSeason}/${currentRaceSlug}` : '';
+const statsBase = currentChainSlug ? `/stats/${currentSeason}/${currentChainSlug}/` : `/stats/`;
 
 const navLinks = [
   { id: 'season',  href: raceBase ? `${raceBase}/`          : '/',         label: 'Race' },
   { id: 'drivers', href: raceBase ? `${raceBase}/drivers/`   : '/',         label: 'Drivers' },
   { id: 'teams',   href: raceBase ? `${raceBase}/teams/`     : '/',         label: 'Teams' },
+  { id: 'stats',   href: statsBase,                                          label: 'Stats' },
   { id: 'compare', href: '/compare/',                                        label: 'Compare' },
 ];
 
@@ -29,6 +32,7 @@ const firstSeg = pathname.split('/').filter(Boolean).at(0) ?? '';
 
 function isActive(id: string): boolean {
   if (id === 'compare') return firstSeg === 'compare';
+  if (id === 'stats')   return firstSeg === 'stats';
   if (id === 'drivers') return firstSeg === 'seasons' && lastSeg === 'drivers';
   if (id === 'teams')   return firstSeg === 'seasons' && lastSeg === 'teams';
   if (id === 'season')  return firstSeg === 'seasons' && !['drivers', 'teams'].includes(lastSeg);
@@ -62,8 +66,8 @@ function isActive(id: string): boolean {
     <!-- Right side controls -->
     <div class="ml-auto flex items-center gap-1">
       <ThemeToggle client:idle />
-      <YearPicker {seasons} {currentSeason} client:load />
-      <RacePicker {byseason} {currentSeason} currentChainSlug={currentChainSlug ?? ''} client:load />
+      <YearPicker {seasons} {currentSeason} {section} client:load />
+      <RacePicker {byseason} {currentSeason} currentChainSlug={currentChainSlug ?? ''} {section} client:load />
     </div>
   </div>
 </header>

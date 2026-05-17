@@ -1,0 +1,136 @@
+---
+import Base from '../../../layouts/Base.astro';
+import AllDriversTable from '../../../components/driver/AllDriversTable.astro';
+import { getAllRacesBySeason, getAllRaces, getAllDriverCareerStatsAsOf } from '../../../lib/queries';
+import type { PageContext } from '../../../lib/types';
+
+export async function getStaticPaths() {
+  const [{ seasons, byseason }, allRaces] = await Promise.all([
+    getAllRacesBySeason(),
+    getAllRaces(),
+  ]);
+
+  const raceNumMap = new Map<string, number>();
+  for (const r of allRaces) raceNumMap.set(`${r.season}/${r.race_slug}`, r.race_number);
+
+  const paths: object[] = [];
+
+  for (const season of seasons) {
+    const seasonRaces = byseason[season] ?? [];
+    const raceCount = seasonRaces.length;
+    const firstRace = seasonRaces[0];
+    const lastRace = seasonRaces[seasonRaces.length - 1];
+    const firstRn = raceNumMap.get(`${season}/${firstRace?.slug}`);
+    const lastRn = raceNumMap.get(`${season}/${lastRace?.slug}`);
+    if (!firstRn || !lastRn) continue;
+
+    // preseason
+    paths.push({
+      params: { season: String(season), chain: 'preseason' },
+      props: {
+        season,
+        raceCount,
+        chainSlug: 'preseason',
+        raceName: null,
+        beforeRaceNumber: firstRn,
+        driverLinkRaceSlug: firstRace.slug,
+        prevChainSlug: undefined,
+        nextChainSlug: firstRace.slug,
+      },
+    });
+
+    // individual races
+    for (let i = 0; i < seasonRaces.length; i++) {
+      const race = seasonRaces[i];
+      const rn = raceNumMap.get(`${season}/${race.slug}`);
+      if (!rn) continue;
+      paths.push({
+        params: { season: String(season), chain: race.slug },
+        props: {
+          season,
+          raceCount,
+          chainSlug: race.slug,
+          raceName: race.name,
+          beforeRaceNumber: rn + 1,
+          driverLinkRaceSlug: race.slug,
+          prevChainSlug: i > 0 ? seasonRaces[i - 1].slug : 'preseason',
+          nextChainSlug: i < seasonRaces.length - 1 ? seasonRaces[i + 1].slug : 'postseason',
+        },
+      });
+    }
+
+    // postseason
+    paths.push({
+      params: { season: String(season), chain: 'postseason' },
+      props: {
+        season,
+        raceCount,
+        chainSlug: 'postseason',
+        raceName: null,
+        beforeRaceNumber: lastRn + 1,
+        driverLinkRaceSlug: lastRace.slug,
+        prevChainSlug: lastRace.slug,
+        nextChainSlug: undefined,
+      },
+    });
+  }
+
+  return paths;
+}
+
+const { season, raceCount, chainSlug, raceName, beforeRaceNumber, driverLinkRaceSlug, prevChainSlug, nextChainSlug } = Astro.props as {
+  season: number;
+  raceCount: number;
+  chainSlug: string;
+  raceName: string | null;
+  beforeRaceNumber: number;
+  driverLinkRaceSlug: string;
+  prevChainSlug: string | undefined;
+  nextChainSlug: string | undefined;
+};
+
+const drivers = await getAllDriverCareerStatsAsOf(beforeRaceNumber);
+
+const pageContext: PageContext = {
+  kind: 'stats',
+  season,
+  raceCount,
+  chainSlug,
+  raceName,
+  prevChainSlug,
+  nextChainSlug,
+};
+
+let title: string;
+let description: string;
+let canonicalPath: string;
+
+if (chainSlug === 'preseason') {
+  title = `${season} Season — Driver Career Stats (Start of Season)`;
+  description = `Career statistics for all F1 drivers going into the ${season} season.`;
+  canonicalPath = `/stats/${season}/preseason/`;
+} else if (chainSlug === 'postseason') {
+  title = `${season} Season — Driver Career Stats (End of Season)`;
+  description = `Career statistics for all F1 drivers at the end of the ${season} season.`;
+  canonicalPath = `/stats/${season}/postseason/`;
+} else {
+  title = `${raceName} ${season} — Driver Career Stats`;
+  description = `Career statistics for all F1 drivers as of the ${season} ${raceName}.`;
+  canonicalPath = `/stats/${season}/${chainSlug}/`;
+}
+---
+
+<Base title={title} description={description} canonical={canonicalPath} {pageContext}>
+  <div class="mb-8 border-b border-border pb-6">
+    <h1 class="text-3xl font-bold tracking-tight text-fg sm:text-4xl">Driver Career Stats</h1>
+    <p class="mt-2 text-lg text-fg-muted">
+      {chainSlug === 'preseason'
+        ? `Going into ${season} season`
+        : chainSlug === 'postseason'
+          ? `End of ${season} season`
+          : `As of ${raceName} ${season}`}
+    </p>
+  </div>
+
+  <AllDriversTable {drivers} {season} raceSlug={driverLinkRaceSlug} />
+</Base>

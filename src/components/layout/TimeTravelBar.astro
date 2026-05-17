@@ -41,6 +41,17 @@ if (pageContext.kind === 'preseason') {
   detail = `stats as of ${pageContext.raceName} ${pageContext.season}`;
   if (pageContext.prevRaceSlug) prevHref = `/teams/${pageContext.teamSlug}/${pageContext.season}/${pageContext.prevRaceSlug}/`;
   if (pageContext.nextRaceSlug) nextHref = `/teams/${pageContext.teamSlug}/${pageContext.season}/${pageContext.nextRaceSlug}/`;
+} else if (pageContext.kind === 'stats') {
+  label = 'Driver Stats';
+  if (pageContext.chainSlug === 'preseason') {
+    detail = `Start of ${pageContext.season} season · ${pageContext.raceCount} rounds`;
+  } else if (pageContext.chainSlug === 'postseason') {
+    detail = `End of ${pageContext.season} season · ${pageContext.raceCount} rounds`;
+  } else {
+    detail = `as of ${pageContext.raceName ?? pageContext.chainSlug} ${pageContext.season}`;
+  }
+  if (pageContext.prevChainSlug) prevHref = `/stats/${pageContext.season}/${pageContext.prevChainSlug}/`;
+  if (pageContext.nextChainSlug) nextHref = `/stats/${pageContext.season}/${pageContext.nextChainSlug}/`;
 }
 ---
 

@@ -4,9 +4,10 @@
   interface Props {
     seasons: number[];
     currentSeason: number;
+    section?: 'seasons' | 'stats';
   }
 
-  let { seasons, currentSeason }: Props = $props();
+  let { seasons, currentSeason, section = 'seasons' }: Props = $props();
 
   let open = $state(false);
 
@@ -45,7 +46,7 @@
         {#each sortedSeasons as season}
           {@const isActive = season === currentSeason}
           <a
-            href="/seasons/{season}/preseason/"
+            href={section === 'stats' ? `/stats/${season}/preseason/` : `/seasons/${season}/preseason/`}
             onclick={() => { open = false; }}
             class="flex items-center px-4 py-2.5 text-sm font-medium transition-colors {isActive ? 'bg-bg-alt text-accent' : 'text-fg hover:bg-bg-hover'}"
             aria-current={isActive ? 'page' : undefined}

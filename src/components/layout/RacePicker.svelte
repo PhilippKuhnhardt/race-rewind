@@ -6,9 +6,18 @@
     byseason: Record<number, RaceNavEntry[]>;
     currentSeason: number;
     currentChainSlug: string;
+    section?: 'seasons' | 'stats';
   }
 
-  let { byseason, currentSeason, currentChainSlug }: Props = $props();
+  let { byseason, currentSeason, currentChainSlug, section = 'seasons' }: Props = $props();
+
+  function href(slug: string): string {
+    return section === 'stats'
+      ? `/stats/${currentSeason}/${slug}/`
+      : slug === 'preseason' || slug === 'postseason'
+        ? `/seasons/${currentSeason}/${slug}/`
+        : `/seasons/${currentSeason}/${slug}/`;
+  }
 
   let open = $state(false);
 
@@ -55,7 +64,7 @@
 
       <nav class="flex-1 overflow-y-auto py-2" aria-label="Season rounds">
         <a
-          href="/seasons/{currentSeason}/preseason/"
+          href={href('preseason')}
           onclick={() => { open = false; }}
           class="flex items-center gap-3 px-4 py-2 text-sm transition-colors {currentChainSlug === 'preseason' ? 'bg-bg-alt font-semibold text-accent' : 'text-fg-muted hover:bg-bg-hover hover:text-fg'}"
           aria-current={currentChainSlug === 'preseason' ? 'page' : undefined}
@@ -66,7 +75,7 @@
 
         {#each seasonRaces as race, i}
           <a
-            href="/seasons/{currentSeason}/{race.slug}/"
+            href={href(race.slug)}
             onclick={() => { open = false; }}
             class="flex items-center gap-3 px-4 py-2 text-sm transition-colors {race.slug === currentChainSlug ? 'bg-bg-alt font-semibold text-accent' : 'text-fg hover:bg-bg-hover'}"
             aria-current={race.slug === currentChainSlug ? 'page' : undefined}
@@ -77,7 +86,7 @@
         {/each}
 
         <a
-          href="/seasons/{currentSeason}/postseason/"
+          href={href('postseason')}
           onclick={() => { open = false; }}
           class="flex items-center gap-3 px-4 py-2 text-sm transition-colors {currentChainSlug === 'postseason' ? 'bg-bg-alt font-semibold text-accent' : 'text-fg-muted hover:bg-bg-hover hover:text-fg'}"
           aria-current={currentChainSlug === 'postseason' ? 'page' : undefined}

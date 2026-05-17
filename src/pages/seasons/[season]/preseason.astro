@@ -1,7 +1,6 @@
 ---
 import Base from '../../../layouts/Base.astro';
 import SeasonGridTable from '../../../components/driver/SeasonGridTable.astro';
-import AllDriversTable from '../../../components/driver/AllDriversTable.astro';
 import {
   getAllSeasons,
   getSeasonBookends,
@@ -9,7 +8,6 @@ import {
   getDriverCareerStats,
   getDriverPriorSeasons,
   getDriverBestChampionshipPos,
-  getAllDriverCareerStatsAsOf,
 } from '../../../lib/queries';
 import { stripYearPrefix, preseasonLink } from '../../../lib/format';
 import type { PageContext } from '../../../lib/types';
@@ -35,7 +33,6 @@ const season = Number(seasonStr);
 
 const bookends = await getSeasonBookends(season);
 const grid = await getSeasonGrid(bookends.firstRaceNumber);
-const allDrivers = await getAllDriverCareerStatsAsOf(bookends.firstRaceNumber);
 const firstRaceSlug = stripYearPrefix(bookends.firstSlug, season);
 
 const pageContext: PageContext = {
@@ -85,6 +82,4 @@ const description = `${season} F1 season: the starting grid and career statistic
     season={season}
     raceSlug={firstRaceSlug}
   />
-
-  <AllDriversTable drivers={allDrivers} season={season} raceSlug={firstRaceSlug} />
 </Base>

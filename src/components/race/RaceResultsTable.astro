@@ -16,19 +16,19 @@ const winnerTime = results.find((r) => r.position === 1)?.time ?? null;
 {results.length > 0 ? (
   <div>
     <div class="overflow-x-auto rounded-lg border border-border">
-      <table class="w-full border-collapse text-sm">
+      <table class="w-full border-collapse text-sm" data-sortable>
         <thead>
           <tr>
-            <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap w-10">Pos</th>
-            <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Driver</th>
-            <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Team</th>
-            {!isSprint && <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">No.</th>}
-            <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Grid</th>
-            <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Laps</th>
+            <th data-sort-key="pos" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap w-10">Pos</th>
+            <th data-sort-key="driver" class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Driver</th>
+            <th data-sort-key="team" class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Team</th>
+            {!isSprint && <th data-sort-key="no" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">No.</th>}
+            <th data-sort-key="grid" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Grid</th>
+            <th data-sort-key="laps" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Laps</th>
             <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap font-mono">Time / Gap</th>
             <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Status</th>
-            {!isSprint && <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Stops</th>}
-            <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Pts</th>
+            {!isSprint && <th data-sort-key="stops" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Stops</th>}
+            <th data-sort-key="pts" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Pts</th>
           </tr>
         </thead>
         <tbody>
@@ -38,7 +38,7 @@ const winnerTime = results.find((r) => r.position === 1)?.time ?? null;
             const isFl = row.fastest_lap_rank === 1;
             return (
               <tr class="border-b border-border last:border-0 hover:bg-bg-hover transition-colors">
-                <td class="px-3 py-2.5 text-right tabular-nums font-bold text-fg">{formatPos(row.position)}</td>
+                <td class="px-3 py-2.5 text-right tabular-nums font-bold text-fg" data-sort-value={row.position ?? ''}>{formatPos(row.position)}</td>
                 <td class="px-3 py-2.5">
                   <a
                     href={driverLink(row.driver_slug, season, raceSlug)}
@@ -68,3 +68,7 @@ const winnerTime = results.find((r) => r.position === 1)?.time ?? null;
 ) : (
   <p class="text-sm text-fg-muted">No results available yet.</p>
 )}
+
+<script>
+  import '../../scripts/sortable-table.ts';
+</script>

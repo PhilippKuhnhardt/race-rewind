@@ -11,25 +11,24 @@ interface Props {
 const { quali, season, raceSlug } = Astro.props;
 
 const isModernQuali = quali.length > 0 && (quali[0].q1_time != null || quali[0].q2_time != null);
-
 ---
 
 {quali.length > 0 ? (
   <div class="overflow-x-auto rounded-lg border border-border">
-    <table class="w-full border-collapse text-sm">
+    <table class="w-full border-collapse text-sm" data-sortable>
       <thead>
         <tr>
-          <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap w-10">Pos</th>
-          <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Driver</th>
-          <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Team</th>
+          <th data-sort-key="pos" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap w-10">Pos</th>
+          <th data-sort-key="driver" class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Driver</th>
+          <th data-sort-key="team" class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Team</th>
           {isModernQuali ? (
             <>
-              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap font-mono">Q1</th>
-              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap font-mono">Q2</th>
-              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap font-mono">Q3</th>
+              <th data-sort-key="q1" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap font-mono">Q1</th>
+              <th data-sort-key="q2" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap font-mono">Q2</th>
+              <th data-sort-key="q3" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap font-mono">Q3</th>
             </>
           ) : (
-            <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap font-mono">Time</th>
+            <th data-sort-key="time" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap font-mono">Time</th>
           )}
         </tr>
       </thead>
@@ -60,3 +59,7 @@ const isModernQuali = quali.length > 0 && (quali[0].q1_time != null || quali[0].
 ) : (
   <p class="text-sm text-fg-muted">No qualifying data available for this race.</p>
 )}
+
+<script>
+  import '../../scripts/sortable-table.ts';
+</script>
