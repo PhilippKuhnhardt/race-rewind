@@ -23,5 +23,6 @@ export function raceSubNavItems(
     ...(hasQuali ? [{ id: 'qualifying', label: 'Qualifying', href: `${base}/qualifying/` }] : []),
     ...(hasGrid ? [{ id: 'grid', label: 'Starting Grid', href: `${base}/grid/` }] : []),
     { id: 'race', label: 'Race', href: `${base}/race/` },
+    { id: 'standings', label: 'Standings', href: `${base}/standings/` },
   ];
 }
