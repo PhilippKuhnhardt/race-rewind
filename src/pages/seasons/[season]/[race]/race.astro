@@ -1,7 +1,17 @@
 ---
 import RaceSessionLayout from '../../../../layouts/RaceSessionLayout.astro';
 import RaceResultsTable from '../../../../components/race/RaceResultsTable.astro';
-import { getAllRaces, getRaceResults } from '../../../../lib/queries';
+import Podium from '../../../../components/race/Podium.astro';
+import DriverStandingsTable from '../../../../components/standings/DriverStandingsTable.astro';
+import TeamStandingsTable from '../../../../components/standings/TeamStandingsTable.astro';
+import {
+  getAllRaces,
+  getRaceResults,
+  getDriverStandings,
+  getTeamStandings,
+  getDriverStandingsBeforeRace,
+  getTeamStandingsBeforeRace,
+} from '../../../../lib/queries';
 import { getRacePageBase } from '../../../../lib/race-page';
 import { raceLink } from '../../../../lib/format';
 
@@ -16,15 +26,50 @@ const base = await getRacePageBase(season, raceSlug);
 if (!base) throw new Error(`Race not found: ${season}-${raceSlug}`);
 const { race, raceCount, pageContext, hasQuali } = base;
 
-const results = await getRaceResults(race.race_number);
+const [results, preRaceDriverChamp, postRaceDriverChamp, preRaceTeamChamp, postRaceTeamChamp] = await Promise.all([
+  getRaceResults(race.race_number),
+  getDriverStandingsBeforeRace(race.race_number),
+  getDriverStandings(race.race_number),
+  getTeamStandingsBeforeRace(race.race_number),
+  getTeamStandings(race.race_number),
+]);
+
+const podium = results
+  .filter((r) => r.position != null && r.position <= 3)
+  .sort((a, b) => (a.position ?? 99) - (b.position ?? 99));
+
+const preRaceDriverPosById = new Map(preRaceDriverChamp.map((r) => [r.driver_id, r.position]));
+const preRaceTeamPosById = new Map(preRaceTeamChamp.map((r) => [r.team_id, r.position]));
 
 const title = `${race.season} ${race.name} — Race Results`;
 const description = `${race.season} ${race.name} race results at ${race.circuit_name}${race.circuit_locality ? ', ' + race.circuit_locality : ''}.`;
 ---
 
 <RaceSessionLayout {race} {raceCount} {raceSlug} {hasQuali} {pageContext} {title} {description} canonical={`${raceLink(season, raceSlug)}race/`} activeId="race">
-  <section>
-    <h2 class="mb-4 text-lg font-semibold text-fg">Race</h2>
-    <RaceResultsTable {results} season={race.season} {raceSlug} />
-  </section>
+  <div class="space-y-8">
+
+    <Podium {podium} season={race.season} {raceSlug} />
+
+    <section>
+      <h2 class="mb-4 text-lg font-semibold text-fg">Race</h2>
+      <RaceResultsTable {results} season={race.season} {raceSlug} />
+    </section>
+
+    <DriverStandingsTable
+      title="Drivers' Championship — After This Race"
+      rows={postRaceDriverChamp}
+      season={race.season}
+      raceSlug={raceSlug}
+      prevPositions={preRaceDriverPosById}
+    />
+
+    <TeamStandingsTable
+      title="Constructors' Championship — After This Race"
+      rows={postRaceTeamChamp}
+      season={race.season}
+      raceSlug={raceSlug}
+      prevPositions={preRaceTeamPosById}
+    />
+
+  </div>
 </RaceSessionLayout>

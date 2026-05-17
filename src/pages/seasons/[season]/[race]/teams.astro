@@ -2,14 +2,9 @@
 import Base from '../../../../layouts/Base.astro';
 import RaceHeroCard from '../../../../components/race/RaceHeroCard.astro';
 import TeamStandingsTable from '../../../../components/standings/TeamStandingsTable.astro';
-import {
-  getAllRaces,
-  getSeasonGrid,
-  getTeamStandings,
-  getTeamStandingsBeforeRace,
-} from '../../../../lib/queries';
+import { getAllRaces, getTeamStandingsBeforeRace } from '../../../../lib/queries';
 import { getRacePageBase } from '../../../../lib/race-page';
-import { raceLink, driverLink, teamLink } from '../../../../lib/format';
+import { raceLink } from '../../../../lib/format';
 
 export async function getStaticPaths() {
   return (await getAllRaces()).map((r) => ({
@@ -22,26 +17,10 @@ const base = await getRacePageBase(season, raceSlug);
 if (!base) throw new Error(`Race not found: ${season}-${raceSlug}`);
 const { race, raceCount, pageContext } = base;
 
-const [teamChamp, preRaceTeamChamp, grid] = await Promise.all([
-  getTeamStandings(race.race_number),
-  getTeamStandingsBeforeRace(race.race_number),
-  getSeasonGrid(race.race_number),
-]);
-
-const preRaceTeamPosById = new Map(preRaceTeamChamp.map((r) => [r.team_id, r.position]));
-
-const teamRoster = new Map<string, { name: string; primaryColor: string | null; slug: string | null; drivers: typeof grid }>();
-for (const row of grid) {
-  const key = row.team_slug ?? row.team_name ?? '—';
-  if (!teamRoster.has(key)) {
-    teamRoster.set(key, { name: row.team_name ?? '—', primaryColor: row.primary_color ?? null, slug: row.team_slug ?? null, drivers: [] });
-  }
-  teamRoster.get(key)!.drivers.push(row);
-}
-const rosterEntries = [...teamRoster.entries()];
+const preRaceTeamChamp = await getTeamStandingsBeforeRace(race.race_number);
 
 const title = `${race.season} ${race.name} — Teams`;
-const description = `Constructor championship standings and team roster for the ${race.season} ${race.name}.`;
+const description = `Constructor championship standings going into the ${race.season} ${race.name}.`;
 ---
 
 <Base title={title} description={description} canonical={`${raceLink(season, raceSlug)}teams/`} {pageContext}>
@@ -57,53 +36,10 @@ const description = `Constructor championship standings and team roster for the 
   />
 
   <TeamStandingsTable
-    title="Constructors' Championship — After This Race"
-    rows={teamChamp}
+    title="Constructors' Championship — Going Into This Race"
+    rows={preRaceTeamChamp}
     season={race.season}
     raceSlug={raceSlug}
-    prevPositions={preRaceTeamPosById}
+    emptyNote="First race of the season — championship not yet started."
   />
-
-  {preRaceTeamChamp.length > 0 && (
-    <TeamStandingsTable
-      title="Constructors' Championship — Going Into This Race"
-      rows={preRaceTeamChamp}
-      season={race.season}
-      raceSlug={raceSlug}
-    />
-  )}
-
-  {rosterEntries.length > 0 && (
-    <section class="mt-10">
-      <h2 class="mb-3 border-b border-border pb-2 text-lg font-semibold text-fg">Team Roster at This Race</h2>
-      <div class="space-y-4">
-        {rosterEntries.map(([, team]) => (
-          <div class="rounded-lg border border-border bg-bg-alt overflow-hidden">
-            <div class="flex items-center gap-2 px-4 py-2.5 border-b border-border">
-              {team.primaryColor && (
-                <span class="inline-block h-3 w-1 shrink-0 rounded-full" style={`background:${team.primaryColor}`} aria-hidden="true" />
-              )}
-              {team.slug ? (
-                <a href={teamLink(team.slug, race.season, raceSlug)} class="font-semibold text-sm text-accent hover:underline">
-                  {team.name}
-                </a>
-              ) : (
-                <span class="font-semibold text-sm text-fg">{team.name}</span>
-              )}
-            </div>
-            <ul class="divide-y divide-border">
-              {team.drivers.map((d) => (
-                <li class="flex items-center gap-3 px-4 py-2 text-sm">
-                  <span class="w-6 text-right tabular-nums text-fg-muted">{d.car_number ?? '—'}</span>
-                  <a href={driverLink(d.driver_slug, race.season, raceSlug)} class="text-accent hover:underline font-medium">
-                    {d.full_name}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-    </section>
-  )}
 </Base>

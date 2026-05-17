@@ -19,9 +19,10 @@ interface Props {
   raceSlug: string;
   prevPositions?: Map<number, number | null>;
   emptyNote?: string;
+  viewAllHref?: string;
 }
 
-const { title, rows, season, raceSlug, prevPositions, emptyNote } = Astro.props;
+const { title, rows, season, raceSlug, prevPositions, emptyNote, viewAllHref } = Astro.props;
 const showDelta = prevPositions != null;
 
 const enriched = rows.map((row) => {
@@ -38,7 +39,10 @@ const enriched = rows.map((row) => {
 
 {(rows.length > 0 || emptyNote) && (
   <section class="mt-10">
-    <h2 class="mb-3 border-b border-border pb-2 text-lg font-semibold text-fg">{title}</h2>
+    <div class="mb-3 flex items-baseline justify-between border-b border-border pb-2">
+      <h2 class="text-lg font-semibold text-fg">{title}</h2>
+      {viewAllHref && <a href={viewAllHref} class="text-sm text-accent hover:underline">Full standings →</a>}
+    </div>
     {rows.length === 0 ? (
       <p class="text-sm text-fg-muted">{emptyNote}</p>
     ) : (

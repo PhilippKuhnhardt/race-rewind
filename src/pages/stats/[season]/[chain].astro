@@ -51,7 +51,7 @@ export async function getStaticPaths() {
           raceCount,
           chainSlug: race.slug,
           raceName: race.name,
-          beforeRaceNumber: rn + 1,
+          beforeRaceNumber: rn,
           driverLinkRaceSlug: race.slug,
           prevChainSlug: i > 0 ? seasonRaces[i - 1].slug : 'preseason',
           nextChainSlug: i < seasonRaces.length - 1 ? seasonRaces[i + 1].slug : 'postseason',
@@ -114,8 +114,8 @@ if (chainSlug === 'preseason') {
   description = `Career statistics for all F1 drivers at the end of the ${season} season.`;
   canonicalPath = `/stats/${season}/postseason/`;
 } else {
-  title = `${raceName} ${season} — Driver Career Stats`;
-  description = `Career statistics for all F1 drivers as of the ${season} ${raceName}.`;
+  title = `${raceName} ${season} — Driver Career Stats (Going In)`;
+  description = `Career statistics for all F1 drivers going into the ${season} ${raceName}.`;
   canonicalPath = `/stats/${season}/${chainSlug}/`;
 }
 ---
@@ -128,7 +128,7 @@ if (chainSlug === 'preseason') {
         ? `Going into ${season} season`
         : chainSlug === 'postseason'
           ? `End of ${season} season`
-          : `As of ${raceName} ${season}`}
+          : `Going into ${raceName} ${season}`}
     </p>
   </div>
 
