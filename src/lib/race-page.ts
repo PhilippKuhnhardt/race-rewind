@@ -1,13 +1,15 @@
-import { getAllRacesBySeason, getRaceBySlug, getSeasonBookends, getRaceNumbersWithQualifying } from './queries';
+import { getAllRacesBySeason, getRaceBySlug, getSeasonBookends, getRaceNumbersWithQualifying, getRaceNumbersWithSprintQualifying, getSessionTabOrderByRace } from './queries';
 import type { PageContext } from './types';
 
 export async function getRacePageBase(season: string, raceSlug: string) {
   const fullSlug = `${season}-${raceSlug}`;
 
-  const [race, { byseason }, qualiSet] = await Promise.all([
+  const [race, { byseason }, qualiSet, sqSet, orderMap] = await Promise.all([
     getRaceBySlug(fullSlug),
     getAllRacesBySeason(),
     getRaceNumbersWithQualifying(),
+    getRaceNumbersWithSprintQualifying(),
+    getSessionTabOrderByRace(),
   ]);
 
   if (!race) return undefined;
@@ -32,6 +34,8 @@ export async function getRacePageBase(season: string, raceSlug: string) {
   };
 
   const hasQuali = qualiSet.has(race.race_number);
+  const hasSprintQualifying = sqSet.has(race.race_number);
+  const sessionOrder = orderMap.get(race.race_number) ?? ['race'];
 
-  return { race, raceCount, prevRaceSlug, nextRaceSlug, pageContext, hasQuali };
+  return { race, raceCount, prevRaceSlug, nextRaceSlug, pageContext, hasQuali, hasSprintQualifying, sessionOrder };
 }

@@ -21,7 +21,7 @@ export async function getStaticPaths() {
 const { season, race: raceSlug } = Astro.params;
 const base = await getRacePageBase(season, raceSlug);
 if (!base) throw new Error(`Race not found: ${season}-${raceSlug}`);
-const { race, raceCount, pageContext, hasQuali } = base;
+const { race, raceCount, pageContext, hasQuali, hasSprintQualifying, sessionOrder } = base;
 
 const [preRaceDriverChamp, postRaceDriverChamp, preRaceTeamChamp, postRaceTeamChamp] = await Promise.all([
   getDriverStandingsBeforeRace(race.race_number),
@@ -37,7 +37,7 @@ const title = `${race.season} ${race.name} — Standings`;
 const description = `Driver and constructor championship standings after the ${race.season} ${race.name}.`;
 ---
 
-<RaceSessionLayout {race} {raceCount} {raceSlug} {hasQuali} {pageContext} {title} {description} canonical={`${raceLink(season, raceSlug)}standings/`} activeId="standings">
+<RaceSessionLayout {race} {raceCount} {raceSlug} {hasQuali} {hasSprintQualifying} {sessionOrder} {pageContext} {title} {description} canonical={`${raceLink(season, raceSlug)}standings/`} activeId="standings">
   <div class="space-y-8">
 
     <DriverStandingsTable

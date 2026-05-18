@@ -17,7 +17,7 @@ export async function getStaticPaths() {
 const { season, race: raceSlug } = Astro.params;
 const base = await getRacePageBase(season, raceSlug);
 if (!base) throw new Error(`Race not found: ${season}-${raceSlug}`);
-const { race, raceCount, pageContext, hasQuali } = base;
+const { race, raceCount, pageContext, hasQuali, hasSprintQualifying, sessionOrder } = base;
 
 const grid = await getGridOrder(race.race_number);
 
@@ -25,7 +25,7 @@ const title = `${race.season} ${race.name} — Starting Grid`;
 const description = `${race.season} ${race.name} starting grid at ${race.circuit_name}.`;
 ---
 
-<RaceSessionLayout {race} {raceCount} {raceSlug} {hasQuali} {pageContext} {title} {description} canonical={`${raceLink(season, raceSlug)}grid/`} activeId="grid">
+<RaceSessionLayout {race} {raceCount} {raceSlug} {hasQuali} {hasSprintQualifying} {sessionOrder} {pageContext} {title} {description} canonical={`${raceLink(season, raceSlug)}grid/`} activeId="grid">
   <section>
     <h2 class="mb-4 text-lg font-semibold text-fg">Starting Grid</h2>
     <GridTable {grid} season={race.season} {raceSlug} />

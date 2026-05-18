@@ -18,6 +18,8 @@ interface Props {
   raceCount: number;
   raceSlug: string;
   hasQuali: boolean;
+  hasSprintQualifying: boolean;
+  sessionOrder: string[];
   pageContext: PageContext;
   title: string;
   description: string;
@@ -25,7 +27,7 @@ interface Props {
   activeId: 'overview' | 'qualifying' | 'sprint-qualifying' | 'sprint' | 'grid' | 'race' | 'standings';
 }
 
-const { race, raceCount, raceSlug, hasQuali, pageContext, title, description, canonical, activeId } = Astro.props;
+const { race, raceCount, raceSlug, hasQuali, hasSprintQualifying, sessionOrder, pageContext, title, description, canonical, activeId } = Astro.props;
 ---
 
 <Base {title} {description} {canonical} {pageContext}>
@@ -43,7 +45,9 @@ const { race, raceCount, raceSlug, hasQuali, pageContext, title, description, ca
   <RaceSubNav
     season={race.season}
     {raceSlug}
+    {sessionOrder}
     {hasQuali}
+    {hasSprintQualifying}
     hasSprint={!!race.has_sprint}
     hasGrid={!hasQuali}
     {activeId}

@@ -1,5 +1,5 @@
 ---
-import { orDash, driverLink, teamLink } from '../../lib/format';
+import { driverLink, teamLink, formatQualifyingTime } from '../../lib/format';
 import type { getSprintQualifyingResults } from '../../lib/queries';
 
 interface Props {
@@ -34,9 +34,9 @@ const { sprintQuali, season, raceSlug } = Astro.props;
             <td class="px-3 py-2.5 text-fg-muted">
               <a href={teamLink(row.team_slug, season, raceSlug)} class="text-fg-muted hover:text-accent hover:underline">{row.team_name}</a>
             </td>
-            <td class="px-3 py-2.5 text-right font-mono text-xs tabular-nums">{orDash(row.sq1_time)}</td>
-            <td class="px-3 py-2.5 text-right font-mono text-xs tabular-nums">{orDash(row.sq2_time)}</td>
-            <td class="px-3 py-2.5 text-right font-mono text-xs tabular-nums">{orDash(row.sq3_time)}</td>
+            <td class="px-3 py-2.5 text-right font-mono text-xs tabular-nums">{formatQualifyingTime(row.sq1_time)}</td>
+            <td class="px-3 py-2.5 text-right font-mono text-xs tabular-nums">{formatQualifyingTime(row.sq2_time)}</td>
+            <td class="px-3 py-2.5 text-right font-mono text-xs tabular-nums">{formatQualifyingTime(row.sq3_time)}</td>
           </tr>
         ))}
       </tbody>

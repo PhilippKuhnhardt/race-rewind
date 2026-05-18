@@ -22,7 +22,7 @@ export async function getStaticPaths() {
 const { season, race: raceSlug } = Astro.params;
 const base = await getRacePageBase(season, raceSlug);
 if (!base) throw new Error(`Race not found: ${season}-${raceSlug}`);
-const { race, raceCount, pageContext, hasQuali } = base;
+const { race, raceCount, pageContext, hasQuali, hasSprintQualifying, sessionOrder } = base;
 
 const sprint = await getSprintResults(race.race_number);
 
@@ -30,7 +30,7 @@ const title = `${race.season} ${race.name} — Sprint`;
 const description = `${race.season} ${race.name} sprint race results at ${race.circuit_name}.`;
 ---
 
-<RaceSessionLayout {race} {raceCount} {raceSlug} {hasQuali} {pageContext} {title} {description} canonical={`${raceLink(season, raceSlug)}sprint/`} activeId="sprint">
+<RaceSessionLayout {race} {raceCount} {raceSlug} {hasQuali} {hasSprintQualifying} {sessionOrder} {pageContext} {title} {description} canonical={`${raceLink(season, raceSlug)}sprint/`} activeId="sprint">
   <section>
     <h2 class="mb-4 text-lg font-semibold text-fg">Sprint Race</h2>
     <RaceResultsTable results={sprint} season={race.season} {raceSlug} isSprint={true} />

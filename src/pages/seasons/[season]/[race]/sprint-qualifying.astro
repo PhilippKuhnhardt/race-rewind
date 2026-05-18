@@ -2,7 +2,7 @@
 import RaceSessionLayout from '../../../../layouts/RaceSessionLayout.astro';
 import SprintQualifyingTable from '../../../../components/race/SprintQualifyingTable.astro';
 import { db } from '../../../../db/client';
-import { races } from '../../../../db/schema';
+import { races, sprintQualifyingResults } from '../../../../db/schema';
 import { eq } from 'drizzle-orm';
 import { stripYearPrefix, raceLink } from '../../../../lib/format';
 import { getSprintQualifyingResults } from '../../../../lib/queries';
@@ -10,9 +10,9 @@ import { getRacePageBase } from '../../../../lib/race-page';
 
 export async function getStaticPaths() {
   const rows = await db
-    .select({ season: races.season, slug: races.slug })
-    .from(races)
-    .where(eq(races.hasSprint, 1));
+    .selectDistinct({ season: races.season, slug: races.slug })
+    .from(sprintQualifyingResults)
+    .innerJoin(races, eq(races.raceNumber, sprintQualifyingResults.raceNumber));
 
   return rows.map((r) => ({
     params: { season: String(r.season), race: stripYearPrefix(r.slug, r.season) },
@@ -22,7 +22,7 @@ export async function getStaticPaths() {
 const { season, race: raceSlug } = Astro.params;
 const base = await getRacePageBase(season, raceSlug);
 if (!base) throw new Error(`Race not found: ${season}-${raceSlug}`);
-const { race, raceCount, pageContext, hasQuali } = base;
+const { race, raceCount, pageContext, hasQuali, hasSprintQualifying, sessionOrder } = base;
 
 const sprintQuali = await getSprintQualifyingResults(race.race_number);
 
@@ -30,7 +30,7 @@ const title = `${race.season} ${race.name} — Sprint Qualifying`;
 const description = `${race.season} ${race.name} sprint qualifying results at ${race.circuit_name}.`;
 ---
 
-<RaceSessionLayout {race} {raceCount} {raceSlug} {hasQuali} {pageContext} {title} {description} canonical={`${raceLink(season, raceSlug)}sprint-qualifying/`} activeId="sprint-qualifying">
+<RaceSessionLayout {race} {raceCount} {raceSlug} {hasQuali} {hasSprintQualifying} {sessionOrder} {pageContext} {title} {description} canonical={`${raceLink(season, raceSlug)}sprint-qualifying/`} activeId="sprint-qualifying">
   <section>
     <h2 class="mb-4 text-lg font-semibold text-fg">Sprint Qualifying</h2>
     <SprintQualifyingTable {sprintQuali} season={race.season} {raceSlug} />

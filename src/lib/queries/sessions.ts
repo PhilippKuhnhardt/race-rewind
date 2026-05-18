@@ -1,11 +1,43 @@
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, not, sql } from 'drizzle-orm';
 import { db } from '../../db/client';
-import { qualifyingResults, sprintQualifyingResults, raceResults, sprintResults, drivers, teams } from '../../db/schema';
+import { qualifyingResults, sprintQualifyingResults, raceResults, sprintResults, sessions, drivers, teams } from '../../db/schema';
+
+const TYPE_TO_TAB: Record<string, string> = {
+  Q1: 'qualifying', Q2: 'qualifying', Q3: 'qualifying',
+  QA: 'qualifying', QB: 'qualifying', QO: 'qualifying',
+  SQ1: 'sprint-qualifying', SQ2: 'sprint-qualifying', SQ3: 'sprint-qualifying',
+  SR: 'sprint',
+  R:  'race',
+};
+
+export async function getSessionTabOrderByRace(): Promise<Map<number, string[]>> {
+  const rows = await db
+    .select({ raceNumber: sessions.raceNumber, type: sessions.type })
+    .from(sessions)
+    .orderBy(sessions.raceNumber, sessions.timestamp);
+
+  const result = new Map<number, string[]>();
+  for (const { raceNumber, type } of rows) {
+    const id = TYPE_TO_TAB[type];
+    if (!id) continue;
+    let list = result.get(raceNumber);
+    if (!list) { list = []; result.set(raceNumber, list); }
+    if (!list.includes(id)) list.push(id);
+  }
+  return result;
+}
 
 export async function getRaceNumbersWithQualifying(): Promise<Set<number>> {
   const rows = await db
     .selectDistinct({ raceNumber: qualifyingResults.raceNumber })
     .from(qualifyingResults);
+  return new Set(rows.map((r) => r.raceNumber));
+}
+
+export async function getRaceNumbersWithSprintQualifying(): Promise<Set<number>> {
+  const rows = await db
+    .selectDistinct({ raceNumber: sprintQualifyingResults.raceNumber })
+    .from(sprintQualifyingResults);
   return new Set(rows.map((r) => r.raceNumber));
 }
 
@@ -92,7 +124,7 @@ export async function getGridOrder(raceNumber: number) {
     .from(raceResults)
     .innerJoin(drivers, eq(drivers.id, raceResults.driverId))
     .innerJoin(teams, eq(teams.id, raceResults.teamId))
-    .where(eq(raceResults.raceNumber, raceNumber))
+    .where(and(eq(raceResults.raceNumber, raceNumber), not(eq(raceResults.grid, 0))))
     .orderBy(sql`${raceResults.grid} ASC NULLS LAST`);
 }
 

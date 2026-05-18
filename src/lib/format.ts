@@ -3,6 +3,17 @@ export function orDash(t: string | null | undefined): string {
   return t ?? '—';
 }
 
+/** Format a qualifying lap time as "M:SS.mmm". Input format from DB: "HH:MM:SS[.fff]". */
+export function formatQualifyingTime(t: string | null | undefined): string {
+  if (t == null) return '—';
+  const m = /^(?:\d+:)?(\d+):(\d+)(?:\.(\d+))?$/.exec(t);
+  if (!m) return t;
+  const minutes = parseInt(m[1], 10);
+  const seconds = m[2].padStart(2, '0');
+  const millis = (m[3] ?? '').padEnd(3, '0').slice(0, 3);
+  return `${minutes}:${seconds}.${millis}`;
+}
+
 /** Format a points value — strip trailing ".0" for whole numbers. */
 export function formatPts(pts: number | null | undefined): string {
   if (pts == null) return '—';

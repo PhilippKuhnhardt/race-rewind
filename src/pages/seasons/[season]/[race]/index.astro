@@ -16,7 +16,7 @@ export async function getStaticPaths() {
 const { season, race: raceSlug } = Astro.params;
 const base = await getRacePageBase(season, raceSlug);
 if (!base) throw new Error(`Race not found: ${season}-${raceSlug}`);
-const { race, raceCount, pageContext, hasQuali } = base;
+const { race, raceCount, pageContext, hasQuali, hasSprintQualifying, sessionOrder } = base;
 
 const [preRaceDriverChamp, preRaceTeamChamp] = await Promise.all([
   getDriverStandingsBeforeRace(race.race_number),
@@ -45,7 +45,7 @@ const title = `${race.season} ${race.name}`;
 const description = `${race.season} ${race.name} at ${race.circuit_name}${race.circuit_locality ? ', ' + race.circuit_locality : ''}: standings and session details.`;
 ---
 
-<RaceSessionLayout {race} {raceCount} {raceSlug} {hasQuali} {pageContext} {title} {description} canonical={raceLink(season, raceSlug)} activeId="overview">
+<RaceSessionLayout {race} {raceCount} {raceSlug} {hasQuali} {hasSprintQualifying} {sessionOrder} {pageContext} {title} {description} canonical={raceLink(season, raceSlug)} activeId="overview">
 
   <div class="space-y-8">
     <PreRaceLeaders {driverLeader} {teamLeader} season={race.season} {raceSlug} />
@@ -68,41 +68,6 @@ const description = `${race.season} ${race.name} at ${race.circuit_name}${race.c
       viewAllHref={`/seasons/${race.season}/${raceSlug}/teams/`}
       emptyNote="First race of the season — championship not yet started."
     />
-
-    <!-- Session link cards -->
-    <section>
-      <h2 class="mb-4 text-lg font-semibold text-fg">Sessions</h2>
-      <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        {hasQuali && (
-          <a href={`/seasons/${race.season}/${raceSlug}/qualifying/`} class="group flex flex-col rounded-xl border border-border bg-bg-alt p-4 no-underline transition-all hover:border-accent hover:bg-bg-hover">
-            <span class="text-sm font-semibold text-fg group-hover:text-accent transition-colors">Qualifying</span>
-            <span class="mt-0.5 text-xs text-fg-muted">Grid order</span>
-          </a>
-        )}
-        {!hasQuali && (
-          <a href={`/seasons/${race.season}/${raceSlug}/grid/`} class="group flex flex-col rounded-xl border border-border bg-bg-alt p-4 no-underline transition-all hover:border-accent hover:bg-bg-hover">
-            <span class="text-sm font-semibold text-fg group-hover:text-accent transition-colors">Starting Grid</span>
-            <span class="mt-0.5 text-xs text-fg-muted">Grid order</span>
-          </a>
-        )}
-        {(!!race.has_sprint) && (
-          <>
-            <a href={`/seasons/${race.season}/${raceSlug}/sprint-qualifying/`} class="group flex flex-col rounded-xl border border-border bg-bg-alt p-4 no-underline transition-all hover:border-accent hover:bg-bg-hover">
-              <span class="text-sm font-semibold text-fg group-hover:text-accent transition-colors">Sprint Qualifying</span>
-              <span class="mt-0.5 text-xs text-fg-muted">Sprint grid</span>
-            </a>
-            <a href={`/seasons/${race.season}/${raceSlug}/sprint/`} class="group flex flex-col rounded-xl border border-border bg-bg-alt p-4 no-underline transition-all hover:border-accent hover:bg-bg-hover">
-              <span class="text-sm font-semibold text-fg group-hover:text-accent transition-colors">Sprint</span>
-              <span class="mt-0.5 text-xs text-fg-muted">Sprint race results</span>
-            </a>
-          </>
-        )}
-        <a href={`/seasons/${race.season}/${raceSlug}/race/`} class="group flex flex-col rounded-xl border border-border bg-bg-alt p-4 no-underline transition-all hover:border-accent hover:bg-bg-hover">
-          <span class="text-sm font-semibold text-fg group-hover:text-accent transition-colors">Race</span>
-          <span class="mt-0.5 text-xs text-fg-muted">Results &amp; podium</span>
-        </a>
-      </div>
-    </section>
   </div>
 
 </RaceSessionLayout>

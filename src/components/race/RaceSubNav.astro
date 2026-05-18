@@ -4,14 +4,16 @@ import { raceSubNavItems } from '../../lib/race-subnav';
 interface Props {
   season: number;
   raceSlug: string;
+  sessionOrder: string[];
   hasQuali: boolean;
+  hasSprintQualifying: boolean;
   hasSprint: boolean;
   hasGrid?: boolean;
   activeId: string;
 }
 
-const { season, raceSlug, hasQuali, hasSprint, hasGrid = false, activeId } = Astro.props;
-const items = raceSubNavItems(season, raceSlug, hasQuali, hasSprint, hasGrid);
+const { season, raceSlug, sessionOrder, hasQuali, hasSprintQualifying, hasSprint, hasGrid = false, activeId } = Astro.props;
+const items = raceSubNavItems(season, raceSlug, sessionOrder, hasQuali, hasSprintQualifying, hasSprint, hasGrid);
 ---
 
 <nav class="mb-8 -mx-4 sm:-mx-6 border-b border-border" aria-label="Race sections">
