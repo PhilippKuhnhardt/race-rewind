@@ -7,6 +7,7 @@ import {
   getAllRacesBySeason,
   getDriverBySlug,
   getDriverCareerStats,
+  getDriverPriorSeasons,
   getDriverTeamsDriven,
   getRaceBySlug,
 } from '../../../../lib/queries';
@@ -28,10 +29,11 @@ const race = await getRaceBySlug(fullSlug);
 if (!race) throw new Error(`Race not found: ${fullSlug}`);
 
 const raceNavSlug = stripYearPrefix(race.slug, race.season);
-const [stats, teamsDriven, { byseason }] = await Promise.all([
+const [stats, teamsDriven, { byseason }, priorSeasons] = await Promise.all([
   getDriverCareerStats(driver.id, race.race_number),
   getDriverTeamsDriven(driver.id, race.race_number),
   getAllRacesBySeason(),
+  getDriverPriorSeasons(driver.id, race.race_number),
 ]);
 
 const seasonRaces = byseason[race.season] ?? [];
@@ -98,6 +100,7 @@ const description = `${driver.full_name}'s career going into the ${race.season} 
           { label: 'Fastest Laps', value: stats.fastest_laps },
           { label: 'Career Points', value: formatPts(stats.points) },
           { label: 'Championships', value: stats.championships },
+          { label: 'Seasons', value: priorSeasons },
         ].map(({ label, value }) => (
           <div class="rounded-lg border border-border bg-bg-alt p-3">
             <div class="text-xs text-fg-muted uppercase tracking-wide">{label}</div>
