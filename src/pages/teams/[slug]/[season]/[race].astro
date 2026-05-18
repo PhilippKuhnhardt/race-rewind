@@ -10,6 +10,7 @@ import {
   getTeamDriversFielded,
 } from '../../../../lib/queries';
 import type { PageContext } from '../../../../lib/types';
+import { emojify } from '../../../../lib/ui/emojify';
 
 export const prerender = false;
 
@@ -72,7 +73,7 @@ const description = `${team.name}'s career going into the ${race.season} ${race.
       )
     }
     <h1 class="text-2xl font-bold text-fg">{team.name}</h1>
-    {team.nationality && <p class="text-sm text-fg-muted mt-1">{team.nationality}</p>}
+    {team.nationality && <p class="text-sm text-fg-muted mt-1">{emojify(team.nationality)}</p>}
   </div>
 
   <section class="mb-4">

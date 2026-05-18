@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Dialog } from 'bits-ui';
   import type { RaceNavEntry } from '../../lib/queries/races';
+  import { emojify } from '../../lib/ui/emojify';
 
   interface Props {
     byseason: Record<number, RaceNavEntry[]>;
@@ -27,7 +28,7 @@
     if (currentChainSlug === 'preseason') return 'Start of season';
     if (currentChainSlug === 'postseason') return 'End of season';
     const race = seasonRaces.find((r) => r.slug === currentChainSlug);
-    return race ? race.name.replace(/ Grand Prix$/, ' GP') : 'Race';
+    return race ? emojify(race.name.replace(/ Grand Prix$/, ' GP')) : 'Race';
   });
 </script>
 
@@ -81,7 +82,7 @@
             aria-current={race.slug === currentChainSlug ? 'page' : undefined}
           >
             <span class="w-6 text-right text-xs tabular-nums text-fg-muted">{i + 1}</span>
-            <span>{race.name.replace(/ Grand Prix$/, '')}</span>
+            <span>{emojify(race.name.replace(/ Grand Prix$/, ''))}</span>
           </a>
         {/each}
 

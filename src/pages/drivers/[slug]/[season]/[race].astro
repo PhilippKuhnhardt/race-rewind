@@ -11,6 +11,7 @@ import {
   getRaceBySlug,
 } from '../../../../lib/queries';
 import type { PageContext } from '../../../../lib/types';
+import { emojify } from '../../../../lib/ui/emojify';
 
 export const prerender = false;
 
@@ -72,7 +73,7 @@ const description = `${driver.full_name}'s career going into the ${race.season} 
     <p class="text-sm text-fg-muted mt-1">
       {
         [
-          driver.nationality,
+          driver.nationality && emojify(driver.nationality),
           driver.date_of_birth ? `b. ${driver.date_of_birth}` : null,
           driver.abbreviation,
           driver.permanent_car_number ? `#${driver.permanent_car_number}` : null,
