@@ -1,14 +1,15 @@
 ---
+import TeamsDrivenTable from '../../../../components/team/TeamsDrivenTable.astro';
 import Base from '../../../../layouts/Base.astro';
+import { driverLink, formatPts, raceLink, stripYearPrefix, teamLink } from '../../../../lib/format';
 import {
   getAllDriverRacePairs,
   getAllRacesBySeason,
   getDriverBySlug,
   getDriverCareerStats,
-  getDriverStandingBeforeRace,
+  getDriverTeamsDriven,
   getRaceBySlug,
 } from '../../../../lib/queries';
-import { formatPts, stripYearPrefix, driverLink, raceLink } from '../../../../lib/format';
 import type { PageContext } from '../../../../lib/types';
 
 export async function getStaticPaths() {
@@ -27,9 +28,9 @@ const race = await getRaceBySlug(fullSlug);
 if (!race) throw new Error(`Race not found: ${fullSlug}`);
 
 const raceNavSlug = stripYearPrefix(race.slug, race.season);
-const [stats, standing, { byseason }] = await Promise.all([
+const [stats, teamsDriven, { byseason }] = await Promise.all([
   getDriverCareerStats(driver.id, race.race_number),
-  getDriverStandingBeforeRace(driver.id, race.race_number),
+  getDriverTeamsDriven(driver.id, race.race_number),
   getAllRacesBySeason(),
 ]);
 
@@ -53,10 +54,19 @@ const title = `${driver.full_name} — ${race.season} ${race.name}`;
 const description = `${driver.full_name}'s career going into the ${race.season} ${race.name}: ${stats.wins} wins, ${stats.podiums} podiums, ${stats.championships} championship${stats.championships !== 1 ? 's' : ''}.`;
 ---
 
-<Base title={title} description={description} canonical={driverLink(slug, season, raceSlug)} {pageContext}>
+<Base
+  title={title}
+  description={description}
+  canonical={driverLink(slug, season, raceSlug)}
+  {pageContext}
+>
   <div class="mb-4">
-    <a href={raceLink(race.season, raceNavSlug)} class="text-sm text-fg-muted hover:text-accent transition-colors">
-      &larr; {race.season} {race.name}
+    <a
+      href={raceLink(race.season, raceNavSlug)}
+      class="text-sm text-fg-muted hover:text-accent transition-colors"
+    >
+      &larr; {race.season}
+      {race.name}
     </a>
   </div>
 
@@ -76,49 +86,34 @@ const description = `${driver.full_name}'s career going into the ${race.season} 
     </p>
   </div>
 
-  <section class="mb-6">
-    <h2 class="mb-4 text-lg font-semibold text-fg">Going Into This Race</h2>
-    {standing ? (
-      <div class="overflow-x-auto rounded-lg border border-border">
-        <table class="w-full border-collapse text-sm">
-          <thead>
-            <tr>
-              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Championship Pos</th>
-              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Points</th>
-              <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Wins</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="px-3 py-2.5 text-right tabular-nums font-semibold text-accent">{standing.position ?? '—'}</td>
-              <td class="px-3 py-2.5 text-right tabular-nums text-fg">{formatPts(standing.points)}</td>
-              <td class="px-3 py-2.5 text-right tabular-nums text-fg">{standing.win_count}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    ) : (
-      <p class="text-sm text-fg-muted">First race of the season — championship not yet started.</p>
-    )}
-  </section>
-
-  <section>
+  <section class="mb-4">
     <h2 class="mb-4 text-lg font-semibold text-fg">Career Going Into This Race</h2>
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-      {[
-        { label: 'Starts', value: stats.starts },
-        { label: 'Wins', value: stats.wins },
-        { label: 'Podiums', value: stats.podiums },
-        { label: 'Poles', value: stats.poles },
-        { label: 'Fastest Laps', value: stats.fastest_laps },
-        { label: 'Career Points', value: formatPts(stats.points) },
-        { label: 'Championships', value: stats.championships },
-      ].map(({ label, value }) => (
-        <div class="rounded-lg border border-border bg-bg-alt p-3">
-          <div class="text-xs text-fg-muted uppercase tracking-wide">{label}</div>
-          <div class={`text-xl font-bold mt-1 ${label === 'Championships' && Number(value) > 0 ? 'text-accent' : 'text-fg'}`}>{value}</div>
-        </div>
-      ))}
+      {
+        [
+          { label: 'Starts', value: stats.starts },
+          { label: 'Wins', value: stats.wins },
+          { label: 'Podiums', value: stats.podiums },
+          { label: 'Poles', value: stats.poles },
+          { label: 'Fastest Laps', value: stats.fastest_laps },
+          { label: 'Career Points', value: formatPts(stats.points) },
+          { label: 'Championships', value: stats.championships },
+        ].map(({ label, value }) => (
+          <div class="rounded-lg border border-border bg-bg-alt p-3">
+            <div class="text-xs text-fg-muted uppercase tracking-wide">{label}</div>
+            <div
+              class={`text-xl font-bold mt-1 ${label === 'Championships' && Number(value) > 0 ? 'text-accent' : 'text-fg'}`}
+            >
+              {value}
+            </div>
+          </div>
+        ))
+      }
     </div>
   </section>
+
+  <TeamsDrivenTable
+    teams={teamsDriven}
+    teamHref={(tSlug) => teamLink(tSlug, race.season, raceNavSlug)}
+  />
 </Base>

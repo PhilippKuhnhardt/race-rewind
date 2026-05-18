@@ -204,6 +204,7 @@ export async function getTeamDriversFielded(teamId: number, beforeRaceNumber: nu
         team_championships: teamChamps,
       };
     })
+    .filter((d) => d.starts > 0)
     .sort((a, b) => a.first_season - b.first_season || a.full_name.localeCompare(b.full_name))
     .map(({ first_season: _fs, ...rest }) => rest);
 }
