@@ -4,7 +4,6 @@ import Base from '../../../../layouts/Base.astro';
 import { driverLink, formatPts, raceLink, stripYearPrefix, teamLink } from '../../../../lib/format';
 import {
   getAllRacesBySeason,
-  getAllTeamRacePairs,
   getRaceBySlug,
   getTeamBySlug,
   getTeamCareerStats,
@@ -12,19 +11,15 @@ import {
 } from '../../../../lib/queries';
 import type { PageContext } from '../../../../lib/types';
 
-export async function getStaticPaths() {
-  return (await getAllTeamRacePairs()).map((p) => ({
-    params: { slug: p.team_slug, season: String(p.season), race: p.race_slug },
-  }));
-}
+export const prerender = false;
 
 const { slug, season, race: raceSlug } = Astro.params;
 
-const team = await getTeamBySlug(slug);
+const team = slug && (await getTeamBySlug(slug));
 if (!team) throw new Error(`Team not found: ${slug}`);
 
 const fullSlug = `${season}-${raceSlug}`;
-const race = await getRaceBySlug(fullSlug);
+const race = season && raceSlug && (await getRaceBySlug(fullSlug));
 if (!race) throw new Error(`Race not found: ${fullSlug}`);
 
 const raceNavSlug = stripYearPrefix(race.slug, race.season);
