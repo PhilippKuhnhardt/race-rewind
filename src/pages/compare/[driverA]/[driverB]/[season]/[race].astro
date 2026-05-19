@@ -1,0 +1,146 @@
+---
+import Base from '../../../../../layouts/Base.astro';
+import ComparisonTable from '../../../../../components/compare/ComparisonTable.astro';
+import { buildDriverAtRacePayload } from '../../../../../lib/payloads/driver-at-race';
+import { getAllRacesBySeason, getSeasonBounds } from '../../../../../lib/queries';
+import { getDriverBySlug, getDriverCareerStats } from '../../../../../lib/queries';
+import { raceLink, preseasonLink, postseasonLink } from '../../../../../lib/format';
+import type { PageContext } from '../../../../../lib/types';
+import type { DriverAtRacePayload } from '../../../../../lib/api-types';
+
+export const prerender = false;
+
+const { driverA, driverB, season: seasonStr, race: raceSlug } = Astro.params;
+const season = Number(seasonStr);
+
+const isBoundary = raceSlug === 'preseason' || raceSlug === 'postseason';
+
+let payloadA: DriverAtRacePayload;
+let payloadB: DriverAtRacePayload;
+let pageContext: PageContext;
+let backHref: string;
+let backLabel: string;
+let subLabel: string;
+
+if (isBoundary) {
+  const [driverDataA, driverDataB, bounds] = await Promise.all([
+    getDriverBySlug(driverA!),
+    getDriverBySlug(driverB!),
+    getSeasonBounds(season),
+  ]);
+
+  if (!driverDataA) throw new Error(`Driver not found: ${driverA}`);
+  if (!driverDataB) throw new Error(`Driver not found: ${driverB}`);
+  if (!bounds) throw new Error(`Season not found: ${season}`);
+
+  const beforeRaceNumber =
+    raceSlug === 'preseason'
+      ? bounds.firstRaceNumber
+      : (bounds.nextSeasonFirstRaceNumber ?? bounds.lastRaceNumber + 1);
+
+  const [statsA, statsB] = await Promise.all([
+    getDriverCareerStats(driverDataA.id, beforeRaceNumber),
+    getDriverCareerStats(driverDataB.id, beforeRaceNumber),
+  ]);
+
+  const makePayload = (driver: typeof driverDataA, stats: typeof statsA): DriverAtRacePayload => ({
+    driver: {
+      slug: driver.slug,
+      full_name: driver.full_name,
+      abbreviation: driver.abbreviation,
+      nationality: driver.nationality,
+      date_of_birth: driver.date_of_birth,
+      permanent_car_number: driver.permanent_car_number,
+    },
+    race: {
+      slug: raceSlug!,
+      season,
+      round: 0,
+      name: raceSlug === 'preseason' ? 'Preseason' : 'Postseason',
+      date: '',
+      race_number: beforeRaceNumber,
+    },
+    team_at_race: null,
+    standing_going_in: null,
+    career_going_in: stats,
+    result_this_race: null,
+  });
+
+  payloadA = makePayload(driverDataA, statsA);
+  payloadB = makePayload(driverDataB, statsB);
+
+  const prevRaceSlug = raceSlug === 'postseason' ? bounds.lastRaceSlug : undefined;
+  const nextRaceSlug = raceSlug === 'preseason' ? bounds.firstRaceSlug : undefined;
+
+  pageContext = {
+    kind: 'compare-race',
+    season,
+    raceName: raceSlug === 'preseason' ? 'Preseason' : 'Postseason',
+    raceSlug: raceSlug!,
+    driverAName: driverDataA.full_name,
+    driverASlug: driverDataA.slug,
+    driverBName: driverDataB.full_name,
+    driverBSlug: driverDataB.slug,
+    prevRaceSlug,
+    nextRaceSlug,
+  };
+
+  backHref = raceSlug === 'preseason' ? preseasonLink(season) : postseasonLink(season);
+  backLabel = raceSlug === 'preseason' ? `${season} Preseason` : `${season} Postseason`;
+  subLabel = raceSlug === 'preseason' ? `${season} — before Round 1` : `${season} — end of season`;
+} else {
+  const [pA, pB, { byseason }] = await Promise.all([
+    buildDriverAtRacePayload(driverA!, seasonStr!, raceSlug!),
+    buildDriverAtRacePayload(driverB!, seasonStr!, raceSlug!),
+    getAllRacesBySeason(),
+  ]);
+
+  if (!pA || !pB) throw new Error(`Could not load comparison: ${driverA} vs ${driverB} at ${seasonStr}-${raceSlug}`);
+  payloadA = pA;
+  payloadB = pB;
+
+  const race = payloadA.race;
+  const seasonRaces = byseason[race.season] ?? [];
+  const idx = seasonRaces.findIndex((r) => r.slug === race.slug);
+  const prevRaceSlug = idx > 0 ? seasonRaces[idx - 1].slug : 'preseason';
+  const nextRaceSlug = idx < seasonRaces.length - 1 ? seasonRaces[idx + 1].slug : 'postseason';
+
+  pageContext = {
+    kind: 'compare-race',
+    season: race.season,
+    raceName: race.name,
+    raceSlug: race.slug,
+    driverAName: payloadA.driver.full_name,
+    driverASlug: payloadA.driver.slug,
+    driverBName: payloadB.driver.full_name,
+    driverBSlug: payloadB.driver.slug,
+    prevRaceSlug,
+    nextRaceSlug,
+  };
+
+  backHref = raceLink(race.season, race.slug);
+  backLabel = `${race.season} ${race.name}`;
+  subLabel = `${race.season} ${race.name}`;
+}
+
+const title = `${payloadA.driver.full_name} vs ${payloadB.driver.full_name} — ${subLabel}`;
+const description = `Compare ${payloadA.driver.full_name} and ${payloadB.driver.full_name}: ${subLabel}.`;
+const canonical = `/compare/${payloadA.driver.slug}/${payloadB.driver.slug}/${season}/${raceSlug}/`;
+---
+
+<Base {title} {description} {canonical} {pageContext}>
+  <div class="mb-4">
+    <a href={backHref} class="text-sm text-fg-muted hover:text-accent transition-colors">
+      &larr; {backLabel}
+    </a>
+  </div>
+
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-fg">
+      {payloadA.driver.full_name} <span class="text-fg-muted font-normal">vs</span> {payloadB.driver.full_name}
+    </h1>
+    <p class="text-sm text-fg-muted mt-1">Career stats — {subLabel}</p>
+  </div>
+
+  <ComparisonTable a={payloadA} b={payloadB} />
+</Base>

@@ -30,7 +30,8 @@ const currentRaceSlug = (() => {
   switch (pageContext.kind) {
     case 'race':
     case 'driver-race':
-    case 'team-race':  return pageContext.raceSlug;
+    case 'team-race':
+    case 'compare-race': return pageContext.raceSlug;
     case 'preseason':  return pageContext.firstRaceSlug;
     case 'postseason': return pageContext.prevRaceSlug;
     case 'stats':      return pageContext.chainSlug;
@@ -42,6 +43,22 @@ const currentChainSlug =
   : pageContext?.kind === 'postseason' ? 'postseason'
   : pageContext?.kind === 'stats'    ? pageContext.chainSlug
   : currentRaceSlug;
+
+const compareSlug = (() => {
+  if (!pageContext) return stripYearPrefix(latest.slug, latest.season);
+  switch (pageContext.kind) {
+    case 'race':
+    case 'driver-race':
+    case 'team-race':
+    case 'compare-race': return pageContext.raceSlug;
+    case 'preseason':    return 'preseason';
+    case 'postseason':   return 'postseason';
+    case 'stats': {
+      const cs = pageContext.chainSlug;
+      return cs === 'preseason' || cs === 'postseason' ? cs : cs;
+    }
+  }
+})();
 
 const section: 'seasons' | 'stats' = pageContext?.kind === 'stats' ? 'stats' : 'seasons';
 ---
@@ -79,6 +96,7 @@ const section: 'seasons' | 'stats' = pageContext?.kind === 'stats' ? 'stats' : '
         {currentSeason}
         {currentRaceSlug}
         {currentChainSlug}
+        {compareSlug}
         {section}
       />
 

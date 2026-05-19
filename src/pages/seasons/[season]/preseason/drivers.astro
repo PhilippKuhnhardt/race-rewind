@@ -1,0 +1,40 @@
+---
+import Base from '../../../../layouts/Base.astro';
+import DriverStandingsTable from '../../../../components/standings/DriverStandingsTable.astro';
+import { getAllSeasons, getSeasonBookends } from '../../../../lib/queries';
+import { stripYearPrefix, preseasonLink } from '../../../../lib/format';
+import { getDriverStandingsBeforeRace } from '../../../../lib/queries';
+import type { PageContext } from '../../../../lib/types';
+
+export async function getStaticPaths() {
+  return (await getAllSeasons()).map((s) => ({ params: { season: String(s) } }));
+}
+
+const { season: seasonStr } = Astro.params;
+const season = Number(seasonStr);
+
+const bookends = await getSeasonBookends(season);
+const firstRaceSlug = stripYearPrefix(bookends.firstSlug, season);
+
+const pageContext: PageContext = {
+  kind: 'preseason',
+  season,
+  raceCount: bookends.raceCount,
+  firstRaceSlug,
+};
+
+const rows = await getDriverStandingsBeforeRace(bookends.firstRaceNumber);
+
+const title = `${season} Season — Drivers (Preseason)`;
+const description = `Driver championship standings going into the ${season} season.`;
+---
+
+<Base {title} {description} canonical={`${preseasonLink(season)}drivers/`} {pageContext}>
+  <DriverStandingsTable
+    title="Drivers' Championship — Going Into the Season"
+    {rows}
+    {season}
+    raceSlug={firstRaceSlug}
+    emptyNote="No championship data before the season starts."
+  />
+</Base>

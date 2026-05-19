@@ -33,7 +33,7 @@ if (pageContext.kind === 'preseason') {
 } else if (pageContext.kind === 'driver-race') {
   label = pageContext.driverName;
   detail = `career as of ${pageContext.raceName} ${pageContext.season}`;
-  compareHref = `/compare/?a=${pageContext.driverSlug}&race=${pageContext.season}-${pageContext.raceSlug}`;
+  compareHref = `/compare/${pageContext.season}/${pageContext.raceSlug}/?prefill=${pageContext.driverSlug}`;
   if (pageContext.prevRaceSlug) prevHref = `/drivers/${pageContext.driverSlug}/${pageContext.season}/${pageContext.prevRaceSlug}/`;
   if (pageContext.nextRaceSlug) nextHref = `/drivers/${pageContext.driverSlug}/${pageContext.season}/${pageContext.nextRaceSlug}/`;
 } else if (pageContext.kind === 'team-race') {
@@ -41,6 +41,11 @@ if (pageContext.kind === 'preseason') {
   detail = `stats as of ${pageContext.raceName} ${pageContext.season}`;
   if (pageContext.prevRaceSlug) prevHref = `/teams/${pageContext.teamSlug}/${pageContext.season}/${pageContext.prevRaceSlug}/`;
   if (pageContext.nextRaceSlug) nextHref = `/teams/${pageContext.teamSlug}/${pageContext.season}/${pageContext.nextRaceSlug}/`;
+} else if (pageContext.kind === 'compare-race') {
+  label = `${pageContext.driverAName} vs ${pageContext.driverBName}`;
+  detail = `compared as of ${pageContext.raceName} ${pageContext.season}`;
+  if (pageContext.prevRaceSlug) prevHref = `/compare/${pageContext.driverASlug}/${pageContext.driverBSlug}/${pageContext.season}/${pageContext.prevRaceSlug}/`;
+  if (pageContext.nextRaceSlug) nextHref = `/compare/${pageContext.driverASlug}/${pageContext.driverBSlug}/${pageContext.season}/${pageContext.nextRaceSlug}/`;
 } else if (pageContext.kind === 'stats') {
   label = 'Driver Stats';
   if (pageContext.chainSlug === 'preseason') {

@@ -1,0 +1,71 @@
+---
+import type { DriverAtRacePayload } from '../../lib/api-types';
+import { formatPts } from '../../lib/format';
+
+interface Props {
+  a: DriverAtRacePayload;
+  b: DriverAtRacePayload;
+}
+
+const { a, b } = Astro.props;
+
+const statRows: { label: string; key: keyof DriverAtRacePayload['career_going_in'] }[] = [
+  { label: 'Starts', key: 'starts' },
+  { label: 'Wins', key: 'wins' },
+  { label: 'Podiums', key: 'podiums' },
+  { label: 'Poles', key: 'poles' },
+  { label: 'Fastest Laps', key: 'fastest_laps' },
+  { label: 'Career Points', key: 'points' },
+  { label: 'Championships', key: 'championships' },
+];
+
+function fmt(key: keyof DriverAtRacePayload['career_going_in'], val: number): string {
+  return key === 'points' ? formatPts(val) : String(val);
+}
+---
+
+<div class="space-y-4">
+  <!-- Career stats -->
+  <div class="rounded-lg border border-border overflow-hidden">
+    <div class="grid grid-cols-3 border-b border-border">
+      <div class="bg-bg-alt p-3 font-semibold text-fg text-center text-sm truncate">
+        {a.driver.full_name}
+      </div>
+      <div
+        class="bg-bg-alt p-3 text-center text-xs font-semibold uppercase tracking-wide text-fg-muted border-x border-border"
+      >
+        Career going in
+      </div>
+      <div class="bg-bg-alt p-3 font-semibold text-fg text-center text-sm truncate">
+        {b.driver.full_name}
+      </div>
+    </div>
+    <div class="divide-y divide-border">
+      {
+        statRows.map(({ label, key }) => {
+          const valA = a.career_going_in[key] as number;
+          const valB = b.career_going_in[key] as number;
+          const aWins = valA > valB;
+          const bWins = valB > valA;
+          return (
+            <div class="grid grid-cols-3 text-sm">
+              <div
+                class={`px-3 py-2.5 text-right tabular-nums ${aWins ? 'font-bold text-accent' : 'text-fg'}`}
+              >
+                {fmt(key, valA)}
+              </div>
+              <div class="px-3 py-2.5 text-center text-xs text-fg-muted border-x border-border">
+                {label}
+              </div>
+              <div
+                class={`px-3 py-2.5 tabular-nums ${bWins ? 'font-bold text-accent' : 'text-fg'}`}
+              >
+                {fmt(key, valB)}
+              </div>
+            </div>
+          );
+        })
+      }
+    </div>
+  </div>
+</div>

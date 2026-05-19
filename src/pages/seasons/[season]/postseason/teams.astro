@@ -1,0 +1,48 @@
+---
+import Base from '../../../../layouts/Base.astro';
+import TeamStandingsTable from '../../../../components/standings/TeamStandingsTable.astro';
+import { getAllSeasons, getSeasonBookends, getTeamStandings } from '../../../../lib/queries';
+import { stripYearPrefix, postseasonLink } from '../../../../lib/format';
+import type { PageContext } from '../../../../lib/types';
+
+export async function getStaticPaths() {
+  return (await getAllSeasons()).map((s) => ({ params: { season: String(s) } }));
+}
+
+const { season: seasonStr } = Astro.params;
+const season = Number(seasonStr);
+
+const bookends = await getSeasonBookends(season);
+const hasData = bookends.latestCompletedRaceNumber != null;
+const isComplete = hasData && bookends.latestCompletedRaceNumber === bookends.lastRaceNumber;
+const asOfRaceNumber = bookends.latestCompletedRaceNumber ?? bookends.firstRaceNumber;
+const lastRaceSlug = stripYearPrefix(bookends.lastSlug, season);
+const prevRaceSlug = !isComplete && hasData && bookends.latestCompletedSlug
+  ? stripYearPrefix(bookends.latestCompletedSlug, season)
+  : lastRaceSlug;
+
+const pageContext: PageContext = {
+  kind: 'postseason',
+  season,
+  raceCount: bookends.raceCount,
+  prevRaceSlug,
+  inProgressRound: !isComplete && hasData ? bookends.latestCompletedRound : null,
+};
+
+const rows = hasData ? await getTeamStandings(asOfRaceNumber) : [];
+
+const title = `${season} Season — Constructors' Championship`;
+const description = isComplete
+  ? `${season} F1 season final constructors' championship standings.`
+  : `${season} F1 season constructors' championship — standings as of round ${bookends.latestCompletedRound}.`;
+---
+
+<Base {title} {description} canonical={`${postseasonLink(season)}teams/`} {pageContext}>
+  <TeamStandingsTable
+    title={isComplete ? "Constructors' Championship — Final" : "Constructors' Championship — In Progress"}
+    {rows}
+    {season}
+    raceSlug={lastRaceSlug}
+    emptyNote="No results available yet for this season."
+  />
+</Base>

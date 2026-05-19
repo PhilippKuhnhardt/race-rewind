@@ -82,29 +82,13 @@ export async function getDriverStandingBeforeRace(driverId: number, raceNumber: 
   return row ?? undefined;
 }
 
-export interface DriverRacePair {
-  driver_slug: string;
-  season: number;
-  race_slug: string;
-}
-
-export async function getAllDriverRacePairs(): Promise<DriverRacePair[]> {
+export async function getAllDriversForPicker(): Promise<{ slug: string; full_name: string; nationality: string | null }[]> {
   const rows = await db
-    .selectDistinct({
-      driver_slug: drivers.slug,
-      season: races.season,
-      race_slug: races.slug,
-    })
-    .from(roundEntries)
-    .innerJoin(races, eq(races.raceNumber, roundEntries.raceNumber))
-    .innerJoin(drivers, eq(drivers.id, roundEntries.driverId))
-    .orderBy(races.raceNumber);
-
-  return rows.map((r) => ({
-    driver_slug: r.driver_slug,
-    season: r.season,
-    race_slug: stripYearPrefix(r.race_slug, r.season),
-  }));
+    .selectDistinct({ slug: drivers.slug, full_name: drivers.fullName, nationality: drivers.nationality })
+    .from(drivers)
+    .innerJoin(roundEntries, eq(roundEntries.driverId, drivers.id))
+    .orderBy(drivers.fullName);
+  return rows.map((r) => ({ slug: r.slug, full_name: r.full_name, nationality: r.nationality }));
 }
 
 export async function getDriverSeasonFirstRaces(driverId: number): Promise<Record<number, string>> {

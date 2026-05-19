@@ -61,6 +61,49 @@ export async function getRaceBySlug(slug: string) {
   return row ?? undefined;
 }
 
+export interface SeasonBounds {
+  firstRaceNumber: number;
+  firstRaceSlug: string;
+  firstRaceName: string;
+  lastRaceNumber: number;
+  lastRaceSlug: string;
+  lastRaceName: string;
+  raceCount: number;
+  nextSeasonFirstRaceNumber: number | null;
+}
+
+export async function getSeasonBounds(season: number): Promise<SeasonBounds | undefined> {
+  const rows = await db
+    .select({ raceNumber: races.raceNumber, slug: races.slug, name: races.name, round: races.round, isFinalRound: races.isFinalRound })
+    .from(races)
+    .where(eq(races.season, season))
+    .orderBy(asc(races.raceNumber));
+
+  if (rows.length === 0) return undefined;
+
+  const first = rows[0];
+  const last = rows[rows.length - 1];
+
+  const nextRow = await db
+    .select({ raceNumber: races.raceNumber })
+    .from(races)
+    .where(eq(races.season, season + 1))
+    .orderBy(asc(races.raceNumber))
+    .limit(1)
+    .get();
+
+  return {
+    firstRaceNumber: first.raceNumber,
+    firstRaceSlug: stripYearPrefix(first.slug, season),
+    firstRaceName: first.name,
+    lastRaceNumber: last.raceNumber,
+    lastRaceSlug: stripYearPrefix(last.slug, season),
+    lastRaceName: last.name,
+    raceCount: rows.length,
+    nextSeasonFirstRaceNumber: nextRow?.raceNumber ?? null,
+  };
+}
+
 export async function getLatestRace(): Promise<LatestRace> {
   const today = new Date().toISOString().slice(0, 10);
   const row = await db
@@ -79,4 +122,40 @@ export async function getAllSeasons(): Promise<number[]> {
     .from(races)
     .orderBy(asc(races.season));
   return rows.map((r) => r.season);
+}
+
+export interface SeasonCalendarRow {
+  round: number;
+  race_slug: string;
+  name: string;
+  date: string;
+  circuit_name: string;
+  circuit_locality: string | null;
+  circuit_country: string | null;
+}
+
+export async function getSeasonCalendar(season: number): Promise<SeasonCalendarRow[]> {
+  const rows = await db
+    .select({
+      round: races.round,
+      slug: races.slug,
+      name: races.name,
+      date: races.date,
+      circuit_name: circuits.name,
+      circuit_locality: circuits.locality,
+      circuit_country: circuits.country,
+    })
+    .from(races)
+    .innerJoin(circuits, eq(circuits.id, races.circuitId))
+    .where(eq(races.season, season))
+    .orderBy(asc(races.round));
+  return rows.map((r) => ({
+    round: r.round,
+    race_slug: stripYearPrefix(r.slug, season),
+    name: r.name,
+    date: r.date,
+    circuit_name: r.circuit_name,
+    circuit_locality: r.circuit_locality,
+    circuit_country: r.circuit_country,
+  }));
 }

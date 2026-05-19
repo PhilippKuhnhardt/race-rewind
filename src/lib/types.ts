@@ -53,4 +53,16 @@ export type PageContext =
       raceName: string | null;
       prevChainSlug?: string;
       nextChainSlug?: string;
+    }
+  | {
+      kind: 'compare-race';
+      season: number;
+      raceName: string;
+      raceSlug: string;
+      driverAName: string;
+      driverASlug: string;
+      driverBName: string;
+      driverBSlug: string;
+      prevRaceSlug?: string;
+      nextRaceSlug?: string;
     };

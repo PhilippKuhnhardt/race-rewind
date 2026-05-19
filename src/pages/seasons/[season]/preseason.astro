@@ -1,10 +1,12 @@
 ---
 import Base from '../../../layouts/Base.astro';
 import SeasonGridTable from '../../../components/driver/SeasonGridTable.astro';
+import SeasonCalendarTable from '../../../components/race/SeasonCalendarTable.astro';
 import {
   getAllSeasons,
   getSeasonBookends,
   getSeasonGrid,
+  getSeasonCalendar,
   getDriverCareerStats,
   getDriverPriorSeasons,
   getDriverBestChampionshipPos,
@@ -32,7 +34,10 @@ const { season: seasonStr } = Astro.params;
 const season = Number(seasonStr);
 
 const bookends = await getSeasonBookends(season);
-const grid = await getSeasonGrid(bookends.firstRaceNumber);
+const [grid, calendar] = await Promise.all([
+  getSeasonGrid(bookends.firstRaceNumber),
+  getSeasonCalendar(season),
+]);
 const firstRaceSlug = stripYearPrefix(bookends.firstSlug, season);
 
 const pageContext: PageContext = {
@@ -75,6 +80,11 @@ const description = `${season} F1 season: the starting grid and career statistic
       {bookends.raceCount} rounds &middot; {bookends.firstDate} &ndash; {bookends.lastDate}
     </p>
   </div>
+
+  <section class="mb-10">
+    <h2 class="mb-3 border-b border-border pb-2 text-lg font-semibold text-fg">Race Calendar</h2>
+    <SeasonCalendarTable races={calendar} season={season} />
+  </section>
 
   <SeasonGridTable
     title="Grid &amp; Statistics Going into the Season"

@@ -10,20 +10,25 @@ interface Props {
   currentSeason: number;
   currentRaceSlug?: string;
   currentChainSlug?: string;
+  compareSlug?: string;
   section?: 'seasons' | 'stats';
 }
 
-const { seasons, byseason, currentSeason, currentRaceSlug, currentChainSlug, section = 'seasons' } = Astro.props;
+const { seasons, byseason, currentSeason, currentRaceSlug, currentChainSlug, compareSlug, section = 'seasons' } = Astro.props;
 
-const raceBase = currentRaceSlug ? `/seasons/${currentSeason}/${currentRaceSlug}` : '';
+const isBoundaryPage = currentChainSlug === 'preseason' || currentChainSlug === 'postseason';
+// Boundary pages use 'preseason'/'postseason' as the slug — no race-based sub-routes exist
+const navSlug = isBoundaryPage ? currentChainSlug : currentRaceSlug;
+const raceBase = navSlug ? `/seasons/${currentSeason}/${navSlug}` : '';
 const statsBase = currentChainSlug ? `/stats/${currentSeason}/${currentChainSlug}/` : `/stats/`;
+const compareHref = compareSlug ? `/compare/${currentSeason}/${compareSlug}/` : '/compare/';
 
 const navLinks = [
-  { id: 'season',  href: raceBase ? `${raceBase}/`          : '/',         label: 'Race' },
-  { id: 'drivers', href: raceBase ? `${raceBase}/drivers/`   : '/',         label: 'Drivers' },
-  { id: 'teams',   href: raceBase ? `${raceBase}/teams/`     : '/',         label: 'Teams' },
-  { id: 'stats',   href: statsBase,                                          label: 'Stats' },
-  { id: 'compare', href: '/compare/',                                        label: 'Compare' },
+  { id: 'season',  href: raceBase ? `${raceBase}/`          : '/', label: 'Race' },
+  { id: 'drivers', href: raceBase ? `${raceBase}/drivers/`   : '/', label: 'Drivers' },
+  { id: 'teams',   href: raceBase ? `${raceBase}/teams/`     : '/', label: 'Teams' },
+  { id: 'stats',   href: statsBase,                                  label: 'Stats' },
+  { id: 'compare', href: compareHref,                                label: 'Compare' },
 ];
 
 const pathname = Astro.url.pathname;

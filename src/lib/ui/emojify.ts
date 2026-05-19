@@ -12,6 +12,8 @@ function customRaceName(countryName: string): string | null {
       return '🇺🇸';
     case countryName.includes('Caesars Palace'):
       return '🇺🇸';
+    case countryName.includes('Dallas'):
+      return '🇺🇸';
     case countryName.includes('Styrian'):
       return '🇦🇹';
     case countryName.includes('Tuscan'):
@@ -32,6 +34,10 @@ function customRaceName(countryName: string): string | null {
       return '🇧🇷';
     case countryName.includes('Pacific'):
       return '🇯🇵';
+    case countryName.includes('Korean'):
+      return '🇰🇷';
+    case countryName.includes('European'):
+      return '🇪🇺';
     default:
       return null;
   }

@@ -1,18 +1,9 @@
 ---
-import Base from '../../layouts/Base.astro';
-import ComparePage from '../../components/compare/ComparePage.svelte';
+import { getLatestRace } from '../../lib/queries';
 
-const title = 'Driver Comparison';
-const description = 'Compare any two F1 drivers at any historic race — career stats, championship standing, and race result side by side.';
+const { season, slug } = await getLatestRace();
+const target = `/compare/${season}/${slug.slice(String(season).length + 1)}/`;
 ---
 
-<Base {title} {description} canonical="/compare/">
-  <div class="mb-6">
-    <h1 class="text-2xl font-bold text-fg">Driver Comparison</h1>
-    <p class="text-sm text-fg-muted mt-1">
-      Compare any two drivers at any point in F1 history.
-    </p>
-  </div>
-
-  <ComparePage client:load />
-</Base>
+<meta http-equiv="refresh" content={`0; url=${target}`} />
+<script define:vars={{ target }}>window.location.href = target;</script>

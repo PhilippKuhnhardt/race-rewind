@@ -1,0 +1,51 @@
+---
+import type { SeasonCalendarRow } from '../../lib/queries/races';
+import { raceLink } from '../../lib/format';
+import { emojify } from '../../lib/ui/emojify';
+
+interface Props {
+  races: SeasonCalendarRow[];
+  season: number;
+}
+
+const { races, season } = Astro.props;
+
+function formatDate(iso: string): string {
+  const [year, month, day] = iso.split('-').map(Number);
+  const d = new Date(year, month - 1, day);
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+}
+---
+
+<div class="overflow-x-auto rounded-lg border border-border">
+  <table class="w-full border-collapse text-sm" data-sortable>
+    <thead>
+      <tr>
+        <th data-sort-key="round" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap w-10">#</th>
+        <th data-sort-key="date" class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Date</th>
+        <th data-sort-key="name" class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Grand Prix</th>
+        <th data-sort-key="circuit" class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Circuit</th>
+        <th data-sort-key="location" class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Location</th>
+      </tr>
+    </thead>
+    <tbody>
+      {races.map((race) => (
+        <tr class="border-b border-border last:border-0 hover:bg-bg-hover transition-colors">
+          <td class="px-3 py-2.5 text-right tabular-nums text-fg-muted">{race.round}</td>
+          <td class="px-3 py-2.5 tabular-nums text-fg-muted whitespace-nowrap" data-sort-value={race.date}>{formatDate(race.date)}</td>
+          <td class="px-3 py-2.5 font-medium">
+            <a href={raceLink(season, race.race_slug)} class="text-accent hover:underline">
+              {emojify(race.name)}
+            </a>
+          </td>
+          <td class="px-3 py-2.5 text-fg-muted">{race.circuit_name}</td>
+          <td class="px-3 py-2.5 text-fg-muted whitespace-nowrap">{[race.circuit_locality, race.circuit_country].filter(Boolean).join(', ')}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<script>
+  import '../../scripts/sortable-table.ts';
+</script>

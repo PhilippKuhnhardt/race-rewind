@@ -34,27 +34,27 @@ const { title, drivers, season, raceSlug } = Astro.props;
 <section class="mt-10">
   <h2 class="mb-3 border-b border-border pb-2 text-lg font-semibold text-fg">{title}</h2>
   <div class="overflow-x-auto rounded-lg border border-border">
-    <table class="w-full border-collapse text-sm">
+    <table class="w-full border-collapse text-sm" data-sortable>
       <thead>
         <tr>
-          <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">No.</th>
-          <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Driver</th>
-          <th class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Team</th>
-          <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Age</th>
-          <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Seasons</th>
-          <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Starts</th>
-          <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Wins</th>
-          <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Podiums</th>
-          <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Points</th>
-          <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Best</th>
-          <th class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Champs</th>
+          <th data-sort-key="no" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">No.</th>
+          <th data-sort-key="driver" class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Driver</th>
+          <th data-sort-key="team" class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Team</th>
+          <th data-sort-key="age" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Age</th>
+          <th data-sort-key="seasons" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Seasons</th>
+          <th data-sort-key="starts" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Starts</th>
+          <th data-sort-key="wins" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Wins</th>
+          <th data-sort-key="podiums" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Podiums</th>
+          <th data-sort-key="points" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Points</th>
+          <th data-sort-key="best" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Best</th>
+          <th data-sort-key="champs" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Champs</th>
         </tr>
       </thead>
       <tbody>
         {drivers.map((row) => (
           <tr class="border-b border-border last:border-0 hover:bg-bg-hover transition-colors">
             <td class="px-3 py-2.5 text-right tabular-nums text-fg-muted">{row.car_number ?? '—'}</td>
-            <td class="px-3 py-2.5">
+            <td class="px-3 py-2.5" data-sort-value={row.full_name}>
               <div class="flex items-center gap-2">
                 {row.primary_color && (
                   <span
@@ -68,7 +68,7 @@ const { title, drivers, season, raceSlug } = Astro.props;
                 </a>
               </div>
             </td>
-            <td class="px-3 py-2.5 text-fg-muted whitespace-nowrap">
+            <td class="px-3 py-2.5 text-fg-muted whitespace-nowrap" data-sort-value={row.team_name ?? ''}>
               {row.team_slug
                 ? <a href={teamLink(row.team_slug!, season, raceSlug)} class="text-fg-muted hover:text-accent hover:underline">{row.team_name}</a>
                 : (row.team_name ?? '—')}
@@ -79,7 +79,7 @@ const { title, drivers, season, raceSlug } = Astro.props;
             <td class="px-3 py-2.5 text-right tabular-nums font-medium">{row.career.wins}</td>
             <td class="px-3 py-2.5 text-right tabular-nums">{row.career.podiums}</td>
             <td class="px-3 py-2.5 text-right tabular-nums">{formatPts(row.career.points)}</td>
-            <td class="px-3 py-2.5 text-right tabular-nums text-fg-muted text-xs">{row.bestChamp != null ? ordinal(row.bestChamp) : '—'}</td>
+            <td class="px-3 py-2.5 text-right tabular-nums text-fg-muted text-xs" data-sort-value={row.bestChamp ?? ''}>{row.bestChamp != null ? ordinal(row.bestChamp) : '—'}</td>
             <td class="px-3 py-2.5 text-right tabular-nums font-semibold {row.career.championships > 0 ? 'text-accent' : ''}">{row.career.championships}</td>
           </tr>
         ))}
