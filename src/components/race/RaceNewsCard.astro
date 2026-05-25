@@ -6,12 +6,17 @@ interface Props {
   heading?: string;
 }
 
-const { entry, heading = 'Going into this race' } = Astro.props;
-const { source_url, source_title, license } = entry.data;
+const { entry, heading } = Astro.props;
+const { source_url, source_title, license, phase } = entry.data;
+
+const defaultHeading =
+  phase === 'preseason' ? 'Before the season'
+  : phase === 'postseason' ? 'Season summary'
+  : 'Going into this race';
 ---
 
 <section>
-  <h2 class="mb-4 text-lg font-semibold text-fg">{heading}</h2>
+  <h2 class="mb-4 text-lg font-semibold text-fg">{heading ?? defaultHeading}</h2>
   <div class="rounded-xl border border-border bg-bg-alt p-4">
     <div class="max-w-none text-sm text-fg leading-relaxed space-y-3">
       <Fragment set:html={entry.rendered?.html ?? ''} />

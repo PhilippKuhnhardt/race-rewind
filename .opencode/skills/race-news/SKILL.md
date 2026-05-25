@@ -1,20 +1,22 @@
 ---
 name: race-news
-description: Use ONLY when creating Wikipedia-derived race preview content for the F1 History app. Covers the end-to-end workflow of sourcing, extracting, and writing race preview markdown files. Triggered by requests like "create race news for season X" or "generate previews for all 2024 races".
+description: Use ONLY when creating Wikipedia-derived race preview content for the F1 History app. Covers the end-to-end workflow of sourcing, extracting, and writing race preview markdown files. Triggered by requests like "create race news for season X" or "generate previews for all 2024 races". Also handles preseason and postseason content.
 ---
 
 # Race News Creation
 
 Generate Wikipedia-derived race previews for the F1 History app. Content goes into
-`content/race-news/{slug}/preview.md` — one file per race, per phase. For now only
-the `preview` phase is in scope.
+`content/race-news/{slug}/{phase}.md` — one file per race, per phase. Phases include
+`preview`, `preseason`, and `postseason`. For now the `preview`, `preseason`, and
+`postseason` phases are in scope (not `post-qualifying` or `post-race`).
 
 ## Data sources
 
-Every fact in a preview must be verifiable against one of these two Wikipedia pages:
+Every fact must be verifiable against one of these Wikipedia pages:
 
 1. **Season overview:** `https://en.wikipedia.org/wiki/{year}_Formula_One_World_Championship`
-   — championship context, regulation changes, driver market, team changes, mid-season developments.
+   — championship context, regulation changes, driver market, team changes, mid-season developments,
+   final standings. This is the primary source for preseason and postseason content.
 2. **Race article:** `https://en.wikipedia.org/wiki/{year}_{Title_Case_Grand_Prix_Name}`
    (from the `wikipedia` column of the `races` table in `data/f1-history.sqlite`)
    — pre-race build-up, "Background" section, weather, practice/qualifying format notes.
@@ -23,7 +25,117 @@ Read the season overview first (once), then each race article in calendar order.
 A following race's "Background" section often contains material that also applies to
 the next race, so cross-reference.
 
-## Workflow
+## Phase overview
+
+| Phase | Slug pattern | File path | Page rendered on |
+|---|---|---|---|
+| `preseason` | `{year}-preseason` | `content/race-news/{year}-preseason/preseason.md` | `/seasons/{year}/preseason/` |
+| `preview` | `{year}-{race-slug}` | `content/race-news/{year}-{race-slug}/preview.md` | `/seasons/{year}/{race-slug}/` |
+| `postseason` | `{year}-postseason` | `content/race-news/{year}-postseason/postseason.md` | `/seasons/{year}/postseason/` |
+
+When no entry exists, the section is silently omitted from the page.
+
+## Workflow — Preseason
+
+### 1. Fetch the season overview
+
+Fetch `https://en.wikipedia.org/wiki/{year}_Formula_One_World_Championship`. From it, extract:
+
+- Season number (e.g. "75th running"), number of races, defending champions
+- **Entries section**: full team/driver table, team names, engine suppliers
+- **Team changes**: rebrands, ownership changes, management restructures
+- **Driver changes**: any driver market movements before the season (if none, note it)
+- **Calendar**: circuit list, sprint events, calendar changes from previous year
+- **Regulation changes**: technical and sporting regulations, tyre rules
+- **Pre-season testing**: where, when, who was fastest, notable incidents
+
+### 2. Write the preseason file
+
+Write to `content/race-news/{year}-preseason/preseason.md`.
+
+**Tense:** All content is written in present tense — the season is about to begin.
+
+**Structure:** Use `###` level-3 headings for sections. Typical structure:
+
+```markdown
+### Entrants
+### Team changes
+### Calendar
+### Regulation changes
+### Pre-season testing
+```
+
+**Content rules:** Same tightness and factuality rules as the preview phase. No speculation, no circuit descriptions, no flourishes. Every fact must come from Wikipedia.
+
+**Do NOT include:** Driver standings (the season hasn't started), in-season changes, race results.
+
+### 3. Frontmatter
+
+```yaml
+race_slug: {year}-preseason
+phase: preseason
+source_url: https://en.wikipedia.org/wiki/{year}_Formula_One_World_Championship
+source_revision: "1234567890"
+source_title: {year} Formula One World Championship
+license: CC-BY-SA-4.0
+generated_at: "{ISO date}"
+model: deepseek/deepseek-v4-pro
+```
+
+## Workflow — Postseason
+
+### 1. Fetch the season overview
+
+Fetch `https://en.wikipedia.org/wiki/{year}_Formula_One_World_Championship`. From it, extract:
+
+- **Season summary** (opening paragraphs): overall narrative, key storylines
+- **In-season driver changes**: all substitutions (injury, ban, mid-season replacement)
+- **Closing rounds section**: who clinched what, when, key statistics
+- **Final Drivers' Championship standings** (all positions that scored points)
+- **Final Constructors' Championship standings** (all positions)
+- **Notable records or milestones** achieved during the season
+
+### 2. Write the postseason file
+
+Write to `content/race-news/{year}-postseason/postseason.md`.
+
+**Tense:** Past tense for events that happened during the season. Present tense for describing what the final standings are.
+
+**Structure:** Use `###` level-3 headings. Typical structure:
+
+```markdown
+### Season summary
+### Final Drivers' Championship
+### Final Constructors' Championship
+### In-season driver changes
+### Notable statistics
+### Farewells
+```
+
+**Content rules:**
+
+- The season summary should cover the narrative arc: who dominated when, how the championship shifted, key turning points.
+- List the top 8 drivers and all 10 teams with their final point totals. Do not list every driver — only those who scored points are relevant.
+- Driver changes should list the when, who, and why for each substitution.
+- Notable statistics should be specific facts (e.g., "first driver to win for two teams in first two races"), not general observations.
+- Farewells: list drivers who left teams, retired, or had notable last races.
+
+**Do NOT include:** Race-by-race results (those are on individual race pages), speculation about the future, generic praise.
+
+### 3. Frontmatter
+
+```yaml
+race_slug: {year}-postseason
+phase: postseason
+source_url: https://en.wikipedia.org/wiki/{year}_Formula_One_World_Championship
+source_revision: "1234567890"
+source_title: {year} Formula One World Championship
+license: CC-BY-SA-4.0
+generated_at: "{ISO date}"
+model: deepseek/deepseek-v4-pro
+```
+
+## Workflow — Race previews
 
 ### 1. Collect race data for the season
 
@@ -50,10 +162,7 @@ From it, extract:
 
 Process races in round order. For each:
 
-1. **Fetch the race article** using the Wikipedia API summary endpoint
-   (`https://en.wikipedia.org/api/rest_v1/page/summary/{title}`) or fetch the
-   full page with the `oldid` approach. Always capture the `oldid` (revision permalink)
-   for attribution, not the live article URL.
+1. **Fetch the race article** using the webfetch tool (text format).
 
 2. **Find the pre-race "Background" and "Practice" sections** — extract the Background
    (championship standings before the race, entrants, tyre choices) and the Practice
@@ -116,7 +225,11 @@ model: deepseek/deepseek-v4-pro
 
 ### Tense
 
-Present tense for the state going into the race. Past tense for events that happened at a previous race.
+| Phase | Tense |
+|---|---|
+| `preseason` | Present tense — the season is about to begin. |
+| `preview` | Present tense for the state going into this race. Past tense for events that happened at a previous race. |
+| `postseason` | Past tense for events during the season. Present tense for describing final standings. |
 
 | Present (state into this race) | Past (events at the previous race) |
 |---|---|
@@ -147,20 +260,35 @@ Consequences of race N always go into the preview of race N+1:
 ## File path scheme
 
 ```
-content/race-news/{year}-{slugified-name}/preview.md
+content/race-news/{year}-preseason/preseason.md         # Preseason overview
+content/race-news/{year}-{slugified-name}/preview.md    # Race previews
+content/race-news/{year}-postseason/postseason.md       # Postseason summary
 ```
 
-The `{slug}` matches the `slug` column in the races DB table.
+The `{slug}` in race previews matches the `slug` column in the races DB table.
+
+## Full season workflow
+
+When generating content for an entire season, generate in this order:
+
+1. **Preseason** — from the season overview page
+2. **Race previews** — one per race, in calendar order (1 → 24)
+3. **Postseason** — from the season overview page (closing rounds + final standings)
+
+This ensures that season-level context (regulation changes, calendar, driver market) is
+captured before diving into individual races.
 
 ## Verification
 
-After generating all previews for a season:
+After generating content for a season:
 
 ```bash
 pnpm check     # Zod validation + TypeScript type-check
 pnpm lint --fix
-pnpm dev       # Visual check on a race with content and one without
+pnpm dev       # Visual check on preseason, a race with content, postseason, and a race without
 ```
 
-The preview block renders at `/seasons/{year}/{race-slug}/` via `RaceNewsCard.astro`.
-When no entry exists for a race, the section is silently omitted.
+Race preview blocks render at `/seasons/{year}/{race-slug}/` via `RaceNewsCard.astro`.
+Preseason content renders at `/seasons/{year}/preseason/` via `RaceNewsCard.astro`.
+Postseason content renders at `/seasons/{year}/postseason/` via `RaceNewsCard.astro`.
+When no entry exists for a given race or phase, the section is silently omitted.

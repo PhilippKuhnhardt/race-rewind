@@ -1,7 +1,7 @@
 import { getEntry } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 
-export type Phase = 'preview' | 'post-qualifying' | 'post-race';
+export type Phase = 'preview' | 'post-qualifying' | 'post-race' | 'preseason' | 'postseason';
 export type RaceNewsEntry = CollectionEntry<'raceNews'>;
 
 export async function getRaceNews(

@@ -6,7 +6,7 @@ const raceNews = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './content/race-news' }),
   schema: z.object({
     race_slug: z.string(),
-    phase: z.enum(['preview', 'post-qualifying', 'post-race']),
+    phase: z.enum(['preview', 'post-qualifying', 'post-race', 'preseason', 'postseason']),
     source_url: z.string(),
     source_revision: z.string().optional(),
     source_title: z.string(),

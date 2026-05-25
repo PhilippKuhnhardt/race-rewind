@@ -1,5 +1,6 @@
 ---
 import Base from '../../../layouts/Base.astro';
+import RaceNewsCard from '../../../components/race/RaceNewsCard.astro';
 import SeasonGridTable from '../../../components/driver/SeasonGridTable.astro';
 import SeasonCalendarTable from '../../../components/race/SeasonCalendarTable.astro';
 import {
@@ -13,6 +14,7 @@ import {
 } from '../../../lib/queries';
 import { stripYearPrefix, preseasonLink } from '../../../lib/format';
 import { pitForPreseason } from '../../../lib/point-in-time';
+import { getRaceNews } from '../../../lib/race-news';
 import type { PageContext } from '../../../lib/types';
 
 export async function getStaticPaths() {
@@ -68,6 +70,8 @@ driverStats.sort((a, b) => {
 
 const title = `${season} Season — Start of Season`;
 const description = `${season} F1 season: the starting grid and career statistics for every driver going into the season.`;
+
+const newsEntry = await getRaceNews(`${season}-preseason`, 'preseason');
 ---
 
 <Base
@@ -82,6 +86,12 @@ const description = `${season} F1 season: the starting grid and career statistic
       {bookends.raceCount} rounds &middot; {bookends.firstDate} &ndash; {bookends.lastDate}
     </p>
   </div>
+
+  {newsEntry && (
+    <div class="mb-8">
+      <RaceNewsCard entry={newsEntry} />
+    </div>
+  )}
 
   <section class="mb-10">
     <h2 class="mb-3 border-b border-border pb-2 text-lg font-semibold text-fg">Race Calendar</h2>

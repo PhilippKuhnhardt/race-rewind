@@ -1,5 +1,6 @@
 ---
 import Base from '../../../layouts/Base.astro';
+import RaceNewsCard from '../../../components/race/RaceNewsCard.astro';
 import DriverStandingsTable from '../../../components/standings/DriverStandingsTable.astro';
 import TeamStandingsTable from '../../../components/standings/TeamStandingsTable.astro';
 import {
@@ -10,6 +11,7 @@ import {
 } from '../../../lib/queries';
 import { stripYearPrefix, postseasonLink } from '../../../lib/format';
 import { pitForPostseason } from '../../../lib/point-in-time';
+import { getRaceNews } from '../../../lib/race-news';
 import type { PageContext } from '../../../lib/types';
 
 export async function getStaticPaths() {
@@ -52,6 +54,8 @@ const title = `${season} Season — End of Season`;
 const description = isComplete
   ? `${season} F1 season final standings: drivers' and constructors' championships.`
   : `${season} F1 season in progress — standings as of round ${bookends.latestCompletedRound}.`;
+
+const newsEntry = await getRaceNews(`${season}-postseason`, 'postseason');
 ---
 
 <Base
@@ -66,6 +70,12 @@ const description = isComplete
       {bookends.raceCount} rounds &middot; {bookends.firstDate} &ndash; {bookends.lastDate}
     </p>
   </div>
+
+  {newsEntry && (
+    <div class="mb-8">
+      <RaceNewsCard entry={newsEntry} />
+    </div>
+  )}
 
   {!isComplete && hasData && (
     <div class="mb-6 rounded-lg border border-border bg-bg-alt px-4 py-3 text-sm text-fg-muted">
