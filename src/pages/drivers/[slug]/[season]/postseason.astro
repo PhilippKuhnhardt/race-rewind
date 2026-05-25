@@ -1,70 +1,65 @@
 ---
 import TeamsDrivenTable from '../../../../components/team/TeamsDrivenTable.astro';
 import Base from '../../../../layouts/Base.astro';
-import { driverLink, formatPts, raceLink, stripYearPrefix, teamLink } from '../../../../lib/format';
+import { driverLinkAt, teamLinkAt, raceLinkAt } from '../../../../lib/nav';
+import { pitForPostseason, resolveAsOfRaceNumber } from '../../../../lib/point-in-time';
+import { formatPts, stripYearPrefix } from '../../../../lib/format';
 import {
-  getAllRacesBySeason,
   getDriverBySlug,
   getDriverCareerStats,
   getDriverPriorSeasons,
   getDriverTeamsDriven,
-  getRaceBySlug,
+  getSeasonBookends,
 } from '../../../../lib/queries';
 import type { PageContext } from '../../../../lib/types';
 import { emojify } from '../../../../lib/ui/emojify';
 
 export const prerender = false;
 
-const { slug, season, race: raceSlug } = Astro.params;
+const { slug, season: seasonStr } = Astro.params;
+const season = Number(seasonStr);
 
 const driver = slug && (await getDriverBySlug(slug));
 if (!driver) throw new Error(`Driver not found: ${slug}`);
 
-const fullSlug = `${season}-${raceSlug}`;
-const race = season && raceSlug && (await getRaceBySlug(fullSlug));
-if (!race) throw new Error(`Race not found: ${fullSlug}`);
+const bookends = await getSeasonBookends(season);
+const pit = pitForPostseason(season);
+const asOf = resolveAsOfRaceNumber(pit, bookends);
+const lastRaceSlug = stripYearPrefix(bookends.lastSlug, season);
 
-const raceNavSlug = stripYearPrefix(race.slug, race.season);
-const [stats, teamsDriven, { byseason }, priorSeasons] = await Promise.all([
-  getDriverCareerStats(driver.id, race.race_number),
-  getDriverTeamsDriven(driver.id, race.race_number),
-  getAllRacesBySeason(),
-  getDriverPriorSeasons(driver.id, race.race_number),
+const [stats, teamsDriven, priorSeasons] = await Promise.all([
+  getDriverCareerStats(driver.id, asOf),
+  getDriverTeamsDriven(driver.id, asOf),
+  getDriverPriorSeasons(driver.id, asOf),
 ]);
 
-const seasonRaces = byseason[race.season] ?? [];
-const idx = seasonRaces.findIndex((r) => r.slug === raceNavSlug);
-const prevRaceSlug = idx > 0 ? seasonRaces[idx - 1].slug : 'preseason';
-const nextRaceSlug = idx < seasonRaces.length - 1 ? seasonRaces[idx + 1].slug : 'postseason';
+const seasonsDone = priorSeasons; // includes the just-completed season
 
 const pageContext: PageContext = {
-  kind: 'driver-race',
-  season: race.season,
-  raceName: race.name,
-  raceSlug: raceNavSlug,
+  kind: 'driver-postseason',
+  season,
+  raceCount: bookends.raceCount,
   driverName: driver.full_name,
   driverSlug: slug,
-  prevRaceSlug,
-  nextRaceSlug,
+  prevRaceSlug: lastRaceSlug,
 };
 
-const title = `${driver.full_name} — ${race.season} ${race.name}`;
-const description = `${driver.full_name}'s career going into the ${race.season} ${race.name}: ${stats.wins} wins, ${stats.podiums} podiums, ${stats.championships} championship${stats.championships !== 1 ? 's' : ''}.`;
+const title = `${driver.full_name} — ${season} Postseason`;
+const description = `${driver.full_name}'s career after the ${season} season: ${stats.wins} wins, ${stats.podiums} podiums, ${stats.championships} championship${stats.championships !== 1 ? 's' : ''}.`;
 ---
 
 <Base
   title={title}
   description={description}
-  canonical={driverLink(slug, season, raceSlug)}
+  canonical={driverLinkAt(slug, pit)}
   {pageContext}
 >
   <div class="mb-4">
     <a
-      href={raceLink(race.season, raceNavSlug)}
+      href={raceLinkAt(pit)}
       class="text-sm text-fg-muted hover:text-accent transition-colors"
     >
-      &larr; {race.season}
-      {race.name}
+      &larr; {season} Season
     </a>
   </div>
 
@@ -85,7 +80,7 @@ const description = `${driver.full_name}'s career going into the ${race.season} 
   </div>
 
   <section class="mb-4">
-    <h2 class="mb-4 text-lg font-semibold text-fg">Career Going Into This Race</h2>
+    <h2 class="mb-4 text-lg font-semibold text-fg">Career After the Season</h2>
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
       {
         [
@@ -96,7 +91,7 @@ const description = `${driver.full_name}'s career going into the ${race.season} 
           { label: 'Fastest Laps', value: stats.fastest_laps },
           { label: 'Career Points', value: formatPts(stats.points) },
           { label: 'Championships', value: stats.championships },
-          { label: 'Seasons', value: priorSeasons },
+          { label: 'Seasons', value: seasonsDone },
         ].map(({ label, value }) => (
           <div class="rounded-lg border border-border bg-bg-alt p-3">
             <div class="text-xs text-fg-muted uppercase tracking-wide">{label}</div>
@@ -113,6 +108,6 @@ const description = `${driver.full_name}'s career going into the ${race.season} 
 
   <TeamsDrivenTable
     teams={teamsDriven}
-    teamHref={(tSlug) => teamLink(tSlug, race.season, raceNavSlug)}
+    teamHref={(tSlug) => teamLinkAt(tSlug, pit)}
   />
 </Base>

@@ -3,6 +3,7 @@ import Base from '../../../../layouts/Base.astro';
 import TeamStandingsTable from '../../../../components/standings/TeamStandingsTable.astro';
 import { getAllSeasons, getSeasonBookends, getTeamStandings } from '../../../../lib/queries';
 import { stripYearPrefix, postseasonLink } from '../../../../lib/format';
+import { pitForPostseason } from '../../../../lib/point-in-time';
 import type { PageContext } from '../../../../lib/types';
 
 export async function getStaticPaths() {
@@ -20,6 +21,7 @@ const lastRaceSlug = stripYearPrefix(bookends.lastSlug, season);
 const prevRaceSlug = !isComplete && hasData && bookends.latestCompletedSlug
   ? stripYearPrefix(bookends.latestCompletedSlug, season)
   : lastRaceSlug;
+const pit = pitForPostseason(season);
 
 const pageContext: PageContext = {
   kind: 'postseason',
@@ -41,8 +43,7 @@ const description = isComplete
   <TeamStandingsTable
     title={isComplete ? "Constructors' Championship — Final" : "Constructors' Championship — In Progress"}
     {rows}
-    {season}
-    raceSlug={lastRaceSlug}
+    {pit}
     emptyNote="No results available yet for this season."
   />
 </Base>

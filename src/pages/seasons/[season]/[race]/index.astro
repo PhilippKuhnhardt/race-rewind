@@ -6,6 +6,7 @@ import PreRaceLeaders from '../../../../components/race/PreRaceLeaders.astro';
 import { getAllRaces, getDriverStandingsBeforeRace, getTeamStandingsBeforeRace } from '../../../../lib/queries';
 import { getRacePageBase } from '../../../../lib/race-page';
 import { raceLink } from '../../../../lib/format';
+import { pitForRace } from '../../../../lib/point-in-time';
 
 export async function getStaticPaths() {
   return (await getAllRaces()).map((r) => ({
@@ -17,6 +18,7 @@ const { season, race: raceSlug } = Astro.params;
 const base = await getRacePageBase(season, raceSlug);
 if (!base) throw new Error(`Race not found: ${season}-${raceSlug}`);
 const { race, raceCount, pageContext, hasQuali, hasSprintQualifying, sessionOrder } = base;
+const pit = pitForRace(race, raceSlug!);
 
 const [preRaceDriverChamp, preRaceTeamChamp] = await Promise.all([
   getDriverStandingsBeforeRace(race.race_number),
@@ -54,8 +56,7 @@ const description = `${race.season} ${race.name} at ${race.circuit_name}${race.c
     <DriverStandingsTable
       title="Drivers' Championship — Going Into This Race"
       rows={preRaceDriverChamp.slice(0, 10)}
-      season={race.season}
-      raceSlug={raceSlug}
+      {pit}
       emptyNote="First race of the season — championship not yet started."
       viewAllHref={`/seasons/${race.season}/${raceSlug}/drivers/`}
     />
@@ -63,8 +64,7 @@ const description = `${race.season} ${race.name} at ${race.circuit_name}${race.c
     <TeamStandingsTable
       title="Constructors' Championship — Going Into This Race"
       rows={preRaceTeamChamp.slice(0, 5)}
-      season={race.season}
-      raceSlug={raceSlug}
+      {pit}
       viewAllHref={`/seasons/${race.season}/${raceSlug}/teams/`}
       emptyNote="First race of the season — championship not yet started."
     />

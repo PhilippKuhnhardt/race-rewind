@@ -1,68 +1,61 @@
 ---
 import DriversFieldedTable from '../../../../components/driver/DriversFieldedTable.astro';
 import Base from '../../../../layouts/Base.astro';
-import { driverLink, formatPts, raceLink, stripYearPrefix, teamLink } from '../../../../lib/format';
+import { teamLinkAt, driverLinkAt, raceLinkAt } from '../../../../lib/nav';
+import { pitForPreseason, resolveAsOfRaceNumber } from '../../../../lib/point-in-time';
+import { formatPts, stripYearPrefix } from '../../../../lib/format';
 import {
-  getAllRacesBySeason,
-  getRaceBySlug,
   getTeamBySlug,
   getTeamCareerStats,
   getTeamDriversFielded,
+  getSeasonBookends,
 } from '../../../../lib/queries';
 import type { PageContext } from '../../../../lib/types';
 import { emojify } from '../../../../lib/ui/emojify';
 
 export const prerender = false;
 
-const { slug, season, race: raceSlug } = Astro.params;
+const { slug, season: seasonStr } = Astro.params;
+const season = Number(seasonStr);
 
 const team = slug && (await getTeamBySlug(slug));
 if (!team) throw new Error(`Team not found: ${slug}`);
 
-const fullSlug = `${season}-${raceSlug}`;
-const race = season && raceSlug && (await getRaceBySlug(fullSlug));
-if (!race) throw new Error(`Race not found: ${fullSlug}`);
+const bookends = await getSeasonBookends(season);
+const pit = pitForPreseason(season);
+const asOf = resolveAsOfRaceNumber(pit, bookends);
+const firstRaceSlug = stripYearPrefix(bookends.firstSlug, season);
 
-const raceNavSlug = stripYearPrefix(race.slug, race.season);
-const [stats, driversFielded, { byseason }] = await Promise.all([
-  getTeamCareerStats(team.id, race.race_number),
-  getTeamDriversFielded(team.id, race.race_number),
-  getAllRacesBySeason(),
+const [stats, driversFielded] = await Promise.all([
+  getTeamCareerStats(team.id, asOf),
+  getTeamDriversFielded(team.id, asOf),
 ]);
 
-const seasonRaces = byseason[race.season] ?? [];
-const idx = seasonRaces.findIndex((r) => r.slug === raceNavSlug);
-const prevRaceSlug = idx > 0 ? seasonRaces[idx - 1].slug : 'preseason';
-const nextRaceSlug = idx < seasonRaces.length - 1 ? seasonRaces[idx + 1].slug : 'postseason';
-
 const pageContext: PageContext = {
-  kind: 'team-race',
-  season: race.season,
-  raceName: race.name,
-  raceSlug: raceNavSlug,
+  kind: 'team-preseason',
+  season,
+  raceCount: bookends.raceCount,
   teamName: team.name,
   teamSlug: slug,
-  prevRaceSlug,
-  nextRaceSlug,
+  nextRaceSlug: firstRaceSlug,
 };
 
-const title = `${team.name} — ${race.season} ${race.name}`;
-const description = `${team.name}'s career going into the ${race.season} ${race.name}: ${stats.wins} wins, ${stats.podiums} podiums, ${stats.championships} constructors' title${stats.championships !== 1 ? 's' : ''}.`;
+const title = `${team.name} — ${season} Preseason`;
+const description = `${team.name}'s stats going into the ${season} season: ${stats.wins} wins, ${stats.podiums} podiums, ${stats.championships} constructors' title${stats.championships !== 1 ? 's' : ''}.`;
 ---
 
 <Base
   title={title}
   description={description}
-  canonical={teamLink(slug, season, raceSlug)}
+  canonical={teamLinkAt(slug, pit)}
   {pageContext}
 >
   <div class="mb-4">
     <a
-      href={raceLink(race.season, raceNavSlug)}
+      href={raceLinkAt(pit)}
       class="text-sm text-fg-muted hover:text-accent transition-colors"
     >
-      &larr; {race.season}
-      {race.name}
+      &larr; {season} Season
     </a>
   </div>
 
@@ -77,7 +70,7 @@ const description = `${team.name}'s career going into the ${race.season} ${race.
   </div>
 
   <section class="mb-4">
-    <h2 class="mb-4 text-lg font-semibold text-fg">Stats Going Into This Race</h2>
+    <h2 class="mb-4 text-lg font-semibold text-fg">Stats Going Into the Season</h2>
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
       {
         [
@@ -105,6 +98,6 @@ const description = `${team.name}'s career going into the ${race.season} ${race.
 
   <DriversFieldedTable
     drivers={driversFielded}
-    driverHref={(dSlug) => driverLink(dSlug, race.season, raceNavSlug)}
+    driverHref={(dSlug) => driverLinkAt(dSlug, pit)}
   />
 </Base>

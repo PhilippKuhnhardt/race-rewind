@@ -1,5 +1,7 @@
 ---
-import { formatPts, driverLink, teamLink, ordinal } from '../../lib/format';
+import { formatPts, ordinal } from '../../lib/format';
+import { driverLinkAt, teamLinkAt } from '../../lib/nav';
+import type { PointInTime } from '../../lib/point-in-time';
 
 interface DriverRow {
   car_number: number | null;
@@ -23,11 +25,10 @@ interface DriverRow {
 interface Props {
   title: string;
   drivers: DriverRow[];
-  season: number;
-  raceSlug: string;
+  pit: PointInTime;
 }
 
-const { title, drivers, season, raceSlug } = Astro.props;
+const { title, drivers, pit } = Astro.props;
 
 ---
 
@@ -63,14 +64,14 @@ const { title, drivers, season, raceSlug } = Astro.props;
                     aria-hidden="true"
                   />
                 )}
-                <a href={driverLink(row.driver_slug, season, raceSlug)} class="text-accent hover:underline font-medium whitespace-nowrap">
+                <a href={driverLinkAt(row.driver_slug, pit)} class="text-accent hover:underline font-medium whitespace-nowrap">
                   {row.full_name}
                 </a>
               </div>
             </td>
             <td class="px-3 py-2.5 text-fg-muted whitespace-nowrap" data-sort-value={row.team_name ?? ''}>
               {row.team_slug
-                ? <a href={teamLink(row.team_slug!, season, raceSlug)} class="text-fg-muted hover:text-accent hover:underline">{row.team_name}</a>
+                ? <a href={teamLinkAt(row.team_slug!, pit)} class="text-fg-muted hover:text-accent hover:underline">{row.team_name}</a>
                 : (row.team_name ?? '—')}
             </td>
             <td class="px-3 py-2.5 text-right tabular-nums text-fg-muted">{row.age ?? '—'}</td>

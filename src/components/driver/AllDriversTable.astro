@@ -1,15 +1,16 @@
 ---
 import type { getAllDriverCareerStatsAsOf } from '../../lib/queries';
-import { formatPts, driverLink, ordinal } from '../../lib/format';
+import { formatPts, ordinal } from '../../lib/format';
+import { driverLinkAt } from '../../lib/nav';
+import type { PointInTime } from '../../lib/point-in-time';
 
 interface Props {
   drivers: Awaited<ReturnType<typeof getAllDriverCareerStatsAsOf>>;
-  season: number;
-  raceSlug: string;
+  pit: PointInTime;
   title?: string;
 }
 
-const { drivers, season, raceSlug, title = 'All Drivers with at Least One Start' } = Astro.props;
+const { drivers, pit, title = 'All Drivers with at Least One Start' } = Astro.props;
 ---
 
 {drivers.length > 0 && (
@@ -33,7 +34,7 @@ const { drivers, season, raceSlug, title = 'All Drivers with at Least One Start'
           {drivers.map((row) => (
             <tr class="border-b border-border last:border-0 hover:bg-bg-hover transition-colors">
               <td class="px-3 py-2.5">
-                <a href={driverLink(row.driver_slug, season, raceSlug)} class="text-accent hover:underline font-medium">
+                <a href={driverLinkAt(row.driver_slug, pit)} class="text-accent hover:underline font-medium">
                   {row.full_name}
                 </a>
               </td>

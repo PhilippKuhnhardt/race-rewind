@@ -3,6 +3,8 @@ import Base from '../../../layouts/Base.astro';
 import AllDriversTable from '../../../components/driver/AllDriversTable.astro';
 import { getAllRacesBySeason, getAllRaces, getAllDriverCareerStatsAsOf } from '../../../lib/queries';
 import type { PageContext } from '../../../lib/types';
+import { pitForPreseason, pitForPostseason } from '../../../lib/point-in-time';
+import type { PointInTime } from '../../../lib/point-in-time';
 
 export async function getStaticPaths() {
   const [{ seasons, byseason }, allRaces] = await Promise.all([
@@ -89,6 +91,12 @@ const { season, raceCount, chainSlug, raceName, beforeRaceNumber, driverLinkRace
   nextChainSlug: string | undefined;
 };
 
+const pit: PointInTime = chainSlug === 'preseason'
+  ? pitForPreseason(season)
+  : chainSlug === 'postseason'
+    ? pitForPostseason(season)
+    : { kind: 'race', season, raceSlug: driverLinkRaceSlug, raceNumber: beforeRaceNumber };
+
 const drivers = await getAllDriverCareerStatsAsOf(beforeRaceNumber);
 
 const pageContext: PageContext = {
@@ -132,5 +140,5 @@ if (chainSlug === 'preseason') {
     </p>
   </div>
 
-  <AllDriversTable {drivers} {season} raceSlug={driverLinkRaceSlug} />
+  <AllDriversTable {drivers} {pit} />
 </Base>

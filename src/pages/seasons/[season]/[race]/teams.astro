@@ -5,6 +5,7 @@ import TeamStandingsTable from '../../../../components/standings/TeamStandingsTa
 import { getAllRaces, getTeamStandingsBeforeRace } from '../../../../lib/queries';
 import { getRacePageBase } from '../../../../lib/race-page';
 import { raceLink } from '../../../../lib/format';
+import { pitForRace } from '../../../../lib/point-in-time';
 
 export async function getStaticPaths() {
   return (await getAllRaces()).map((r) => ({
@@ -16,6 +17,7 @@ const { season, race: raceSlug } = Astro.params;
 const base = await getRacePageBase(season, raceSlug);
 if (!base) throw new Error(`Race not found: ${season}-${raceSlug}`);
 const { race, raceCount, pageContext } = base;
+const pit = pitForRace(race, raceSlug!);
 
 const preRaceTeamChamp = await getTeamStandingsBeforeRace(race.race_number);
 
@@ -38,8 +40,7 @@ const description = `Constructor championship standings going into the ${race.se
   <TeamStandingsTable
     title="Constructors' Championship — Going Into This Race"
     rows={preRaceTeamChamp}
-    season={race.season}
-    raceSlug={raceSlug}
+    {pit}
     emptyNote="First race of the season — championship not yet started."
   />
 </Base>

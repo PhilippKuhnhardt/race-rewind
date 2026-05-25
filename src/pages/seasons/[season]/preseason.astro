@@ -12,6 +12,7 @@ import {
   getDriverBestChampionshipPos,
 } from '../../../lib/queries';
 import { stripYearPrefix, preseasonLink } from '../../../lib/format';
+import { pitForPreseason } from '../../../lib/point-in-time';
 import type { PageContext } from '../../../lib/types';
 
 export async function getStaticPaths() {
@@ -39,6 +40,7 @@ const [grid, calendar] = await Promise.all([
   getSeasonCalendar(season),
 ]);
 const firstRaceSlug = stripYearPrefix(bookends.firstSlug, season);
+const pit = pitForPreseason(season);
 
 const pageContext: PageContext = {
   kind: 'preseason',
@@ -89,8 +91,7 @@ const description = `${season} F1 season: the starting grid and career statistic
   <SeasonGridTable
     title="Grid &amp; Statistics Going into the Season"
     drivers={driverStats}
-    season={season}
-    raceSlug={firstRaceSlug}
+    {pit}
   />
 </Base>
 

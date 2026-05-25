@@ -4,6 +4,7 @@ import TeamStandingsTable from '../../../../components/standings/TeamStandingsTa
 import { getAllSeasons, getSeasonBookends } from '../../../../lib/queries';
 import { stripYearPrefix, preseasonLink } from '../../../../lib/format';
 import { getTeamStandingsBeforeRace } from '../../../../lib/queries';
+import { pitForPreseason } from '../../../../lib/point-in-time';
 import type { PageContext } from '../../../../lib/types';
 
 export async function getStaticPaths() {
@@ -15,6 +16,7 @@ const season = Number(seasonStr);
 
 const bookends = await getSeasonBookends(season);
 const firstRaceSlug = stripYearPrefix(bookends.firstSlug, season);
+const pit = pitForPreseason(season);
 
 const pageContext: PageContext = {
   kind: 'preseason',
@@ -33,8 +35,7 @@ const description = `Constructor championship standings going into the ${season}
   <TeamStandingsTable
     title="Constructors' Championship — Going Into the Season"
     {rows}
-    {season}
-    raceSlug={firstRaceSlug}
+    {pit}
     emptyNote="No championship data before the season starts."
   />
 </Base>

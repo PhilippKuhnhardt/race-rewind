@@ -55,6 +55,38 @@ export type PageContext =
       nextChainSlug?: string;
     }
   | {
+      kind: 'driver-preseason';
+      season: number;
+      raceCount: number;
+      driverName: string;
+      driverSlug: string;
+      nextRaceSlug: string;
+    }
+  | {
+      kind: 'driver-postseason';
+      season: number;
+      raceCount: number;
+      driverName: string;
+      driverSlug: string;
+      prevRaceSlug: string;
+    }
+  | {
+      kind: 'team-preseason';
+      season: number;
+      raceCount: number;
+      teamName: string;
+      teamSlug: string;
+      nextRaceSlug: string;
+    }
+  | {
+      kind: 'team-postseason';
+      season: number;
+      raceCount: number;
+      teamName: string;
+      teamSlug: string;
+      prevRaceSlug: string;
+    }
+  | {
       kind: 'compare-race';
       season: number;
       raceName: string;

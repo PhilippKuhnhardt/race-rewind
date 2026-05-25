@@ -1,5 +1,7 @@
 ---
-import { formatPts, formatDelta, driverLink, teamLink } from '../../lib/format';
+import { formatPts, formatDelta } from '../../lib/format';
+import { driverLinkAt, teamLinkAt } from '../../lib/nav';
+import type { PointInTime } from '../../lib/point-in-time';
 
 interface DriverRow {
   driver_id: number;
@@ -15,14 +17,13 @@ interface DriverRow {
 interface Props {
   title: string;
   rows: DriverRow[];
-  season: number;
-  raceSlug: string;
+  pit: PointInTime;
   prevPositions?: Map<number, number | null>;
   emptyNote?: string;
   viewAllHref?: string;
 }
 
-const { title, rows, season, raceSlug, prevPositions, emptyNote, viewAllHref } = Astro.props;
+const { title, rows, pit, prevPositions, emptyNote, viewAllHref } = Astro.props;
 const showDelta = prevPositions != null;
 
 const enriched = rows.map((row) => {
@@ -64,13 +65,13 @@ const enriched = rows.map((row) => {
                 <td class="px-3 py-2.5 text-right tabular-nums font-bold text-fg">{row.position ?? '—'}</td>
                 {showDelta && <td class={`px-2 py-2.5 text-right tabular-nums text-xs ${row.deltaClass}`}>{row.delta}</td>}
                 <td class="px-3 py-2.5">
-                  <a href={driverLink(row.driver_slug, season, raceSlug)} class="text-accent hover:underline font-medium">
+                  <a href={driverLinkAt(row.driver_slug, pit)} class="text-accent hover:underline font-medium">
                     {row.full_name}
                   </a>
                 </td>
                 <td class="px-3 py-2.5 text-fg-muted">
                   {row.team_slug
-                    ? <a href={teamLink(row.team_slug!, season, raceSlug)} class="text-fg-muted hover:text-accent hover:underline">{row.team_name}</a>
+                    ? <a href={teamLinkAt(row.team_slug!, pit)} class="text-fg-muted hover:text-accent hover:underline">{row.team_name}</a>
                     : (row.team_name ?? '—')}
                 </td>
                 <td class="px-3 py-2.5 text-right tabular-nums font-medium">{formatPts(row.points)}</td>

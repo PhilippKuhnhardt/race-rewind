@@ -66,20 +66,7 @@ export function stripYearPrefix(slug: string, season: number): string {
   return slug.slice(String(season).length + 1);
 }
 
-export const driverLink = (slug: string, season: number | string, raceSlug: string): string =>
-  `/drivers/${slug}/${season}/${raceSlug}/`;
-
-export const teamLink = (slug: string, season: number | string, raceSlug: string): string =>
-  `/teams/${slug}/${season}/${raceSlug}/`;
-
-export const raceLink = (season: number | string, raceSlug: string): string =>
-  `/seasons/${season}/${raceSlug}/`;
-
-export const preseasonLink = (season: number | string): string =>
-  `/seasons/${season}/preseason/`;
-
-export const postseasonLink = (season: number | string): string =>
-  `/seasons/${season}/postseason/`;
+export { driverLink, teamLink, raceLink, preseasonLink, postseasonLink } from './nav';
 
 /** Format an integer as an ordinal string: 1 → "1st", 2 → "2nd", etc. */
 export function ordinal(n: number): string {

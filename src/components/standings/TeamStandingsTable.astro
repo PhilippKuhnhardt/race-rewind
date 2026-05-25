@@ -1,5 +1,7 @@
 ---
-import { formatPts, formatDelta, teamLink } from '../../lib/format';
+import { formatPts, formatDelta } from '../../lib/format';
+import { teamLinkAt } from '../../lib/nav';
+import type { PointInTime } from '../../lib/point-in-time';
 
 interface TeamRow {
   team_id: number;
@@ -13,14 +15,13 @@ interface TeamRow {
 interface Props {
   title: string;
   rows: TeamRow[];
-  season: number;
-  raceSlug: string;
+  pit: PointInTime;
   prevPositions?: Map<number, number | null>;
   viewAllHref?: string;
   emptyNote?: string;
 }
 
-const { title, rows, season, raceSlug, prevPositions, viewAllHref, emptyNote } = Astro.props;
+const { title, rows, pit, prevPositions, viewAllHref, emptyNote } = Astro.props;
 const showDelta = prevPositions != null;
 
 const enriched = rows.map((row) => {
@@ -61,7 +62,7 @@ const enriched = rows.map((row) => {
               <td class="px-3 py-2.5 text-right tabular-nums font-bold text-fg">{row.position ?? '—'}</td>
               {showDelta && <td class={`px-2 py-2.5 text-right tabular-nums text-xs ${row.deltaClass}`}>{row.delta}</td>}
               <td class="px-3 py-2.5">
-                <a href={teamLink(row.team_slug, season, raceSlug)} class="text-accent hover:underline font-medium">
+                <a href={teamLinkAt(row.team_slug, pit)} class="text-accent hover:underline font-medium">
                   {row.team_name}
                 </a>
               </td>

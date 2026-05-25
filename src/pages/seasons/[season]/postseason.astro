@@ -9,6 +9,7 @@ import {
   getTeamStandings,
 } from '../../../lib/queries';
 import { stripYearPrefix, postseasonLink } from '../../../lib/format';
+import { pitForPostseason } from '../../../lib/point-in-time';
 import type { PageContext } from '../../../lib/types';
 
 export async function getStaticPaths() {
@@ -28,6 +29,7 @@ const isComplete =
 
 const asOfRaceNumber = bookends.latestCompletedRaceNumber ?? bookends.firstRaceNumber;
 
+const pit = pitForPostseason(season);
 const lastRaceSlug = stripYearPrefix(bookends.lastSlug, season);
 const prevRaceSlug = !isComplete && hasData && bookends.latestCompletedSlug
   ? stripYearPrefix(bookends.latestCompletedSlug, season)
@@ -80,11 +82,10 @@ const description = isComplete
   <DriverStandingsTable
     title="Drivers' Championship"
     rows={driverChamp}
-    season={season}
-    raceSlug={lastRaceSlug}
+    {pit}
   />
 
-  <TeamStandingsTable title="Constructors' Championship" rows={teamChamp} season={season} raceSlug={lastRaceSlug} />
+  <TeamStandingsTable title="Constructors' Championship" rows={teamChamp} {pit} />
 </Base>
 
 

@@ -38,6 +38,8 @@ function customRaceName(countryName: string): string | null {
       return '🇰🇷';
     case countryName.includes('European'):
       return '🇪🇺';
+    case countryName.includes('Barcelona'):
+      return '🇪🇸';
     default:
       return null;
   }
