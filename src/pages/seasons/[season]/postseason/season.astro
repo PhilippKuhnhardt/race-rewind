@@ -1,0 +1,55 @@
+---
+import Base from '../../../../layouts/Base.astro';
+import SeasonStory from '../../../../components/season/SeasonStory.astro';
+import { getAllSeasons, getSeasonBookends, getSeasonStoryRows } from '../../../../lib/queries';
+import { stripYearPrefix } from '../../../../lib/format';
+import { pitForPostseason } from '../../../../lib/point-in-time';
+import type { PageContext } from '../../../../lib/types';
+
+export async function getStaticPaths() {
+  return (await getAllSeasons()).map((s) => ({ params: { season: String(s) } }));
+}
+
+const { season: seasonStr } = Astro.params;
+const season = Number(seasonStr);
+
+const bookends = await getSeasonBookends(season);
+const lastRaceSlug = stripYearPrefix(bookends.lastSlug, season);
+const hasData = bookends.latestCompletedRaceNumber != null;
+const isComplete = hasData && bookends.latestCompletedRaceNumber === bookends.lastRaceNumber;
+
+const prevRaceSlug = !isComplete && hasData && bookends.latestCompletedSlug
+  ? stripYearPrefix(bookends.latestCompletedSlug, season)
+  : lastRaceSlug;
+
+const pit = pitForPostseason(season);
+
+const pageContext: PageContext = {
+  kind: 'season',
+  season,
+  raceCount: bookends.raceCount,
+  chainSlug: 'postseason',
+  prevChainSlug: prevRaceSlug,
+};
+
+const asOfRaceNumber = hasData
+  ? bookends.latestCompletedRaceNumber! + 1
+  : bookends.firstRaceNumber;
+
+const rows = await getSeasonStoryRows(season, asOfRaceNumber);
+
+const title = `${season} Season — Race Calendar`;
+const description = isComplete
+  ? `${season} F1 season complete: all ${bookends.raceCount} races with pole positions and podiums.`
+  : `${season} F1 season in progress — race calendar through round ${bookends.latestCompletedRound}.`;
+---
+
+<Base {title} {description} canonical={`/seasons/${season}/postseason/season/`} {pageContext}>
+  <SeasonStory
+    {season}
+    {pit}
+    {rows}
+    raceCount={bookends.raceCount}
+    latestCompletedRound={bookends.latestCompletedRound}
+  />
+</Base>

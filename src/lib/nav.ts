@@ -38,6 +38,10 @@ export function statsLinkAt(pit: PointInTime): string {
   return `/stats/${pit.season}/${pitSlug(pit)}/`;
 }
 
+export function seasonLinkAt(pit: PointInTime): string {
+  return `${raceLinkAt(pit)}season/`;
+}
+
 // ---------------------------------------------------------------------------
 // Shims for callers that still pass raw (season, raceSlug) pairs —
 // these delegate to the PIT-based helpers and will be removed once all

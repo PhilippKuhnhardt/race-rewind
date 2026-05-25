@@ -1,6 +1,7 @@
-import { eq, min, max, count, sql } from 'drizzle-orm';
+import { eq, min, max, count, sql, and, lt, asc } from 'drizzle-orm';
 import { db } from '../../db/client';
-import { races, raceResults, roundEntries, drivers, teams } from '../../db/schema';
+import { races, raceResults, qualifyingResults, roundEntries, drivers, teams, circuits } from '../../db/schema';
+import { stripYearPrefix } from '../format';
 
 export async function getSeasonBookends(season: number) {
   const bounds = await db
@@ -54,6 +55,122 @@ export async function getSeasonBookends(season: number) {
     latestCompletedDate: completed?.date ?? null,
     latestCompletedSlug: completed?.slug ?? null,
   };
+}
+
+export interface PoleEntry {
+  driver_slug: string;
+  driver_surname: string;
+}
+
+export interface PodiumEntry {
+  position: number;
+  driver_slug: string;
+  driver_surname: string;
+}
+
+export interface SeasonStoryRow {
+  round: number;
+  race_number: number;
+  race_slug: string;
+  name: string;
+  date: string;
+  circuit_name: string;
+  circuit_locality: string | null;
+  circuit_country: string | null;
+  isCompleted: boolean;
+  isCurrent: boolean;
+  pole: PoleEntry | null;
+  podium: PodiumEntry[];
+}
+
+export async function getSeasonStoryRows(season: number, asOfRaceNumber: number): Promise<SeasonStoryRow[]> {
+  const [calendarRows, podiumRows, poleRows] = await Promise.all([
+    db
+      .select({
+        raceNumber: races.raceNumber,
+        round: races.round,
+        slug: races.slug,
+        name: races.name,
+        date: races.date,
+        circuit_name: circuits.name,
+        circuit_locality: circuits.locality,
+        circuit_country: circuits.country,
+      })
+      .from(races)
+      .innerJoin(circuits, eq(circuits.id, races.circuitId))
+      .where(eq(races.season, season))
+      .orderBy(asc(races.round)),
+
+    db
+      .select({
+        raceNumber: raceResults.raceNumber,
+        position: raceResults.position,
+        driver_slug: drivers.slug,
+        driver_surname: drivers.surname,
+      })
+      .from(raceResults)
+      .innerJoin(races, eq(races.raceNumber, raceResults.raceNumber))
+      .innerJoin(drivers, eq(drivers.id, raceResults.driverId))
+      .where(
+        and(
+          eq(races.season, season),
+          lt(raceResults.raceNumber, asOfRaceNumber),
+          sql`${raceResults.position} between 1 and 3`,
+        ),
+      )
+      .orderBy(asc(raceResults.raceNumber), sql`${raceResults.position} ASC`),
+
+    db
+      .select({
+        raceNumber: qualifyingResults.raceNumber,
+        driver_slug: drivers.slug,
+        driver_surname: drivers.surname,
+      })
+      .from(qualifyingResults)
+      .innerJoin(races, eq(races.raceNumber, qualifyingResults.raceNumber))
+      .innerJoin(drivers, eq(drivers.id, qualifyingResults.driverId))
+      .where(
+        and(
+          eq(races.season, season),
+          lt(qualifyingResults.raceNumber, asOfRaceNumber),
+          sql`${qualifyingResults.position} = 1`,
+        ),
+      ),
+  ]);
+
+  const podiumByRace = new Map<number, PodiumEntry[]>();
+  for (const r of podiumRows) {
+    if (r.position == null) continue;
+    const arr = podiumByRace.get(r.raceNumber) ?? [];
+    arr.push({ position: r.position, driver_slug: r.driver_slug, driver_surname: r.driver_surname });
+    podiumByRace.set(r.raceNumber, arr);
+  }
+
+  const poleByRace = new Map<number, PoleEntry>();
+  for (const r of poleRows) {
+    poleByRace.set(r.raceNumber, { driver_slug: r.driver_slug, driver_surname: r.driver_surname });
+  }
+
+  return calendarRows.map((r) => ({
+    round: r.round,
+    race_number: r.raceNumber,
+    race_slug: stripYearPrefix(r.slug, season),
+    name: r.name,
+    date: r.date,
+    circuit_name: r.circuit_name,
+    circuit_locality: r.circuit_locality,
+    circuit_country: r.circuit_country,
+    isCompleted: r.raceNumber < asOfRaceNumber,
+    isCurrent: r.raceNumber === asOfRaceNumber,
+    pole: poleByRace.get(r.raceNumber) ?? null,
+    podium: podiumByRace.get(r.raceNumber) ?? [],
+  }));
+}
+
+export async function getRecentFormRows(season: number, asOfRaceNumber: number, limit = 5): Promise<SeasonStoryRow[]> {
+  const rows = await getSeasonStoryRows(season, asOfRaceNumber);
+  const completed = rows.filter((r) => r.isCompleted);
+  return completed.slice(-limit);
 }
 
 export async function getSeasonGrid(raceNumber: number) {

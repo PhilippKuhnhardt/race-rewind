@@ -1,0 +1,26 @@
+---
+import type { SeasonStoryRow } from '../../lib/queries/seasons';
+import type { PointInTime } from '../../lib/point-in-time';
+import { seasonLinkAt } from '../../lib/nav';
+import SeasonTable from './SeasonTable.astro';
+
+interface Props {
+  rows: SeasonStoryRow[];
+  pit: PointInTime;
+}
+
+const { rows, pit } = Astro.props;
+const seasonHref = seasonLinkAt(pit);
+---
+
+{rows.length > 0 && (
+  <section>
+    <div class="mb-3 flex items-baseline justify-between border-b border-border pb-2">
+      <h2 class="text-lg font-semibold text-fg">
+        {`Recent Form — Last ${rows.length} ${rows.length === 1 ? 'Race' : 'Races'}`}
+      </h2>
+      <a href={seasonHref} class="text-sm text-accent hover:underline">Full season →</a>
+    </div>
+    <SeasonTable {rows} {pit} season={pit.season} />
+  </section>
+)}

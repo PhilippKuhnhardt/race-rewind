@@ -87,6 +87,14 @@ export type PageContext =
       prevRaceSlug: string;
     }
   | {
+      kind: 'season';
+      season: number;
+      raceCount: number;
+      chainSlug: string;
+      prevChainSlug?: string;
+      nextChainSlug?: string;
+    }
+  | {
       kind: 'compare-race';
       season: number;
       raceName: string;

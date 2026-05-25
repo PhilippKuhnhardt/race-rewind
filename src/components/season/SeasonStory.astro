@@ -1,0 +1,39 @@
+---
+import type { SeasonStoryRow } from '../../lib/queries/seasons';
+import type { PointInTime } from '../../lib/point-in-time';
+import SeasonTable from './SeasonTable.astro';
+
+interface Props {
+  season: number;
+  pit: PointInTime;
+  rows: SeasonStoryRow[];
+  raceCount: number;
+  latestCompletedRound: number | null;
+}
+
+const { season, pit, rows, raceCount, latestCompletedRound } = Astro.props;
+
+const completedCount = rows.filter((r) => r.isCompleted).length;
+
+let progressLabel: string;
+if (pit.kind === 'preseason') {
+  progressLabel = `Before round 1 of ${raceCount}`;
+} else if (pit.kind === 'postseason') {
+  progressLabel =
+    latestCompletedRound != null && latestCompletedRound < raceCount
+      ? `Through round ${latestCompletedRound} of ${raceCount}`
+      : `${raceCount} rounds completed`;
+} else {
+  progressLabel =
+    completedCount > 0
+      ? `Through round ${completedCount} of ${raceCount}`
+      : `Before round 1 of ${raceCount}`;
+}
+---
+
+<div class="mb-8 border-b border-border pb-6">
+  <h1 class="text-3xl font-bold tracking-tight text-fg sm:text-4xl">{season} Season</h1>
+  <p class="mt-2 text-lg text-fg-muted">{progressLabel}</p>
+</div>
+
+<SeasonTable {rows} {pit} {season} />

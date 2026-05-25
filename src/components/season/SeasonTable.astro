@@ -1,0 +1,125 @@
+---
+import { driverLinkAt } from '../../lib/nav';
+import type { PointInTime } from '../../lib/point-in-time';
+import type { SeasonStoryRow } from '../../lib/queries/seasons';
+import { emojify } from '../../lib/ui/emojify';
+
+interface Props {
+  rows: SeasonStoryRow[];
+  pit: PointInTime;
+  season: number;
+}
+
+const { rows, pit, season } = Astro.props;
+
+function formatDate(iso: string): string {
+  const [year, month, day] = iso.split('-').map(Number);
+  const d = new Date(year, month - 1, day);
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+}
+
+const thBase = 'bg-bg-alt px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap';
+const thL = `${thBase} text-left`;
+const thR = `${thBase} text-right`;
+---
+
+<div class="overflow-x-auto rounded-lg border border-border">
+  <table class="w-full border-collapse text-sm">
+    <thead>
+      <tr>
+        <th class={`${thR} w-10`}>#</th>
+        <th class={thL}>Date</th>
+        <th class={thL}>Grand Prix</th>
+        <th class={thL}>Pole</th>
+        <th class={thL}>P1</th>
+        <th class={thL}>P2</th>
+        <th class={thL}>P3</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((row) => {
+          const p1 = row.podium.find((p) => p.position === 1);
+          const p2 = row.podium.find((p) => p.position === 2);
+          const p3 = row.podium.find((p) => p.position === 3);
+          return (
+            <tr
+              class={`border-b border-border last:border-0 transition-colors hover:bg-bg-hover${row.isCurrent ? ' bg-bg-alt' : ''}`}
+            >
+              <td class="px-3 py-2.5 text-right tabular-nums text-fg-muted">{row.round}</td>
+              <td class="px-3 py-2.5 tabular-nums whitespace-nowrap text-fg-muted">
+                {formatDate(row.date)}
+              </td>
+              <td class="px-3 py-2.5 font-medium">
+                {row.isCompleted ? (
+                  <a
+                    href={`/seasons/${season}/${row.race_slug}/`}
+                    class="text-accent hover:underline"
+                  >
+                    {emojify(row.name)}
+                  </a>
+                ) : row.isCurrent ? (
+                  <span class="inline-flex items-center gap-2">
+                    <a
+                      href={`/seasons/${season}/${row.race_slug}/`}
+                      class="text-fg hover:text-accent hover:underline no-underline"
+                    >
+                      {emojify(row.name)}
+                    </a>
+                  </span>
+                ) : (
+                  <a
+                    href={`/seasons/${season}/${row.race_slug}/`}
+                    class="text-fg-muted hover:text-fg hover:underline no-underline"
+                  >
+                    {emojify(row.name)}
+                  </a>
+                )}
+              </td>
+              <td class="px-3 py-2.5">
+                {row.pole && (
+                  <a
+                    href={driverLinkAt(row.pole.driver_slug, pit)}
+                    class={`whitespace-nowrap no-underline hover:text-accent`}
+                  >
+                    {row.pole.driver_surname}
+                  </a>
+                )}
+              </td>
+              <td class="px-3 py-2.5">
+                {p1 && (
+                  <a
+                    href={driverLinkAt(p1.driver_slug, pit)}
+                    class={`whitespace-nowrap no-underline text-fg hover:text-accent`}
+                  >
+                    {p1.driver_surname}
+                  </a>
+                )}
+              </td>
+              <td class="px-3 py-2.5">
+                {p2 && (
+                  <a
+                    href={driverLinkAt(p2.driver_slug, pit)}
+                    class={`whitespace-nowrap no-underline text-fg-muted hover:text-accent`}
+                  >
+                    {p2.driver_surname}
+                  </a>
+                )}
+              </td>
+              <td class="px-3 py-2.5">
+                {p3 && (
+                  <a
+                    href={driverLinkAt(p3.driver_slug, pit)}
+                    class={`whitespace-nowrap no-underline text-fg-muted hover:text-accent`}
+                  >
+                    {p3.driver_surname}
+                  </a>
+                )}
+              </td>
+            </tr>
+          );
+        })
+      }
+    </tbody>
+  </table>
+</div>

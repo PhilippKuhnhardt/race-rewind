@@ -1,0 +1,56 @@
+---
+import Base from '../../../../layouts/Base.astro';
+import SeasonStory from '../../../../components/season/SeasonStory.astro';
+import { getAllRaces, getSeasonBookends, getSeasonStoryRows, getRaceBySlug, getAllRacesBySeason } from '../../../../lib/queries';
+import { pitForRace } from '../../../../lib/point-in-time';
+import type { PageContext } from '../../../../lib/types';
+
+export async function getStaticPaths() {
+  return (await getAllRaces()).map((r) => ({
+    params: { season: String(r.season), race: r.race_slug },
+  }));
+}
+
+const { season: seasonStr, race: raceSlug } = Astro.params;
+const season = Number(seasonStr);
+const fullSlug = `${seasonStr}-${raceSlug}`;
+
+const [race, { byseason }] = await Promise.all([
+  getRaceBySlug(fullSlug),
+  getAllRacesBySeason(),
+]);
+
+if (!race) throw new Error(`Race not found: ${fullSlug}`);
+
+const bookends = await getSeasonBookends(season);
+const pit = pitForRace(race, raceSlug!);
+
+const seasonRaces = byseason[season] ?? [];
+const idx = seasonRaces.findIndex((r) => r.slug === raceSlug);
+const prevChainSlug = idx > 0 ? seasonRaces[idx - 1].slug : 'preseason';
+const nextChainSlug = idx < seasonRaces.length - 1 ? seasonRaces[idx + 1].slug : 'postseason';
+
+const pageContext: PageContext = {
+  kind: 'season',
+  season,
+  raceCount: bookends.raceCount,
+  chainSlug: raceSlug!,
+  prevChainSlug,
+  nextChainSlug,
+};
+
+const rows = await getSeasonStoryRows(season, race.race_number);
+
+const title = `${season} Season — As of ${race.name}`;
+const description = `${season} F1 season story through round ${race.round}: pole positions and podiums for every completed race.`;
+---
+
+<Base {title} {description} canonical={`/seasons/${season}/${raceSlug}/season/`} {pageContext}>
+  <SeasonStory
+    {season}
+    {pit}
+    {rows}
+    raceCount={bookends.raceCount}
+    latestCompletedRound={bookends.latestCompletedRound}
+  />
+</Base>

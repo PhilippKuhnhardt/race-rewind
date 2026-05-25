@@ -73,6 +73,17 @@ if (pageContext.kind === 'preseason') {
   }
   if (pageContext.prevChainSlug) prevHref = `/stats/${pageContext.season}/${pageContext.prevChainSlug}/`;
   if (pageContext.nextChainSlug) nextHref = `/stats/${pageContext.season}/${pageContext.nextChainSlug}/`;
+} else if (pageContext.kind === 'season') {
+  label = `${pageContext.season} Season`;
+  if (pageContext.chainSlug === 'preseason') {
+    detail = `Start of season · ${pageContext.raceCount} rounds`;
+  } else if (pageContext.chainSlug === 'postseason') {
+    detail = `End of season · ${pageContext.raceCount} rounds`;
+  } else {
+    detail = `${pageContext.raceCount} rounds`;
+  }
+  if (pageContext.prevChainSlug) prevHref = `/seasons/${pageContext.season}/${pageContext.prevChainSlug}/season/`;
+  if (pageContext.nextChainSlug) nextHref = `/seasons/${pageContext.season}/${pageContext.nextChainSlug}/season/`;
 }
 ---
 

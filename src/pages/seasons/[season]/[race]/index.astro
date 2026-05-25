@@ -1,12 +1,18 @@
 ---
-import RaceSessionLayout from '../../../../layouts/RaceSessionLayout.astro';
+import PreRaceLeaders from '../../../../components/race/PreRaceLeaders.astro';
+import RecentFormStrip from '../../../../components/season/RecentFormStrip.astro';
 import DriverStandingsTable from '../../../../components/standings/DriverStandingsTable.astro';
 import TeamStandingsTable from '../../../../components/standings/TeamStandingsTable.astro';
-import PreRaceLeaders from '../../../../components/race/PreRaceLeaders.astro';
-import { getAllRaces, getDriverStandingsBeforeRace, getTeamStandingsBeforeRace } from '../../../../lib/queries';
-import { getRacePageBase } from '../../../../lib/race-page';
+import RaceSessionLayout from '../../../../layouts/RaceSessionLayout.astro';
 import { raceLink } from '../../../../lib/format';
 import { pitForRace } from '../../../../lib/point-in-time';
+import {
+  getAllRaces,
+  getDriverStandingsBeforeRace,
+  getRecentFormRows,
+  getTeamStandingsBeforeRace,
+} from '../../../../lib/queries';
+import { getRacePageBase } from '../../../../lib/race-page';
 
 export async function getStaticPaths() {
   return (await getAllRaces()).map((r) => ({
@@ -20,9 +26,10 @@ if (!base) throw new Error(`Race not found: ${season}-${raceSlug}`);
 const { race, raceCount, pageContext, hasQuali, hasSprintQualifying, sessionOrder } = base;
 const pit = pitForRace(race, raceSlug!);
 
-const [preRaceDriverChamp, preRaceTeamChamp] = await Promise.all([
+const [preRaceDriverChamp, preRaceTeamChamp, recentForm] = await Promise.all([
   getDriverStandingsBeforeRace(race.race_number),
   getTeamStandingsBeforeRace(race.race_number),
+  getRecentFormRows(race.season, race.race_number, 5),
 ]);
 
 const driverLeader = preRaceDriverChamp[0]
@@ -30,7 +37,9 @@ const driverLeader = preRaceDriverChamp[0]
       full_name: preRaceDriverChamp[0].full_name,
       driver_slug: preRaceDriverChamp[0].driver_slug,
       points: preRaceDriverChamp[0].points,
-      gap: preRaceDriverChamp[0].points - (preRaceDriverChamp[1]?.points ?? preRaceDriverChamp[0].points),
+      gap:
+        preRaceDriverChamp[0].points -
+        (preRaceDriverChamp[1]?.points ?? preRaceDriverChamp[0].points),
     }
   : null;
 
@@ -47,10 +56,23 @@ const title = `${race.season} ${race.name}`;
 const description = `${race.season} ${race.name} at ${race.circuit_name}${race.circuit_locality ? ', ' + race.circuit_locality : ''}: standings and session details.`;
 ---
 
-<RaceSessionLayout {race} {raceCount} {raceSlug} {hasQuali} {hasSprintQualifying} {sessionOrder} {pageContext} {title} {description} canonical={raceLink(season, raceSlug)} activeId="overview">
-
+<RaceSessionLayout
+  {race}
+  {raceCount}
+  {raceSlug}
+  {hasQuali}
+  {hasSprintQualifying}
+  {sessionOrder}
+  {pageContext}
+  {title}
+  {description}
+  canonical={raceLink(season, raceSlug)}
+  activeId="overview"
+>
   <div class="space-y-8">
     <PreRaceLeaders {driverLeader} {teamLeader} season={race.season} {raceSlug} />
+
+    <RecentFormStrip rows={recentForm} {pit} />
 
     <!-- Pre-race standings truncated — link to full Drivers/Teams tabs -->
     <DriverStandingsTable
@@ -69,5 +91,4 @@ const description = `${race.season} ${race.name} at ${race.circuit_name}${race.c
       emptyNote="First race of the season — championship not yet started."
     />
   </div>
-
 </RaceSessionLayout>

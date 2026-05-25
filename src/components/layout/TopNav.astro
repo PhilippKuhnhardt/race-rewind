@@ -24,11 +24,12 @@ const statsBase = currentChainSlug ? `/stats/${currentSeason}/${currentChainSlug
 const compareHref = compareSlug ? `/compare/${currentSeason}/${compareSlug}/` : '/compare/';
 
 const navLinks = [
-  { id: 'season',  href: raceBase ? `${raceBase}/`          : '/', label: 'Race' },
-  { id: 'drivers', href: raceBase ? `${raceBase}/drivers/`   : '/', label: 'Drivers' },
-  { id: 'teams',   href: raceBase ? `${raceBase}/teams/`     : '/', label: 'Teams' },
-  { id: 'stats',   href: statsBase,                                  label: 'Stats' },
-  { id: 'compare', href: compareHref,                                label: 'Compare' },
+  { id: 'race',    href: raceBase ? `${raceBase}/`          : '/', label: 'Race' },
+  { id: 'season',  href: raceBase ? `${raceBase}/season/`   : '/', label: 'Season' },
+  { id: 'drivers', href: raceBase ? `${raceBase}/drivers/`  : '/', label: 'Drivers' },
+  { id: 'teams',   href: raceBase ? `${raceBase}/teams/`    : '/', label: 'Teams' },
+  { id: 'stats',   href: statsBase,                                 label: 'Stats' },
+  { id: 'compare', href: compareHref,                               label: 'Compare' },
 ];
 
 const pathname = Astro.url.pathname;
@@ -40,7 +41,8 @@ function isActive(id: string): boolean {
   if (id === 'stats')   return firstSeg === 'stats';
   if (id === 'drivers') return firstSeg === 'seasons' && lastSeg === 'drivers';
   if (id === 'teams')   return firstSeg === 'seasons' && lastSeg === 'teams';
-  if (id === 'season')  return firstSeg === 'seasons' && !['drivers', 'teams'].includes(lastSeg);
+  if (id === 'season')  return firstSeg === 'seasons' && lastSeg === 'season';
+  if (id === 'race')    return firstSeg === 'seasons' && !['drivers', 'teams', 'season'].includes(lastSeg);
   return false;
 }
 ---

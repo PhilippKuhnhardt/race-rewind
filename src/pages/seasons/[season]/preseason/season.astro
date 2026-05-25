@@ -1,0 +1,42 @@
+---
+import Base from '../../../../layouts/Base.astro';
+import SeasonStory from '../../../../components/season/SeasonStory.astro';
+import { getAllSeasons, getSeasonBookends, getSeasonStoryRows } from '../../../../lib/queries';
+import { stripYearPrefix } from '../../../../lib/format';
+import { pitForPreseason } from '../../../../lib/point-in-time';
+import type { PageContext } from '../../../../lib/types';
+
+export async function getStaticPaths() {
+  return (await getAllSeasons()).map((s) => ({ params: { season: String(s) } }));
+}
+
+const { season: seasonStr } = Astro.params;
+const season = Number(seasonStr);
+
+const bookends = await getSeasonBookends(season);
+const firstRaceSlug = stripYearPrefix(bookends.firstSlug, season);
+const pit = pitForPreseason(season);
+
+const pageContext: PageContext = {
+  kind: 'season',
+  season,
+  raceCount: bookends.raceCount,
+  chainSlug: 'preseason',
+  nextChainSlug: firstRaceSlug,
+};
+
+const rows = await getSeasonStoryRows(season, bookends.firstRaceNumber);
+
+const title = `${season} Season — Race Calendar`;
+const description = `${season} F1 season calendar: all ${bookends.raceCount} rounds at a glance.`;
+---
+
+<Base {title} {description} canonical={`/seasons/${season}/preseason/season/`} {pageContext}>
+  <SeasonStory
+    {season}
+    {pit}
+    {rows}
+    raceCount={bookends.raceCount}
+    latestCompletedRound={bookends.latestCompletedRound}
+  />
+</Base>
