@@ -1,0 +1,29 @@
+---
+import type { RaceNewsEntry } from '../../lib/race-news';
+
+interface Props {
+  entry: RaceNewsEntry;
+  heading?: string;
+}
+
+const { entry, heading = 'Going into this race' } = Astro.props;
+const { source_url, source_title, license } = entry.data;
+---
+
+<section>
+  <h2 class="mb-4 text-lg font-semibold text-fg">{heading}</h2>
+  <div class="rounded-xl border border-border bg-bg-alt p-4">
+    <div class="max-w-none text-sm text-fg leading-relaxed space-y-3">
+      <Fragment set:html={entry.rendered?.html ?? ''} />
+    </div>
+    <footer class="mt-4 border-t border-border pt-3 text-xs text-fg-muted">
+      Adapted by AI summarisation from
+      <a href={source_url} class="text-accent hover:underline" rel="noopener">
+        &ldquo;{source_title}&rdquo; on Wikipedia
+      </a>, used under
+      <a href="https://creativecommons.org/licenses/by-sa/4.0/" class="text-accent hover:underline" rel="noopener license">
+        {license}
+      </a>. Modifications: summarised and spoiler-trimmed.
+    </footer>
+  </div>
+</section>

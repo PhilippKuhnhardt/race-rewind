@@ -1,4 +1,5 @@
 ---
+import RaceNewsCard from '../../../../components/race/RaceNewsCard.astro';
 import PreRaceLeaders from '../../../../components/race/PreRaceLeaders.astro';
 import RecentFormStrip from '../../../../components/season/RecentFormStrip.astro';
 import DriverStandingsTable from '../../../../components/standings/DriverStandingsTable.astro';
@@ -6,6 +7,7 @@ import TeamStandingsTable from '../../../../components/standings/TeamStandingsTa
 import RaceSessionLayout from '../../../../layouts/RaceSessionLayout.astro';
 import { raceLink } from '../../../../lib/format';
 import { pitForRace } from '../../../../lib/point-in-time';
+import { getRaceNews } from '../../../../lib/race-news';
 import {
   getAllRaces,
   getDriverStandingsBeforeRace,
@@ -52,6 +54,8 @@ const teamLeader = preRaceTeamChamp[0]
     }
   : null;
 
+const newsEntry = await getRaceNews(`${season}-${raceSlug}`, 'preview');
+
 const title = `${race.season} ${race.name}`;
 const description = `${race.season} ${race.name} at ${race.circuit_name}${race.circuit_locality ? ', ' + race.circuit_locality : ''}: standings and session details.`;
 ---
@@ -70,6 +74,7 @@ const description = `${race.season} ${race.name} at ${race.circuit_name}${race.c
   activeId="overview"
 >
   <div class="space-y-8">
+    {newsEntry && <RaceNewsCard entry={newsEntry} />}
     <PreRaceLeaders {driverLeader} {teamLeader} season={race.season} {raceSlug} />
 
     <RecentFormStrip rows={recentForm} {pit} />

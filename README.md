@@ -53,6 +53,10 @@ Race data comes from the [Jolpica F1 API](https://api.jolpi.ca/docs/#) (Ergast s
 
 DB schema docs: https://dbdocs.io/jolpica/jolpica-f1?view=relationships
 
+## Content licensing
+
+Race context blocks under `content/race-news/` are adapted from Wikipedia and licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Each block carries visible per-entry attribution in the UI. These files are Adapted Material under the CC BY-SA licence; the rest of the project (code, UI, structured race data from Jolpica) is a separate, independent work bundled in a Collection and is not subject to ShareAlike.
+
 ## Architecture
 
 See [architecture.md](./architecture.md) for the full design — data model, ingestion pipeline, rendering strategy, and cost breakdown.
