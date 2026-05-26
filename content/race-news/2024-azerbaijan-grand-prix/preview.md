@@ -5,21 +5,33 @@ source_url: https://en.wikipedia.org/w/index.php?title=2024_Azerbaijan_Grand_Pri
 source_revision: "1355170020"
 source_title: "2024 Azerbaijan Grand Prix"
 license: CC-BY-SA-4.0
-generated_at: "2026-05-25"
-model: deepseek/deepseek-v4-pro
+generated_at: "2026-05-26"
+model: github-copilot/claude-opus-4.6
 ---
 
-### Championship standings before the race
+### Championship standings
 
 Max Verstappen leads the Drivers' Championship with 303 points, 62 points ahead of Lando Norris in second, and 86 ahead of Charles Leclerc in third. Red Bull Racing, with 446 points, leads the Constructors' Championship from McLaren and Ferrari, who are second and third with 438 and 407 points, respectively.
 
-### Entrants
+### Previous race
 
-Franco Colapinto continues at Williams, having replaced Logan Sargeant from the Italian Grand Prix onwards. Kevin Magnussen of Haas is given a one-race ban, having caused a collision at the previous round that put him over the limit of twelve penalty points within twelve months. Magnussen is replaced by reserve driver Oliver Bearman, who last competed at the Saudi Arabian Grand Prix earlier in the season when he substituted for Carlos Sainz Jr. at Ferrari. This is Bearman's second Formula One race.
+At the Italian Grand Prix, Leclerc won for Ferrari, their first home win since 2019. Colapinto made his F1 debut for Williams, finishing twelfth.
 
 ### Between-race developments
 
-At the Italian Grand Prix, Leclerc won for Ferrari (their first home win since 2019) and Colapinto made his F1 debut for Williams, finishing twelfth. Magnussen's collision at Monza incurred two penalty points, taking him to the twelve-point threshold and triggering his automatic ban.
+Magnussen's collision at Monza incurred two penalty points, taking him to the twelve-point threshold and triggering an automatic one-race ban.
+
+### Entrants
+
+Oliver Bearman replaces the banned Magnussen at Haas. Bearman last competed at the Saudi Arabian Grand Prix earlier in the season when he substituted for Carlos Sainz Jr. at Ferrari. This is Bearman's second Formula One race.
+
+### Penalties
+
+Pierre Gasly is disqualified from qualifying for exceeding the instantaneous fuel mass flow limit. Lewis Hamilton and Esteban Ocon start from the pit lane after power unit changes. Zhou Guanyu starts from the back of the grid for exceeding his power unit element quota.
+
+### Weather
+
+Sunny conditions are expected for race day.
 
 ### Tyre choices
 

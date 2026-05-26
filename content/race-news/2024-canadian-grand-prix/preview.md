@@ -1,17 +1,23 @@
 ---
 race_slug: 2024-canadian-grand-prix
 phase: preview
-source_url: https://en.wikipedia.org/wiki/2024_Canadian_Grand_Prix
+source_url: https://en.wikipedia.org/w/index.php?title=2024_Canadian_Grand_Prix&oldid=1346097855
 source_revision: "1346097855"
 source_title: 2024 Canadian Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-25"
-model: deepseek/deepseek-v4-pro
+generated_at: "2026-05-26"
+model: github-copilot/claude-opus-4.6
 ---
 
-### Championship context
+The Canadian Grand Prix is the ninth round of the 2024 season, held at the Circuit Gilles Villeneuve in Montreal.
 
-The Canadian Grand Prix is the ninth round of the 2024 season, held at the Circuit Gilles Villeneuve in Montreal. Max Verstappen leads the Drivers' Championship with 169 points, 31 ahead of Charles Leclerc and 56 ahead of Lando Norris. Red Bull Racing leads the Constructors' Championship with 276 points, followed by Ferrari (252) and McLaren (184). At the preceding Monaco Grand Prix, Leclerc took pole position while Verstappen qualified sixth and Sergio Pérez was eliminated in Q1, starting 18th.
+### Championship standings
+
+Max Verstappen leads the Drivers' Championship with 169 points, 31 ahead of Charles Leclerc and 56 ahead of Lando Norris. Red Bull Racing leads the Constructors' Championship with 276 points, followed by Ferrari (252) and McLaren (184).
+
+### Previous race
+
+At the Monaco Grand Prix, Leclerc took pole position and won his home race — the first Monegasque driver to win at Monaco since Louis Chiron in 1931. Verstappen finished sixth while Pérez was eliminated in Q1. Both Haas drivers were disqualified from qualifying for a DRS technical non-compliance.
 
 ### Entrants
 
@@ -20,6 +26,10 @@ The driver and team line-up is unchanged from the season entry list. Jack Doohan
 ### Penalties
 
 Esteban Ocon carries a five-place grid penalty for causing a collision with his teammate Pierre Gasly at the preceding Monaco Grand Prix.
+
+### Weather
+
+Rain is expected at the start of the race, with conditions drying later.
 
 ### Tyre choices
 

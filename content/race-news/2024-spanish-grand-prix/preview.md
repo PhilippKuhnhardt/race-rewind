@@ -1,17 +1,23 @@
 ---
 race_slug: 2024-spanish-grand-prix
 phase: preview
-source_url: https://en.wikipedia.org/wiki/2024_Spanish_Grand_Prix
+source_url: https://en.wikipedia.org/w/index.php?title=2024_Spanish_Grand_Prix&oldid=1355886818
 source_revision: "1355886818"
 source_title: 2024 Spanish Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-25"
-model: deepseek/deepseek-v4-pro
+generated_at: "2026-05-26"
+model: github-copilot/claude-opus-4.6
 ---
 
-### Championship context
+The Spanish Grand Prix is the tenth round of the 2024 season, held at the Circuit de Barcelona-Catalunya in Montmeló.
 
-The Spanish Grand Prix is the tenth round of the 2024 season, held at the Circuit de Barcelona-Catalunya in Montmeló. Max Verstappen leads the Drivers' Championship with 194 points, 56 ahead of Charles Leclerc and 63 ahead of Lando Norris. Red Bull Racing leads the Constructors' Championship with 301 points, followed by Ferrari (252) and McLaren (212). Verstappen's lead extended significantly after Canada, where a Ferrari double DNF and Verstappen's victory widened the gap at the top of both championships.
+### Championship standings
+
+Max Verstappen leads the Drivers' Championship with 194 points, 56 ahead of Charles Leclerc and 63 ahead of Lando Norris. Red Bull Racing leads the Constructors' Championship with 301 points, followed by Ferrari (252) and McLaren (212).
+
+### Previous race
+
+At the Canadian Grand Prix, Verstappen won his seventh race of the season for his 60th career victory. A Ferrari double DNF widened the gap significantly at the top of both championships.
 
 ### Entrants
 
@@ -21,13 +27,17 @@ The driver and team line-up is unchanged from the season entry list. Oliver Bear
 
 Sergio Pérez carries a three-place grid penalty for failing to leave the track with serious mechanical difficulties after significantly damaging his rear wing at the preceding Canadian Grand Prix.
 
-### Track changes
+### Weather
 
-The DRS zone leading into turn 1 has been shortened by 100 metres.
+Clear conditions are expected for race day.
 
 ### Tyre choices
 
 Pirelli brings the C1, C2, and C3 tyre compounds — the three hardest in their range — designated hard, medium, and soft respectively.
+
+### Track changes
+
+The DRS zone leading into turn 1 has been shortened by 100 metres.
 
 ### Practice
 

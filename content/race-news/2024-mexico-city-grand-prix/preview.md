@@ -3,23 +3,31 @@ race_slug: 2024-mexico-city-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2024_Mexico_City_Grand_Prix&oldid=1332448476
 source_revision: "1332448476"
-source_title: "2024 Mexico City Grand Prix"
+source_title: 2024 Mexico City Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-25"
-model: deepseek/deepseek-v4-pro
+generated_at: "2026-05-26"
+model: github-copilot/claude-opus-4.6
 ---
 
-### Championship standings before the race
+### Championship standings
 
 Max Verstappen leads the Drivers' Championship with 354 points, 57 points ahead of Lando Norris in second, and 79 ahead of Charles Leclerc in third. McLaren, holding 544 points, enters this round as the leader of the Constructors' Championship from Red Bull Racing and Ferrari, who are second and third with 504 and 496 points, respectively.
 
+### Previous race
+
+At the United States Grand Prix, Leclerc won ahead of Sainz for a Ferrari 1-2, their first in the US since 2006. Norris finished third on track but was demoted to fourth after a penalty for overtaking Verstappen off-track. Liam Lawson recovered ten places on his return to Formula One to finish ninth.
+
 ### Entrants
 
-Franco Colapinto continues at Williams, having replaced Logan Sargeant from the Italian Grand Prix onwards. Liam Lawson continues at RB, having replaced Daniel Ricciardo from the preceding United States Grand Prix. During the first free practice session, five teams field alternate drivers who have not raced in more than two Grands Prix, as required by the Formula One regulations: Robert Shwartzman for Sauber in place of Zhou Guanyu, Felipe Drugovich for Aston Martin in place of Fernando Alonso, Patricio O'Ward for McLaren in place of Lando Norris, Kimi Antonelli for Mercedes in place of Lewis Hamilton, and Oliver Bearman for Ferrari in place of Charles Leclerc. Fernando Alonso makes his 400th Grand Prix entry, making him the first driver to reach that milestone.
+During the first free practice session, five teams field alternate drivers who have not raced in more than two Grands Prix, as required by the Formula One regulations: Robert Shwartzman for Sauber in place of Zhou Guanyu, Felipe Drugovich for Aston Martin in place of Fernando Alonso, Patricio O'Ward for McLaren in place of Lando Norris, Kimi Antonelli for Mercedes in place of Lewis Hamilton, and Oliver Bearman for Ferrari in place of Charles Leclerc.
 
-### Between-race developments
+### Milestones
 
-At the United States Grand Prix, Leclerc won for Ferrari ahead of Sainz for a Ferrari 1-2 finish, their first in the United States since 2006 and Ferrari's first win in the United States since 2018. Norris finished third on track but was demoted to fourth after a penalty for overtaking Verstappen off-track. Esteban Ocon achieved his first career fastest lap. Liam Lawson on his return to Formula One recovered ten places to finish ninth after a grid penalty.
+Fernando Alonso makes his 400th Grand Prix entry, becoming the first driver to reach that milestone.
+
+### Weather
+
+Partly cloudy conditions are expected for race day.
 
 ### Tyre choices
 

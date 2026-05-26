@@ -3,27 +3,27 @@ race_slug: 2024-las-vegas-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2024_Las_Vegas_Grand_Prix&oldid=1349931880
 source_revision: "1349931880"
-source_title: "2024 Las Vegas Grand Prix"
+source_title: 2024 Las Vegas Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-25"
-model: deepseek/deepseek-v4-pro
+generated_at: "2026-05-26"
+model: github-copilot/claude-opus-4.6
 ---
 
-### Championship standings before the race
+### Championship standings
 
 Max Verstappen leads the Drivers' Championship with 393 points, 62 points ahead of Lando Norris in second, and 86 ahead of Charles Leclerc in third. McLaren, holding 593 points, enters this round as the leader of the Constructors' Championship from Ferrari and Red Bull Racing, who are second and third with 557 and 544 points, respectively.
+
+### Previous race
+
+At the São Paulo Grand Prix, Verstappen won from 17th on the grid in wet conditions, extending his championship lead to 62 points. Alpine achieved a surprise double podium with Ocon second and Gasly third, their first since 2013. Norris could only manage sixth despite Piastri ceding position to him.
 
 ### Championship permutations
 
 Max Verstappen has the opportunity to secure his fourth consecutive World Drivers' Championship title at this event. With two races remaining after Las Vegas — and the Qatar Grand Prix featuring the sprint format with 60 points still available — Norris must outscore Verstappen by at least three points in Las Vegas to retain a mathematical chance of winning the title. Verstappen will be World Champion if he wins the race or finishes ahead of Norris, or if Norris finishes ninth without the fastest lap or lower. Other scenarios exist where Verstappen can clinch depending on relative finishing positions and fastest lap points.
 
-### Entrants
+### Weather
 
-Franco Colapinto continues at Williams, having replaced Logan Sargeant from the Italian Grand Prix onwards. Liam Lawson continues at RB, having replaced Daniel Ricciardo from the United States Grand Prix.
-
-### Between-race developments
-
-At the São Paulo Grand Prix, Verstappen won from 17th on the grid in wet conditions. Norris finished sixth, with his teammate Oscar Piastri giving up position to him. Alpine achieved a double podium with Esteban Ocon second and Pierre Gasly third, the first double podium for Team Enstone since the 2013 Korean Grand Prix. Verstappen's victory extended his championship lead to 62 points. Alexander Albon did not take part in the race as his car was not repaired in time following a heavy crash during qualifying.
+Clear conditions are expected for race day.
 
 ### Tyre choices
 
