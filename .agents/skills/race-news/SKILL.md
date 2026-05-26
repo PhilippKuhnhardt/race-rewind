@@ -1,14 +1,64 @@
 ---
 name: race-news
-description: Use ONLY when creating Wikipedia-derived race preview content for the F1 History app. Covers the end-to-end workflow of sourcing, extracting, and writing race preview markdown files. Triggered by requests like "create race news for season X" or "generate previews for all 2024 races". Also handles preseason and postseason content.
+description: Use ONLY when creating Wikipedia-derived race preview content for the F1 History app. Covers the end-to-end workflow of sourcing, extracting, and writing race preview markdown files. Triggered by requests like "create race news for season X" or "generate previews for all 2024 races". Also handles preseason content.
 ---
 
 # Race News Creation
 
-Generate Wikipedia-derived race previews for the F1 History app. Content goes into
-`content/race-news/{slug}/{phase}.md` — one file per race, per phase. Phases include
-`preview`, `preseason`, and `postseason`. For now the `preview`, `preseason`, and
-`postseason` phases are in scope (not `post-qualifying` or `post-race`).
+The F1 History app exists so people can rewatch past seasons and experience them as if
+they were live. No spoilers, no hindsight — just the information you would have had
+going into that weekend. The goal is immersion: capture the vibe and atmosphere of a
+season so thoroughly that a viewer rewatching 2000 or 2024 feels the championship
+tension, the rivalries, and the stakes race by race.
+
+Race news content is the backbone of that experience. It provides Wikipedia-sourced
+previews that set the scene before each race — championship context, recent form,
+who's replacing whom, what the weather looks like, what happened in practice. Content
+goes into `content/race-news/{slug}/{phase}.md` — one file per race, per phase. Phases
+include `preview` and `preseason`. For now these two phases are in scope (not
+`post-qualifying` or `post-race`).
+
+## Purpose and voice
+
+The user is about to rewatch a race. They want to feel the moment — the championship
+stakes, the tension between drivers, the unusual circumstances — before they press play.
+This content is the briefing that makes a 20-year-old race feel alive again.
+
+**Every fact should carry weight.** The app already shows championship standings,
+driver/team grids, and race results in its own UI. The preview text should not repeat
+what the user can already see in a table — instead it should provide the narrative that
+tables cannot: momentum shifts, streaks, context, stakes. A standings section that
+lists "Driver A leads with 56 points, Driver B is second with 54" duplicates the
+table. The same fact with stakes — "Driver A's lead has shrunk from 22 points to two
+after three retirements in four races" — tells you what the number means for the race
+you're about to watch.
+
+This is not a request for colour commentary, hype, or speculation. The voice remains
+factual, sourced from Wikipedia, and tight. The difference is between *reporting numbers*
+and *reporting what the numbers mean*. Some guidelines:
+
+- **Championship standings:** The app shows the actual points table, so don't
+  duplicate it. Focus on the story the numbers tell — is the gap growing or shrinking?
+  Has the lead changed hands? Is a streak building or breaking? A single sentence of
+  context ("Häkkinen leads for the first time since Austria") does more than listing
+  every driver's points total.
+- **Previous race:** The recap should convey the mood, not just the result. "Sainz won
+  two weeks after an appendectomy" is more useful than "Sainz won." Both are facts; one
+  tells you something about the race you just watched.
+- **Practice:** Incidents matter more than lap times. A red flag, a crash, a mechanical
+  failure that reshapes the weekend — these are what the viewer will see. Don't just
+  list session-toppers; pick out the moments that had consequences.
+- **Milestones and records:** Connect them to history. "Verstappen's eighth consecutive
+  pole equalled Senna's record" is better than "Verstappen took pole for the eighth
+  consecutive time." The record gives the fact weight.
+- **Entrants and developments:** When something unusual happens — a debut, a replacement,
+  a tribute — include the human context Wikipedia provides. "Leclerc wears a tribute
+  helmet to Bianchi on the tenth anniversary of his fatal accident" is a fact that
+  sets the tone for the weekend.
+
+None of this requires invention. Wikipedia's race articles already contain these
+connections — the job is to preserve them rather than strip them out in pursuit of
+brevity. Be tight, but don't be dry.
 
 ## Data sources
 
@@ -16,7 +66,7 @@ Every fact must be verifiable against one of these Wikipedia pages:
 
 1. **Season overview:** `https://en.wikipedia.org/wiki/{year}_Formula_One_World_Championship`
    — championship context, regulation changes, driver market, team changes, mid-season developments,
-   final standings. This is the primary source for preseason and postseason content.
+   final standings. This is the primary source for preseason content.
 2. **Race article:** `https://en.wikipedia.org/wiki/{year}_{Title_Case_Grand_Prix_Name}`
    (from the `wikipedia` column of the `races` table in `data/f1-history.sqlite`)
    — pre-race build-up, "Background" section, weather, practice/qualifying format notes.
@@ -31,7 +81,6 @@ the next race, so cross-reference.
 |---|---|---|---|
 | `preseason` | `{year}-preseason` | `content/race-news/{year}-preseason/preseason.md` | `/seasons/{year}/preseason/` |
 | `preview` | `{year}-{race-slug}` | `content/race-news/{year}-{race-slug}/preview.md` | `/seasons/{year}/{race-slug}/` |
-| `postseason` | `{year}-postseason` | `content/race-news/{year}-postseason/postseason.md` | `/seasons/{year}/postseason/` |
 
 When no entry exists, the section is silently omitted from the page.
 
@@ -99,92 +148,6 @@ Similarly, if no driver changes occurred, omit the section entirely.
 ```yaml
 race_slug: {year}-preseason
 phase: preseason
-source_url: https://en.wikipedia.org/w/index.php?title={year}_Formula_One_World_Championship&oldid={revision_id}
-source_revision: "{revision_id}"
-source_title: {year} Formula One World Championship
-license: CC-BY-SA-4.0
-generated_at: "{ISO date}"
-model: "{model_id}"
-```
-
-## Workflow — Postseason
-
-### 1. Fetch the season overview
-
-Fetch `https://en.wikipedia.org/wiki/{year}_Formula_One_World_Championship`. From it, extract:
-
-- **Season summary** (opening paragraphs): overall narrative, key storylines
-- **Opening / Mid-season / Closing rounds sections**: the arc of the season — who
-  dominated early, when the momentum shifted, how the championships were decided
-- **Final Drivers' Championship standings** (all positions that scored points)
-- **Final Constructors' Championship standings** (all positions)
-
-### 2. Write the postseason file
-
-Write to `content/race-news/{year}-postseason/postseason.md`.
-
-**Purpose:** The postseason is the story of the season. The user has already watched
-every race and read every preview — they know who replaced whom, who scored their first
-points, and who crashed at turn 3. The postseason should tell them something they can
-only see by looking back: the narrative arc, the power shifts, and the final reckoning.
-
-**Tense:** Past tense for events that happened during the season. Present tense for describing what the final standings are.
-
-**Structure:** Use `###` level-3 headings. Structure as **thematic sections** that tell
-the season's story, not as a chronological or categorical list. Always end with the final
-championship standings. Example:
-
-```markdown
-### Season summary              <!-- One paragraph: the season in a nutshell -->
-### {Team/narrative arc 1}      <!-- e.g. "Red Bull's fade" — a team's rise or decline -->
-### {Team/narrative arc 2}      <!-- e.g. "McLaren's ascent" — the challenger story -->
-### The title fights             <!-- How both championships were decided -->
-### {Competitive landscape}     <!-- e.g. "Seven winners" — the breadth of competition -->
-### Final Drivers' Championship
-### Final Constructors' Championship
-```
-
-The exact headings vary by season. A season with a dominant team might need "Ferrari's
-dominance" and "The fight for second". A chaotic season might need "Four-way battle".
-Choose headings that capture what made the season distinctive.
-
-**Content guidance:**
-
-- **Season summary:** One paragraph that captures the season's defining characteristic.
-  Was it a dominant year? A shift of power? An unexpectedly competitive field?
-- **Narrative arcs:** Each section should tell a team or championship story across the
-  full season. Use specific race references as supporting evidence, but do not
-  race-by-race recap. "Verstappen won seven of the first ten races, then went winless
-  for ten rounds" is a narrative; listing every race result is a recap.
-- **Title fights:** How and when were the championships decided? What made the difference?
-  Include the clinching moment and the key statistic (points gap, permutations met).
-- **Competitive landscape:** Season-wide observations — how many different winners,
-  which teams broke winless streaks, any records set across the full season.
-- **Final standings:** List the top 8 drivers with points. List all 10 constructors
-  with points. Note any historically significant facts about the final positions
-  (e.g. "first title since 1998").
-
-**Do NOT include:**
-
-- **In-season driver changes** — every race preview already covers who replaced whom.
-  The user has read "Colapinto replaces Sargeant" in the Italian GP preview, the
-  Azerbaijan GP preview, the Singapore GP preview, and every race thereafter. Do not
-  repeat it.
-- **Individual race milestones** — "Hamilton won his 104th race at Silverstone" is
-  already in the British GP preview. Only mention milestones in the postseason if they
-  are season-level observations (e.g. "a record seven different drivers won races").
-- **Farewells / driver departures** — the final race preview (typically Abu Dhabi)
-  already covers who is leaving which team. Do not duplicate.
-- **Bullet-point "notable statistics"** lists — these tend to rehash individual race
-  facts. Weave genuinely season-level statistics into the narrative sections instead.
-- **Race-by-race results** — those are on individual race pages.
-- **Speculation** about the following season.
-
-### 3. Frontmatter
-
-```yaml
-race_slug: {year}-postseason
-phase: postseason
 source_url: https://en.wikipedia.org/w/index.php?title={year}_Formula_One_World_Championship&oldid={revision_id}
 source_revision: "{revision_id}"
 source_title: {year} Formula One World Championship
@@ -295,6 +258,11 @@ model: "{model_id}"
   mention a replacement driver again if there is new information — a decision to extend
   them, a new event affecting them, or another change at the same seat. If there is
   nothing new to say about the entry list, omit `### Entrants` entirely.
+- **Repeated session format boilerplate** — If the practice/qualifying format is the
+  same as the previous race (e.g. three free practice sessions followed by qualifying),
+  do not describe it again. Only mention session format when it differs from the norm
+  for that season — for example, sprint weekends replacing FP2 with sprint qualifying,
+  or a format change introduced mid-season. If nothing changed, just report results.
 
 ### Tense
 
@@ -302,7 +270,6 @@ model: "{model_id}"
 |---|---|
 | `preseason` | Present tense — the season is about to begin. |
 | `preview` | Present tense for the state going into this race. Past tense for events that happened at a previous race. |
-| `postseason` | Past tense for events during the season. Present tense for describing final standings. |
 
 | Present (state into this race) | Past (events at the previous race) |
 |---|---|
@@ -353,6 +320,7 @@ Content that belongs under `### Between-race developments`:
 - Post-race penalties affecting the next grid (carry-forward penalties)
 - Regulation clarifications or technical directives issued between races
 - Contract announcements or team news
+- Inter-race testing sessions (where, when, who participated, notable results)
 
 If a development directly results from the previous race (e.g. Magnussen's penalty
 points from Monza triggering his ban), it goes under `### Between-race developments`
@@ -364,7 +332,7 @@ Use `###` level-3 headings. Omit any heading that has no content for a given rac
 Within a season, keep headings consistent.
 
 ```markdown
-### Championship standings       <!-- Required from Round 2 onward: points for top drivers and constructors -->
+### Championship standings       <!-- Required from Round 2 onward: narrative context, not a points table (the app already shows the table) -->
 ### Previous race                <!-- Short recap: who won, standout moments, the mood — not a full play-by-play -->
 ### Between-race developments    <!-- Only if something happened between races: driver changes, penalties, news -->
 ### Championship permutations    <!-- Only when a title can be clinched at this race -->
@@ -384,7 +352,6 @@ Within a season, keep headings consistent.
 ```
 content/race-news/{year}-preseason/preseason.md         # Preseason overview
 content/race-news/{year}-{slugified-name}/preview.md    # Race previews
-content/race-news/{year}-postseason/postseason.md       # Postseason summary
 ```
 
 The `{slug}` in race previews matches the `slug` column in the races DB table.
@@ -395,7 +362,6 @@ When generating content for an entire season, generate in this order:
 
 1. **Preseason** — from the season overview page
 2. **Race previews** — one per race, in calendar order (1 → 24)
-3. **Postseason** — from the season overview page (closing rounds + final standings)
 
 This ensures that season-level context (regulation changes, calendar, driver market) is
 captured before diving into individual races.
@@ -407,10 +373,9 @@ After generating content for a season:
 ```bash
 pnpm check     # Zod validation + TypeScript type-check
 pnpm lint --fix
-pnpm dev       # Visual check on preseason, a race with content, postseason, and a race without
+pnpm dev       # Visual check on preseason, a race with content, and a race without
 ```
 
 Race preview blocks render at `/seasons/{year}/{race-slug}/` via `RaceNewsCard.astro`.
 Preseason content renders at `/seasons/{year}/preseason/` via `RaceNewsCard.astro`.
-Postseason content renders at `/seasons/{year}/postseason/` via `RaceNewsCard.astro`.
 When no entry exists for a given race or phase, the section is silently omitted.
