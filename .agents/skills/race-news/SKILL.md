@@ -249,7 +249,7 @@ model: "{model_id}"
 
 | Category | Example | Source |
 |---|---|---|
-| **Championship implications** | "Verstappen can clinch the title if he outscores Norris by 3 points and Leclerc fails to win." | Season overview + race article |
+| **Championship implications** | "Verstappen can clinch the title if he outscores Norris by 3 points and Leclerc fails to win." | Race article Background only — must be stated explicitly by Wikipedia, never calculated |
 | **Between-race developments** | "After his crash at Monza, Magnussen was replaced by Bearman for this race." | Race article Background |
 | **Regulation / technical** | "The FIA issued a technical directive banning asymmetric braking ahead of this race." | Season overview / race article |
 | **Driver changes** | "This is Colapinto's debut, replacing Sargeant for the remainder of the season." | Season overview / race article |
@@ -264,6 +264,8 @@ model: "{model_id}"
 
 ### What does NOT belong
 
+- **Calculated championship permutations** — Do not compute title-clinch scenarios, win-count comparisons, or points arithmetic yourself. These are easy to get wrong (wrong win counts, wrong formula, wrong remaining-race count) and the errors are invisible until reviewed. Championship permutations belong in the preview **only** when Wikipedia's race article explicitly states them (e.g. "Vettel can clinch the title if he wins and Alonso finishes outside the top five"). Copy those statements; do not derive your own.
+- **Calculated win counts or countback tiebreakers** — Do not count race wins from the DB or your memory to write statements like "with seven wins to his rival's three." Win counts and tiebreaker logic must come verbatim from Wikipedia. If Wikipedia doesn't state it, omit it.
 - **Generic circuit descriptions** — Everyone knows Monaco has no overtaking. Do not describe circuit characteristics unless something changed.
 - **Vague paddock chatter** — "Several contracts are up for renewal" is filler. Name the specific drivers/teams.
 - **Invented weather** — Do not invent forecasts. Use only the weather description from Wikipedia's race details infobox or text (see Weather row above).

@@ -34,7 +34,7 @@ function customRaceName(countryName: string): string | null {
       return '🇧🇷';
     case countryName.includes('Pacific'):
       return '🇯🇵';
-    case countryName.includes('Korean'):
+    case countryName.includes('Korea'):
       return '🇰🇷';
     case countryName.includes('European'):
       return '🇪🇺';
