@@ -6,7 +6,7 @@ source_revision: "1349878987"
 source_title: 2000 Hungarian Grand Prix
 license: CC-BY-SA-4.0
 generated_at: "2026-05-26"
-model: claude-opus-4-5
+model: claude-opus-4-7
 ---
 
 ### Championship standings
@@ -15,7 +15,7 @@ Schumacher leads with 56 points. Häkkinen and Coulthard are tied for second on 
 
 ### Previous race
 
-At Hockenheim, Schumacher had a first-lap collision and did not score. McLaren took the top two places.
+At Hockenheim, Schumacher collided with Fisichella on the opening lap and did not score. McLaren took the top two places. The race was overshadowed by an extraordinary incident on lap 25 when a 47-year-old French Mercedes factory worker, protesting his dismissal, ran onto the circuit carrying a banner — forcing a safety car deployment that ultimately shuffled the pit-stop sequence and contributed to Barrichello claiming his maiden victory. Schumacher said he was "out of the race not because of David but because of Fisichella."
 
 ### Between-race developments
 

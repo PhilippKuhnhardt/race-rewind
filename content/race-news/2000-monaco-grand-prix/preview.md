@@ -6,7 +6,7 @@ source_revision: "1351516997"
 source_title: 2000 Monaco Grand Prix
 license: CC-BY-SA-4.0
 generated_at: "2026-05-26"
-model: claude-opus-4-5
+model: claude-opus-4-7
 ---
 
 ### Championship standings
@@ -15,7 +15,7 @@ Schumacher leads with 46 points following his Nürburgring win. Häkkinen is sec
 
 ### Previous race
 
-At the Nürburgring, Schumacher won in changing conditions, pulling clear of Häkkinen who finished second. Coulthard completed the podium but was lapped by the leaders.
+At the Nürburgring, Schumacher won in rapidly changing conditions, reading the weather switch better than his rivals to pull clear of Häkkinen who finished second. Coulthard completed the podium but was lapped by the leaders; he described Monaco as one of the final chances to recover ground, acknowledging the team had been "slowly chipping away at Michael's lead."
 
 ### Sprint format
 

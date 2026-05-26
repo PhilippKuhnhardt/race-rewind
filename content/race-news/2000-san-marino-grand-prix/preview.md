@@ -6,7 +6,7 @@ source_revision: "1352777649"
 source_title: 2000 San Marino Grand Prix
 license: CC-BY-SA-4.0
 generated_at: "2026-05-26"
-model: claude-opus-4-5
+model: claude-opus-4-7
 ---
 
 ### Championship standings
@@ -15,7 +15,7 @@ Schumacher leads with 20 points after back-to-back wins, while the McLarens rema
 
 ### Previous race
 
-At Interlagos, Schumacher won from Barrichello. Häkkinen retired with a gearbox problem while leading. Button scored his first championship point in sixth, the youngest driver to do so at the time.
+At Interlagos, Schumacher won from Barrichello. Häkkinen led but retired with a gearbox problem; he said afterwards "nothing can describe how I feel" — McLaren had been quick all weekend and left Brazil without points. Button scored his first championship point in sixth, the youngest driver to do so at the time; Button himself said he felt no great joy at the news, because he "wanted to earn any success through driving skills, not someone else's misfortune," a reference to Coulthard's post-race exclusion moving him up.
 
 ### Between-race developments
 

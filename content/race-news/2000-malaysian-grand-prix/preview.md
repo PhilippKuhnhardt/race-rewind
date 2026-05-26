@@ -6,16 +6,20 @@ source_revision: "1349879846"
 source_title: 2000 Malaysian Grand Prix
 license: CC-BY-SA-4.0
 generated_at: "2026-05-26"
-model: claude-opus-4-5
+model: claude-opus-4-7
 ---
 
 ### Championship standings
 
 Schumacher won the Drivers' Championship at the previous race in Japan. He leads with 98 points; Häkkinen is second on 86. Coulthard is third, 67 points behind Schumacher, but Barrichello on 58 can still leapfrog him for third: if Barrichello wins and Coulthard finishes outside the top six, Barrichello takes the championship position. The Constructors' Championship remains undecided — Ferrari leads McLaren 156–143, with 16 points still available. McLaren must finish first and second to take the title; Ferrari needs one of its drivers to finish second or collect three points (fourth place).
 
+### Previous race
+
+At Suzuka, Schumacher clinched his third world title — and Ferrari's first in 21 years since Jody Scheckter in 1979. Ferrari president Luca di Montezemolo called it "the most beautiful day of my life." Häkkinen, who led before being overhauled during the pit-stop sequence, said graciously: "To be a good winner, sometimes you have to be a good loser."
+
 ### Entrants
 
-Johnny Herbert starts his final race in Formula One this weekend. His move to CART was publicised before the race; he acknowledged turning down a Williams test offer. Pedro Diniz also makes his final F1 start, with his future at Sauber uncertain and negotiations with Prost ongoing.
+Johnny Herbert starts his final race in Formula One this weekend. His move to CART was publicised before the race; he acknowledged turning down a Williams test offer. Herbert said he expected to end the year on a high. Pedro Diniz also makes his final F1 start, with his future at Sauber uncertain and negotiations with Prost ongoing.
 
 ### Weather
 

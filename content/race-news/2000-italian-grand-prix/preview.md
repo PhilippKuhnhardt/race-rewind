@@ -6,7 +6,7 @@ source_revision: "1352445359"
 source_title: 2000 Italian Grand Prix
 license: CC-BY-SA-4.0
 generated_at: "2026-05-26"
-model: claude-opus-4-5
+model: claude-opus-4-7
 ---
 
 ### Championship standings
@@ -15,11 +15,11 @@ Häkkinen leads with 74 points, six ahead of Schumacher on 68. Coulthard is thir
 
 ### Previous race
 
-At Spa, Häkkinen started from pole and led until spinning at Stavelot on lap 13. He recovered, lapped faster than Schumacher, and passed him on the final straight while both were lapping Zonta — a manoeuvre described by the international press as the best overtake in grand prix racing. Schumacher remained defiant: "With six points between us and four more races to go, I am still optimistic."
+At Spa, Häkkinen started from pole and led until spinning at Stavelot on lap 13. He recovered, lapped faster than Schumacher, and passed him on the final straight while both were lapping Zonta — a manoeuvre McLaren's Ron Dennis called "one of the greatest in Formula One history," and one that Häkkinen told Schumacher in parc fermé had been "a life and death situation." Schumacher remained defiant: "With six points between us and four more races to go, I am still optimistic."
 
 ### Between-race developments
 
-During the Italian Grand Prix weekend, a fire marshal — Paolo Ghislimberti — died after being struck during the race at the newly reconfigured first chicane. Following his death, all testing teams moved their post-Belgian sessions from Mugello to allow marshals to attend his funeral. The FIA has banned the use of cooled fuel during races "with immediate effect," announced on 7 September.
+The FIA has banned the use of cooled fuel during races "with immediate effect," announced on 7 September. There is heightened concern about safety at the newly reconfigured Monza chicanes: some drivers have warned that the tight new entry angles create conditions for multi-car accidents at the first corner.
 
 ### Track changes
 

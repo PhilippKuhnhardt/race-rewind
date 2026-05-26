@@ -6,7 +6,7 @@ source_revision: "1356028306"
 source_title: 2000 French Grand Prix
 license: CC-BY-SA-4.0
 generated_at: "2026-05-26"
-model: claude-opus-4-5
+model: claude-opus-4-7
 ---
 
 ### Championship standings
@@ -15,7 +15,7 @@ Schumacher leads with 56 points — the same total he has carried since the Brit
 
 ### Previous race
 
-At Montreal, Schumacher won. Coulthard stalled on the grid before the formation lap and was given a ten-second stop-go penalty when his mechanics worked on the car 15 seconds before the race started, effectively ending his challenge.
+At Montreal, Schumacher won his 40th career victory in wet-dry conditions. Coulthard stalled on the grid before the formation lap and was given a ten-second stop-go penalty when his mechanics worked on the car 15 seconds before the race started, effectively ending his challenge. Coulthard acknowledged it was "his fault" but criticised the rigidity of the penalty, and afterwards said "there's still a long way to go in the championship and anything can happen."
 
 ### Between-race developments
 

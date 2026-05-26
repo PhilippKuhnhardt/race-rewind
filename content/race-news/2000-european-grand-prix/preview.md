@@ -6,16 +6,16 @@ source_revision: "1349876482"
 source_title: 2000 European Grand Prix
 license: CC-BY-SA-4.0
 generated_at: "2026-05-26"
-model: claude-opus-4-5
+model: claude-opus-4-7
 ---
 
 ### Championship standings
 
-Schumacher leads with 36 points. Häkkinen is second on 22 after winning in Spain. Coulthard is third on 20, still nursing three broken ribs from his plane crash. McLaren have won back-to-back races for the first time this season and are coming for the championship.
+Schumacher leads with 36 points. Häkkinen is second on 22 after winning in Spain. Coulthard is third on 20, still nursing three broken ribs from his plane crash. McLaren have won back-to-back races for the first time this season and are coming for the championship. Häkkinen said before the Nürburgring: "In this sport something weird always happens. If I were in Michael's shoes I would be getting a little bit worried."
 
 ### Previous race
 
-At Barcelona, Häkkinen won, giving McLaren a second consecutive 1–2. Schumacher had a difficult race, finishing without scoring.
+At Barcelona, Häkkinen won, giving McLaren a second consecutive 1–2. Schumacher had a difficult race, finishing without scoring. During the race a pit-stop accident left Ferrari chief mechanic Nigel Stepney with a compound leg fracture, keeping him sidelined again this weekend.
 
 ### Car upgrades
 

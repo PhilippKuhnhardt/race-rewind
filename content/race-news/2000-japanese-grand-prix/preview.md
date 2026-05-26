@@ -6,7 +6,7 @@ source_revision: "1349879715"
 source_title: 2000 Japanese Grand Prix
 license: CC-BY-SA-4.0
 generated_at: "2026-05-26"
-model: claude-opus-4-5
+model: claude-opus-4-7
 ---
 
 ### Championship standings
@@ -19,7 +19,7 @@ If Schumacher wins at Suzuka, the title is his regardless of Häkkinen's result.
 
 ### Previous race
 
-At Indianapolis, Schumacher won. Häkkinen retired with a pneumatic valve failure while running at the front.
+At Indianapolis, Schumacher won his 42nd career race. Häkkinen had been gaining on him with fastest laps when his pneumatic valve system catastrophically failed, flames and smoke billowing from the engine, costing him the championship lead. Afterwards he said: "I mean, this is not good, but we still have two races. Anything can happen."
 
 ### Between-race developments
 

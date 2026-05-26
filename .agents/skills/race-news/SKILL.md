@@ -56,6 +56,22 @@ and *reporting what the numbers mean*. Some guidelines:
   helmet to Bianchi on the tenth anniversary of his fatal accident" is a fact that
   sets the tone for the weekend.
 
+- **Direct quotes:** Wikipedia frequently includes verbatim lines from drivers,
+  principals, and stewards. Use them when the speaker is named, the quote is short
+  (one or two sentences at most), and it adds mood the surrounding facts cannot.
+  Attribute inline: `Häkkinen called it "one of the hardest weekends of my career."` 
+  Embed the quote inside the section it belongs to — `### Previous race`,
+  `### Between-race developments`, etc. Never create a standalone Quotes heading.
+- **Story tidbits:** The small human-interest details Wikipedia weaves into
+  well-maintained articles — a tribute helmet, a driver racing through injury, a
+  near-miss off-track the week before, an unusual sponsor debut — are what makes a
+  20-year-old race feel alive. Preserve them. They are not flourish; they are the
+  mood material the app exists for.
+
+Both quotes and tidbits earn their place by adding something the standings tables,
+session toppers, and results cannot supply. If a quote only restates a fact already
+in the paragraph, cut it.
+
 None of this requires invention. Wikipedia's race articles already contain these
 connections — the job is to preserve them rather than strip them out in pursuit of
 brevity. Be tight, but don't be dry.
@@ -243,6 +259,8 @@ model: "{model_id}"
 | **Practice sessions** | "Hamilton topped FP1 (Piastri, Russell); Leclerc led FP2 and FP3. Zhou caused a red flag in FP1 after hitting the wall at turn 1." | Race article Practice section |
 | **Circuit-specific format notes** (only if unusual) | "This is the third running of the Las Vegas Grand Prix on the Strip circuit." | Race article |
 | **Car upgrades** | "Eight of ten teams bring upgrades: Red Bull adjusts the floor and upper sidepod; McLaren modifies the front wing and brake ducts." | Race article Background (only when listed) |
+| **Direct quotes** | `Häkkinen said the win "felt like it was meant to be after everything that happened in Monaco."` | Race article — named speaker only; do not quote unnamed sources |
+| **Story tidbits** | "Sainz races two weeks after an appendectomy." / "Coulthard survived a plane crash at Lyon the week before Spain." | Race article Background or Between-race section |
 
 ### What does NOT belong
 
@@ -252,6 +270,7 @@ model: "{model_id}"
 - **Current-race spoilers** — Never mention who won the current race, its podium finishers, or any event from qualifying or the race itself. The Background and Practice sections are your boundary. Results and events from *previous* races are expected and desirable for immersion — see the tense table and "Previous race events" section below.
 - **Speculation** — "Ferrari should excel here" or "Red Bull has been dominant" without sourcing is fluff. If Wikipedia states a fact (e.g., "Red Bull won 7 of the first 8 races"), cite it directly.
 - **Flourishes** — No "jewel in the crown" or "iconic street circuit" filler. Just the facts.
+- **Invented or paraphrased quotes** — Only use quotation marks for wording Wikipedia attributes verbatim to a named person. Do not put your own words in someone's mouth, and do not quote unnamed sources ("a Ferrari engineer said…"). If Wikipedia paraphrases rather than quotes, paraphrase too — without quotation marks.
 - **Repeated driver replacement boilerplate** — When a driver change happens (e.g.
   Colapinto replaces Sargeant), mention it at the race where it occurs. Do NOT repeat
   "continues at Williams, having replaced Sargeant" at every subsequent race. Only
@@ -287,6 +306,7 @@ Passes | Fails |
 | "Hamilton's 300th Grand Prix start. He joins Barrichello and Alonso as the third driver to reach the milestone." | "Monaco is the most glamorous event on the calendar, attracting celebrities from around the world." |
 | "Verstappen leads Norris by 62 points. If he wins and Norris finishes 3rd or lower, the title is decided." | "The championship battle is heating up as we enter the final third of the season." |
 | "Heavy rain is forecast for Sunday with a 70% chance of thunderstorms." (from Wikipedia infobox or text) | "Early forecasts suggest warm conditions with no rain expected." (invented, not from Wikipedia) |
+| `Schumacher called the win "a relief after Hockenheim" — his first finish in four races.` | "Schumacher was reportedly pleased with the result." (unattributed, adds nothing) |
 
 ### Previous race → next race preview
 

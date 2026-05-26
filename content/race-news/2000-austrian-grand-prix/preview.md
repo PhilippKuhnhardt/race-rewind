@@ -6,7 +6,7 @@ source_revision: "1349878708"
 source_title: 2000 Austrian Grand Prix
 license: CC-BY-SA-4.0
 generated_at: "2026-05-26"
-model: claude-opus-4-5
+model: claude-opus-4-7
 ---
 
 ### Championship standings
@@ -15,7 +15,7 @@ Schumacher leads with 56 points — unchanged since the British Grand Prix in Ap
 
 ### Previous race
 
-At Magny-Cours, Coulthard won. Häkkinen finished second, with Schumacher out of the points.
+At Magny-Cours, Coulthard won after a perfectly timed two-stop strategy. Häkkinen finished second, with Schumacher out of the points. Coulthard's overtake on Schumacher, which drew an angry hand gesture from the Ferrari, became the talking point of the weekend — Coulthard said he "just don't think Michael is very sporting," while Mercedes motorsport chief Norbert Haug defended it as "a traditional gesture used to indicate to the driver ahead that you intend to overtake him in one lap's time."
 
 ### Entrants
 

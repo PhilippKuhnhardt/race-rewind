@@ -6,7 +6,7 @@ source_revision: "1349876171"
 source_title: 2000 British Grand Prix
 license: CC-BY-SA-4.0
 generated_at: "2026-05-26"
-model: claude-opus-4-5
+model: claude-opus-4-7
 ---
 
 ### Championship standings
@@ -15,7 +15,7 @@ Schumacher leads with 30 points after three consecutive wins to open the season 
 
 ### Previous race
 
-At Imola, Schumacher took his third win in a row, completing a hat-trick to start the season. Häkkinen picked up his first points of the year.
+At Imola, Schumacher took his third win in a row, completing a hat-trick to start the season. Ferrari team principal Jean Todt said "it will be a long hard road" but took it as an incentive to work harder. Häkkinen picked up his first points of the year; he said afterwards he was "extremely disappointed" with his own performance across the weekend.
 
 ### Between-race developments
 
@@ -29,7 +29,7 @@ McLaren offers a revised front wing specification and new screens behind the fro
 
 ### Weather
 
-The race takes place on Easter Sunday. Practice begins on a dry track but heavy rain falls within the first half hour of the first session, and conditions remain wet throughout the weekend.
+The race takes place on Easter Sunday — a date the FIA controversially brought forward from the traditional July slot. Practice begins on a dry track but heavy rain falls within the first half hour of the first session, and conditions remain wet throughout the weekend. Schumacher called conditions in Friday's sessions "almost impossible to drive and also dangerous."
 
 ### Practice
 

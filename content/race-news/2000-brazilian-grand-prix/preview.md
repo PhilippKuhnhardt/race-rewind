@@ -6,7 +6,7 @@ source_revision: "1349875977"
 source_title: 2000 Brazilian Grand Prix
 license: CC-BY-SA-4.0
 generated_at: "2026-05-26"
-model: claude-opus-4-5
+model: claude-opus-4-7
 ---
 
 ### Championship standings
@@ -15,7 +15,7 @@ Schumacher leads with 10 points after Melbourne. Both McLarens failed to score â
 
 ### Previous race
 
-In Melbourne, McLaren dominated the early running before both cars retired, handing Schumacher an unchallenged win. Barrichello finished second in his first race for Ferrari, with Ralf Schumacher completing the podium. The two Jordans also failed to finish.
+In Melbourne, McLaren dominated the early running before both cars retired, handing Schumacher an unchallenged win. Schumacher admitted afterwards he had been "saving my tyres, saving my fuel, ready for the final moments," and conceded he would have preferred to race the McLarens to prove Ferrari's pace. Barrichello finished second in his first race for Ferrari, with Ralf Schumacher completing the podium. The two Jordans also failed to finish.
 
 ### Weather
 

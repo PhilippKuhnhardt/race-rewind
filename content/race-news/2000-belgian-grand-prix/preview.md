@@ -6,7 +6,7 @@ source_revision: "1355382337"
 source_title: 2000 Belgian Grand Prix
 license: CC-BY-SA-4.0
 generated_at: "2026-05-26"
-model: claude-opus-4-5
+model: claude-opus-4-7
 ---
 
 ### Championship standings
@@ -15,7 +15,7 @@ For the first time all season, Häkkinen leads the Drivers' Championship — wit
 
 ### Previous race
 
-At the Hungaroring, Häkkinen won. Schumacher finished second — his first points in four attempts.
+At the Hungaroring, Häkkinen won in punishing heat. His drink bottle failed roughly a third of the way through the race, leaving him dehydrated and exhausted in temperatures that cost Barrichello 1.5 kg and three litres of fluid. Schumacher finished second — his first points in four attempts — after admitting he had been "too cautious at the start" and conceding Häkkinen would have passed him in the pit stop sequence anyway.
 
 ### Car upgrades
 

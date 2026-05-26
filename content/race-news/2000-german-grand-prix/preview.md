@@ -6,7 +6,7 @@ source_revision: "1355485832"
 source_title: 2000 German Grand Prix
 license: CC-BY-SA-4.0
 generated_at: "2026-05-26"
-model: claude-opus-4-5
+model: claude-opus-4-7
 ---
 
 ### Championship standings
@@ -15,7 +15,7 @@ Schumacher's lead, which stood at 22 points over Coulthard before the French Gra
 
 ### Previous race
 
-At the A1-Ring, Häkkinen won. Schumacher did not score. McLaren and Ferrari emerged from Austria with the title fight very much alive.
+At the A1-Ring, Häkkinen won after Schumacher was knocked out in a first-lap collision with Ricardo Zonta. Schumacher told Zonta afterwards he had "overestimated his ability" and promised him a "quiet word." McLaren and Ferrari emerged from Austria with the title fight very much alive.
 
 ### Between-race developments
 

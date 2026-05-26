@@ -6,7 +6,7 @@ source_revision: "1349876748"
 source_title: 2000 Canadian Grand Prix
 license: CC-BY-SA-4.0
 generated_at: "2026-05-26"
-model: claude-opus-4-5
+model: claude-opus-4-7
 ---
 
 ### Championship standings
@@ -15,7 +15,7 @@ Schumacher leads with 46 points. Coulthard is second on 34 after his Monaco win,
 
 ### Previous race
 
-At Monaco, Coulthard won after Schumacher retired. Häkkinen retired as well, damaged in a first-lap incident.
+At Monaco, Coulthard won after Schumacher retired while leading — his first retirement of the season. Schumacher's exhaust had cracked and the heat "basically cooked the suspension," as he explained afterwards. Häkkinen retired as well, damaged in a first-lap incident. Irvine scored Jaguar's first championship points, though he called it "one of the most difficult races of his Formula One career" owing to a malfunctioning drink bottle and a blistering foot.
 
 ### Between-race developments
 

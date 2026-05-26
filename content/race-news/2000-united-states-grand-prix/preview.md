@@ -6,7 +6,7 @@ source_revision: "1351241909"
 source_title: 2000 United States Grand Prix
 license: CC-BY-SA-4.0
 generated_at: "2026-05-26"
-model: claude-opus-4-5
+model: claude-opus-4-7
 ---
 
 ### Championship standings
@@ -15,7 +15,7 @@ Häkkinen leads with 80 points, Schumacher second on 78. Schumacher won in Italy
 
 ### Previous race
 
-At Monza, Schumacher won and Häkkinen finished second, closing the gap from six points to two. Häkkinen had won three of the previous five races; this is a championship that is going to the final round.
+At Monza, Schumacher won his 41st career victory — equalling Ayrton Senna's record of wins. When a journalist informed him of this in the post-race press conference, he burst into tears; once he had composed himself, he said he remembered Senna's fatal accident at the 1994 San Marino Grand Prix. The race itself was overshadowed by a first-lap accident in which fire marshal Paolo Ghislimberti was struck by a wheel and killed. Häkkinen finished second, closing the gap from six points to two. Häkkinen had won three of the previous five races; this is a championship that is going to the final round.
 
 ### Circuit
 

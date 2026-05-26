@@ -6,18 +6,18 @@ source_revision: "1354171724"
 source_title: 2000 Formula One World Championship
 license: CC-BY-SA-4.0
 generated_at: "2026-05-26"
-model: claude-opus-4-5
+model: claude-opus-4-7
 ---
 
 The 2000 FIA Formula One World Championship is the 54th season of Formula One motor racing. It begins on 12 March in Melbourne and runs for seventeen races. Mika Häkkinen is the defending Drivers' Champion, having won back-to-back titles in 1998 and 1999. Ferrari is the defending Constructors' Champion. All teams compete on Bridgestone tyres, the sole supplier.
 
 ### Driver changes
 
-Rubens Barrichello moves from Stewart to Ferrari, replacing Eddie Irvine, who finished runner-up in 1999. Irvine joins the newly formed Jaguar team in what is essentially a straight swap with Barrichello.
+Rubens Barrichello moves from Stewart to Ferrari, replacing Eddie Irvine, who finished runner-up in 1999. Irvine joins the newly formed Jaguar team in what is essentially a straight swap with Barrichello. Ferrari's objective is unambiguous: Michael Schumacher has won only one title at Maranello — Ferrari's last championship was Jody Scheckter's in 1979.
 
 Damon Hill retires from Formula One after the 1999 season. Jarno Trulli moves from Prost to Jordan, filling Hill's seat alongside Heinz-Harald Frentzen. The two Prost seats go to Jean Alesi, who crosses from Sauber, and Nick Heidfeld, the 1999 International Formula 3000 champion and former McLaren test driver. Mika Salo signs for Sauber after standing in for Zonta and Schumacher during the 1999 season. Olivier Panis leaves Prost to become McLaren's test driver.
 
-Jenson Button makes his Formula One debut at Williams, having beaten test driver Bruno Junqueira in a shoot-out. Button replaces Alessandro Zanardi. At the time of the season opener, Button is the youngest British driver ever to start a Formula One race.
+Jenson Button makes his Formula One debut at Williams, having beaten test driver Bruno Junqueira in a shoot-out for the seat. Button replaces Alessandro Zanardi. At the time of the season opener, Button is the youngest British driver ever to start a Formula One race.
 
 Jos Verstappen returns to Formula One at Arrows, replacing Toranosuke Takagi, who has left for Formula Nippon. Gastón Mazzacane is promoted from Minardi test driver to race seat, replacing Luca Badoer, who opts to continue as Ferrari's test driver.
 
