@@ -29,7 +29,6 @@ export async function buildDriverAtRacePayload(
       .select({
         slug: teams.slug,
         name: teams.name,
-        primary_color: teams.primaryColor,
       })
       .from(roundEntries)
       .innerJoin(teams, eq(teams.id, roundEntries.teamId))

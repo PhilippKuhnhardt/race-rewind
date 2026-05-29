@@ -1,6 +1,7 @@
 ---
 import { formatPts } from '../../lib/format';
 import type { getDriverTeamsDriven } from '../../lib/queries';
+import TeamColorSwatch from '../primitives/TeamColorSwatch.astro';
 
 interface Props {
   teams: Awaited<ReturnType<typeof getDriverTeamsDriven>>;
@@ -31,9 +32,7 @@ const { teams, teamHref = (slug) => `/teams/${slug}/` } = Astro.props;
             <tr class="border-b border-border last:border-0 hover:bg-bg-hover transition-colors">
               <td class="px-3 py-2.5">
                 <span class="inline-flex items-center gap-2">
-                  {t.primary_color && (
-                    <span class="inline-block h-2.5 w-2.5 rounded-full flex-shrink-0" style={`background:${t.primary_color}`} />
-                  )}
+                  <TeamColorSwatch slug={t.team_slug} season={t.color_season} variant="dot" />
                   <a href={teamHref(t.team_slug)} class="text-accent hover:underline font-medium">
                     {t.name}
                   </a>

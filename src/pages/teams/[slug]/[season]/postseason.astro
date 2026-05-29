@@ -1,5 +1,6 @@
 ---
 import DriversFieldedTable from '../../../../components/driver/DriversFieldedTable.astro';
+import TeamColorSwatch from '../../../../components/primitives/TeamColorSwatch.astro';
 import Base from '../../../../layouts/Base.astro';
 import { teamLinkAt, driverLinkAt, raceLinkAt } from '../../../../lib/nav';
 import { pitForPostseason, resolveAsOfRaceNumber } from '../../../../lib/point-in-time';
@@ -60,11 +61,7 @@ const description = `${team.name}'s stats after the ${season} season: ${stats.wi
   </div>
 
   <div class="mb-6">
-    {
-      team.primary_color && (
-        <div class="h-1 w-12 rounded-full mb-3" style={`background:${team.primary_color}`} />
-      )
-    }
+    <TeamColorSwatch slug={team.slug} {season} variant="header" />
     <h1 class="text-2xl font-bold text-fg">{team.name}</h1>
     {team.nationality && <p class="text-sm text-fg-muted mt-1">{emojify(team.nationality)}</p>}
   </div>

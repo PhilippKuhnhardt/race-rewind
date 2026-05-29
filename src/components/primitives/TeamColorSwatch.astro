@@ -1,0 +1,30 @@
+---
+import { teamColor } from '../../lib/team-colors';
+
+interface Props {
+  slug: string | null | undefined;
+  season: number;
+  /**
+   * dot    – h-2.5 w-2.5 circle (used in "Teams Driven For" table)
+   * bar    – h-3 w-1 vertical pill (used in race/quali/standings/grid tables)
+   * header – h-1 w-12 horizontal accent (used above team page headings)
+   */
+  variant?: 'dot' | 'bar' | 'header';
+}
+
+const { slug, season, variant = 'dot' } = Astro.props;
+const color = teamColor(slug, season);
+---
+
+{variant === 'header' ? (
+  color && <div class="h-1 w-12 rounded-full mb-3" style={`background:${color}`} />
+) : (
+  <span
+    class:list={[
+      'inline-block shrink-0 rounded-full',
+      variant === 'dot' ? 'h-2.5 w-2.5' : 'h-3 w-1',
+    ]}
+    style={color ? `background:${color}` : 'background:transparent'}
+    aria-hidden="true"
+  />
+)}

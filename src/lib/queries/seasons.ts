@@ -10,7 +10,6 @@ export interface SeasonGridRow {
   full_name: string;
   team_name: string | null;
   team_slug: string | null;
-  primary_color: string | null;
   age: number | null;
   seasons: number;
   career: {
@@ -57,7 +56,6 @@ export async function getActiveGridStats({
       full_name: d.full_name,
       team_name: d.team_name,
       team_slug: d.team_slug,
-      primary_color: d.primary_color,
       age: computeAge(d.date_of_birth, atDate),
       seasons: s?.seasons ?? 0,
       career: {
@@ -257,7 +255,6 @@ export async function getSeasonGrid(raceNumber: number) {
       date_of_birth: drivers.dateOfBirth,
       team_name: min(teams.name),
       team_slug: min(teams.slug),
-      primary_color: min(teams.primaryColor),
     })
     .from(roundEntries)
     .innerJoin(drivers, eq(drivers.id, roundEntries.driverId))

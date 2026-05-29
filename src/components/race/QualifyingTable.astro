@@ -1,6 +1,7 @@
 ---
 import { driverLink, teamLink, formatQualifyingTime } from '../../lib/format';
 import type { getQualifyingResults } from '../../lib/queries';
+import TeamColorSwatch from '../primitives/TeamColorSwatch.astro';
 
 interface Props {
   quali: Awaited<ReturnType<typeof getQualifyingResults>>;
@@ -37,7 +38,10 @@ const isModernQuali = quali.length > 0 && (quali[0].q1_time != null || quali[0].
           <tr class="border-b border-border last:border-0 hover:bg-bg-hover transition-colors">
             <td class="px-3 py-2.5 text-right tabular-nums font-bold text-fg">{row.position ?? '—'}</td>
             <td class="px-3 py-2.5">
-              <a href={driverLink(row.driver_slug, season, raceSlug)} class="text-accent hover:underline font-medium">{row.full_name}</a>
+              <span class="inline-flex items-center gap-2">
+                <TeamColorSwatch slug={row.team_slug} {season} variant="bar" />
+                <a href={driverLink(row.driver_slug, season, raceSlug)} class="text-accent hover:underline font-medium">{row.full_name}</a>
+              </span>
             </td>
             <td class="px-3 py-2.5 text-fg-muted">
               <a href={teamLink(row.team_slug, season, raceSlug)} class="text-fg-muted hover:text-accent hover:underline">{row.team_name}</a>

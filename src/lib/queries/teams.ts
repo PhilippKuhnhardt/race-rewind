@@ -11,7 +11,6 @@ export async function getTeamBySlug(slug: string) {
       name: teams.name,
       nationality: teams.nationality,
       country_code: teams.countryCode,
-      primary_color: teams.primaryColor,
     })
     .from(teams)
     .where(eq(teams.slug, slug))

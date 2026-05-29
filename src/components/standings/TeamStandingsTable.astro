@@ -2,6 +2,7 @@
 import { formatPts, formatDelta } from '../../lib/format';
 import { teamLinkAt } from '../../lib/nav';
 import type { PointInTime } from '../../lib/point-in-time';
+import TeamColorSwatch from '../primitives/TeamColorSwatch.astro';
 
 interface TeamRow {
   team_id: number;
@@ -62,9 +63,12 @@ const enriched = rows.map((row) => {
               <td class="px-3 py-2.5 text-right tabular-nums font-bold text-fg">{row.position ?? '—'}</td>
               {showDelta && <td class={`px-2 py-2.5 text-right tabular-nums text-xs ${row.deltaClass}`}>{row.delta}</td>}
               <td class="px-3 py-2.5">
-                <a href={teamLinkAt(row.team_slug, pit)} class="text-accent hover:underline font-medium">
-                  {row.team_name}
-                </a>
+                <span class="inline-flex items-center gap-2">
+                  <TeamColorSwatch slug={row.team_slug} season={pit.season} variant="bar" />
+                  <a href={teamLinkAt(row.team_slug, pit)} class="text-accent hover:underline font-medium">
+                    {row.team_name}
+                  </a>
+                </span>
               </td>
               <td class="px-3 py-2.5 text-right tabular-nums font-medium">{formatPts(row.points)}</td>
               <td class="px-3 py-2.5 text-right tabular-nums text-fg-muted">{row.win_count}</td>

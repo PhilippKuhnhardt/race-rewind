@@ -2,6 +2,7 @@
 import { formatPts, formatDelta } from '../../lib/format';
 import { driverLinkAt, teamLinkAt } from '../../lib/nav';
 import type { PointInTime } from '../../lib/point-in-time';
+import TeamColorSwatch from '../primitives/TeamColorSwatch.astro';
 
 interface DriverRow {
   driver_id: number;
@@ -65,9 +66,12 @@ const enriched = rows.map((row) => {
                 <td class="px-3 py-2.5 text-right tabular-nums font-bold text-fg">{row.position ?? '—'}</td>
                 {showDelta && <td class={`px-2 py-2.5 text-right tabular-nums text-xs ${row.deltaClass}`}>{row.delta}</td>}
                 <td class="px-3 py-2.5">
-                  <a href={driverLinkAt(row.driver_slug, pit)} class="text-accent hover:underline font-medium">
-                    {row.full_name}
-                  </a>
+                  <span class="inline-flex items-center gap-2">
+                    <TeamColorSwatch slug={row.team_slug} season={pit.season} variant="bar" />
+                    <a href={driverLinkAt(row.driver_slug, pit)} class="text-accent hover:underline font-medium">
+                      {row.full_name}
+                    </a>
+                  </span>
                 </td>
                 <td class="px-3 py-2.5 text-fg-muted">
                   {row.team_slug

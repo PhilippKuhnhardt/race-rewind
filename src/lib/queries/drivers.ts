@@ -221,8 +221,9 @@ export async function getAllDriverCareerStatsAsOf(beforeRaceNumber: number) {
 export interface DriverTeamRecord {
   team_slug: string;
   name: string;
-  primary_color: string | null;
   years: string;
+  /** Most recent season the driver raced for this team (within the current timeline point). Used for the team-color swatch. */
+  color_season: number;
   starts: number;
   wins: number;
   points: number;
@@ -237,7 +238,6 @@ export async function getDriverTeamsDriven(driverId: number, beforeRaceNumber: n
         team_id: teams.id,
         team_slug: teams.slug,
         name: teams.name,
-        primary_color: teams.primaryColor,
         season: races.season,
       })
       .from(roundEntries)
@@ -278,25 +278,25 @@ export async function getDriverTeamsDriven(driverId: number, beforeRaceNumber: n
 
   const wccPairs = new Set(wccRows.map((r) => `${r.team_id}:${r.season}`));
 
-  const teamMap = new Map<number, { team_slug: string; name: string; primary_color: string | null; seasons: number[] }>();
+  const teamMap = new Map<number, { team_slug: string; name: string; seasons: number[] }>();
   for (const row of seasonRows) {
     if (!teamMap.has(row.team_id)) {
-      teamMap.set(row.team_id, { team_slug: row.team_slug, name: row.name, primary_color: row.primary_color, seasons: [] });
+      teamMap.set(row.team_id, { team_slug: row.team_slug, name: row.name, seasons: [] });
     }
     teamMap.get(row.team_id)!.seasons.push(row.season);
   }
 
   return Array.from(teamMap.entries())
-    .map(([teamId, { team_slug, name, primary_color, seasons }]) => {
+    .map(([teamId, { team_slug, name, seasons }]) => {
       const stats = statsMap.get(teamId) ?? { starts: 0, wins: 0, points: 0 };
       const driverChamps = seasons.filter((s) => wdcSeasons.has(s)).length;
       const teamChamps = seasons.filter((s) => wccPairs.has(`${teamId}:${s}`)).length;
       return {
         team_slug,
         name,
-        primary_color,
         first_season: Math.min(...seasons),
         years: formatYearRanges(seasons),
+        color_season: Math.max(...seasons),
         starts: stats.starts,
         wins: stats.wins,
         points: stats.points,

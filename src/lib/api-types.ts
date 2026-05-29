@@ -18,7 +18,6 @@ export interface DriverAtRacePayload {
   team_at_race: {
     slug: string;
     name: string;
-    primary_color: string | null;
   } | null;
   standing_going_in: {
     position: number | null;

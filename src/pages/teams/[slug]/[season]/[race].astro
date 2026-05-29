@@ -1,5 +1,6 @@
 ---
 import DriversFieldedTable from '../../../../components/driver/DriversFieldedTable.astro';
+import TeamColorSwatch from '../../../../components/primitives/TeamColorSwatch.astro';
 import Base from '../../../../layouts/Base.astro';
 import { driverLink, formatPts, raceLink, stripYearPrefix, teamLink } from '../../../../lib/format';
 import {
@@ -67,11 +68,7 @@ const description = `${team.name}'s career going into the ${race.season} ${race.
   </div>
 
   <div class="mb-6">
-    {
-      team.primary_color && (
-        <div class="h-1 w-12 rounded-full mb-3" style={`background:${team.primary_color}`} />
-      )
-    }
+    <TeamColorSwatch slug={team.slug} season={race.season} variant="header" />
     <h1 class="text-2xl font-bold text-fg">{team.name}</h1>
     {team.nationality && <p class="text-sm text-fg-muted mt-1">{emojify(team.nationality)}</p>}
   </div>
