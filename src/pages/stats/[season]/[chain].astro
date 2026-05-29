@@ -1,7 +1,7 @@
 ---
 import Base from '../../../layouts/Base.astro';
-import AllDriversTable from '../../../components/driver/AllDriversTable.astro';
-import { getAllRacesBySeason, getAllRaces, getAllDriverCareerStatsAsOf } from '../../../lib/queries';
+import StatsDriversView from '../../../components/driver/StatsDriversView.astro';
+import { getAllRacesBySeason, getAllRaces, getAllDriverCareerStatsAsOf, getActiveGridStats } from '../../../lib/queries';
 import type { PageContext } from '../../../lib/types';
 import { pitForPreseason, pitForPostseason } from '../../../lib/point-in-time';
 import type { PointInTime } from '../../../lib/point-in-time';
@@ -13,7 +13,12 @@ export async function getStaticPaths() {
   ]);
 
   const raceNumMap = new Map<string, number>();
-  for (const r of allRaces) raceNumMap.set(`${r.season}/${r.race_slug}`, r.race_number);
+  const raceDateMap = new Map<string, string>();
+  for (const r of allRaces) {
+    const key = `${r.season}/${r.race_slug}`;
+    raceNumMap.set(key, r.race_number);
+    raceDateMap.set(key, r.date);
+  }
 
   const paths: object[] = [];
 
@@ -26,6 +31,9 @@ export async function getStaticPaths() {
     const lastRn = raceNumMap.get(`${season}/${lastRace?.slug}`);
     if (!firstRn || !lastRn) continue;
 
+    const firstDate = raceDateMap.get(`${season}/${firstRace?.slug}`) ?? '';
+    const lastDate = raceDateMap.get(`${season}/${lastRace?.slug}`) ?? '';
+
     // preseason
     paths.push({
       params: { season: String(season), chain: 'preseason' },
@@ -35,6 +43,8 @@ export async function getStaticPaths() {
         chainSlug: 'preseason',
         raceName: null,
         beforeRaceNumber: firstRn,
+        participantRaceNumber: firstRn,
+        atDate: firstDate,
         driverLinkRaceSlug: firstRace.slug,
         prevChainSlug: undefined,
         nextChainSlug: firstRace.slug,
@@ -45,6 +55,7 @@ export async function getStaticPaths() {
     for (let i = 0; i < seasonRaces.length; i++) {
       const race = seasonRaces[i];
       const rn = raceNumMap.get(`${season}/${race.slug}`);
+      const rd = raceDateMap.get(`${season}/${race.slug}`) ?? '';
       if (!rn) continue;
       paths.push({
         params: { season: String(season), chain: race.slug },
@@ -54,6 +65,8 @@ export async function getStaticPaths() {
           chainSlug: race.slug,
           raceName: race.name,
           beforeRaceNumber: rn,
+          participantRaceNumber: rn,
+          atDate: rd,
           driverLinkRaceSlug: race.slug,
           prevChainSlug: i > 0 ? seasonRaces[i - 1].slug : 'preseason',
           nextChainSlug: i < seasonRaces.length - 1 ? seasonRaces[i + 1].slug : 'postseason',
@@ -61,7 +74,7 @@ export async function getStaticPaths() {
       });
     }
 
-    // postseason
+    // postseason: stats as-of after last race, but participants = last race's entrants
     paths.push({
       params: { season: String(season), chain: 'postseason' },
       props: {
@@ -70,6 +83,8 @@ export async function getStaticPaths() {
         chainSlug: 'postseason',
         raceName: null,
         beforeRaceNumber: lastRn + 1,
+        participantRaceNumber: lastRn,
+        atDate: lastDate,
         driverLinkRaceSlug: lastRace.slug,
         prevChainSlug: lastRace.slug,
         nextChainSlug: undefined,
@@ -80,12 +95,18 @@ export async function getStaticPaths() {
   return paths;
 }
 
-const { season, raceCount, chainSlug, raceName, beforeRaceNumber, driverLinkRaceSlug, prevChainSlug, nextChainSlug } = Astro.props as {
+const {
+  season, raceCount, chainSlug, raceName,
+  beforeRaceNumber, participantRaceNumber, atDate,
+  driverLinkRaceSlug, prevChainSlug, nextChainSlug,
+} = Astro.props as {
   season: number;
   raceCount: number;
   chainSlug: string;
   raceName: string | null;
   beforeRaceNumber: number;
+  participantRaceNumber: number;
+  atDate: string;
   driverLinkRaceSlug: string;
   prevChainSlug: string | undefined;
   nextChainSlug: string | undefined;
@@ -97,7 +118,10 @@ const pit: PointInTime = chainSlug === 'preseason'
     ? pitForPostseason(season)
     : { kind: 'race', season, raceSlug: driverLinkRaceSlug, raceNumber: beforeRaceNumber };
 
-const drivers = await getAllDriverCareerStatsAsOf(beforeRaceNumber);
+const [drivers, activeGrid] = await Promise.all([
+  getAllDriverCareerStatsAsOf(beforeRaceNumber),
+  getActiveGridStats({ participantRaceNumber, statsAsOfRaceNumber: beforeRaceNumber, atDate }),
+]);
 
 const pageContext: PageContext = {
   kind: 'stats',
@@ -112,19 +136,23 @@ const pageContext: PageContext = {
 let title: string;
 let description: string;
 let canonicalPath: string;
+let activeTitle: string;
 
 if (chainSlug === 'preseason') {
   title = `${season} Season — Driver Career Stats (Start of Season)`;
   description = `Career statistics for all F1 drivers going into the ${season} season.`;
   canonicalPath = `/stats/${season}/preseason/`;
+  activeTitle = `Active Drivers — Start of ${season} Season`;
 } else if (chainSlug === 'postseason') {
   title = `${season} Season — Driver Career Stats (End of Season)`;
   description = `Career statistics for all F1 drivers at the end of the ${season} season.`;
   canonicalPath = `/stats/${season}/postseason/`;
+  activeTitle = `Active Drivers — End of ${season} Season`;
 } else {
   title = `${raceName} ${season} — Driver Career Stats (Going In)`;
   description = `Career statistics for all F1 drivers going into the ${season} ${raceName}.`;
   canonicalPath = `/stats/${season}/${chainSlug}/`;
+  activeTitle = `Active Drivers — ${raceName} ${season}`;
 }
 ---
 
@@ -140,5 +168,5 @@ if (chainSlug === 'preseason') {
     </p>
   </div>
 
-  <AllDriversTable {drivers} {pit} />
+  <StatsDriversView {drivers} {activeGrid} {activeTitle} {pit} />
 </Base>

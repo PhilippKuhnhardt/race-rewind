@@ -14,7 +14,7 @@ const { drivers, pit, title = 'All Drivers with at Least One Start' } = Astro.pr
 ---
 
 {drivers.length > 0 && (
-  <section class="mt-10">
+  <section>
     <h2 class="mb-3 border-b border-border pb-2 text-lg font-semibold text-fg">{title}</h2>
     <div class="overflow-x-auto rounded-lg border border-border">
       <table class="w-full border-collapse text-sm" data-sortable>

@@ -6,11 +6,8 @@ import SeasonCalendarTable from '../../../components/race/SeasonCalendarTable.as
 import {
   getAllSeasons,
   getSeasonBookends,
-  getSeasonGrid,
   getSeasonCalendar,
-  getDriverCareerStats,
-  getDriverPriorSeasons,
-  getDriverBestChampionshipPos,
+  getActiveGridStats,
 } from '../../../lib/queries';
 import { stripYearPrefix, preseasonLink } from '../../../lib/format';
 import { pitForPreseason } from '../../../lib/point-in-time';
@@ -23,22 +20,16 @@ export async function getStaticPaths() {
   }));
 }
 
-function computeAge(dob: string | null, atDate: string): number | null {
-  if (!dob) return null;
-  const d = new Date(dob);
-  const r = new Date(atDate);
-  let age = r.getFullYear() - d.getFullYear();
-  const m = r.getMonth() - d.getMonth();
-  if (m < 0 || (m === 0 && r.getDate() < d.getDate())) age--;
-  return age;
-}
-
 const { season: seasonStr } = Astro.params;
 const season = Number(seasonStr);
 
 const bookends = await getSeasonBookends(season);
-const [grid, calendar] = await Promise.all([
-  getSeasonGrid(bookends.firstRaceNumber),
+const [driverStats, calendar] = await Promise.all([
+  getActiveGridStats({
+    participantRaceNumber: bookends.firstRaceNumber,
+    statsAsOfRaceNumber: bookends.firstRaceNumber,
+    atDate: bookends.firstDate,
+  }),
   getSeasonCalendar(season),
 ]);
 const firstRaceSlug = stripYearPrefix(bookends.firstSlug, season);
@@ -50,23 +41,6 @@ const pageContext: PageContext = {
   raceCount: bookends.raceCount,
   firstRaceSlug,
 };
-
-const driverStats = await Promise.all(
-  grid.map(async (d) => {
-    const [career, seasons, bestChamp] = await Promise.all([
-      getDriverCareerStats(d.driver_id, bookends.firstRaceNumber),
-      getDriverPriorSeasons(d.driver_id, bookends.firstRaceNumber),
-      getDriverBestChampionshipPos(d.driver_id, bookends.firstRaceNumber),
-    ]);
-    const age = computeAge(d.date_of_birth, bookends.firstDate);
-    return { ...d, career, seasons, bestChamp, age };
-  })
-);
-
-driverStats.sort((a, b) => {
-  if (a.team_name !== b.team_name) return (a.team_name ?? '').localeCompare(b.team_name ?? '');
-  return b.career.points - a.career.points;
-});
 
 const title = `${season} Season — Start of Season`;
 const description = `${season} F1 season: the starting grid and career statistics for every driver going into the season.`;

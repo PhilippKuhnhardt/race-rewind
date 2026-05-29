@@ -32,12 +32,12 @@ export async function getAllRacesBySeason(): Promise<{
   return { seasons: seasonList, byseason };
 }
 
-export async function getAllRaces(): Promise<{ season: number; race_slug: string; race_number: number }[]> {
+export async function getAllRaces(): Promise<{ season: number; race_slug: string; race_number: number; date: string }[]> {
   const rows = await db
-    .select({ season: races.season, slug: races.slug, raceNumber: races.raceNumber })
+    .select({ season: races.season, slug: races.slug, raceNumber: races.raceNumber, date: races.date })
     .from(races)
     .orderBy(asc(races.raceNumber));
-  return rows.map((r) => ({ season: r.season, race_slug: stripYearPrefix(r.slug, r.season), race_number: r.raceNumber }));
+  return rows.map((r) => ({ season: r.season, race_slug: stripYearPrefix(r.slug, r.season), race_number: r.raceNumber, date: r.date }));
 }
 
 export async function getRaceBySlug(slug: string) {

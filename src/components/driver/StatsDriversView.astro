@@ -1,0 +1,61 @@
+---
+import type { getAllDriverCareerStatsAsOf } from '../../lib/queries';
+import type { SeasonGridRow } from '../../lib/queries/seasons';
+import type { PointInTime } from '../../lib/point-in-time';
+import AllDriversTable from './AllDriversTable.astro';
+import SeasonGridTable from './SeasonGridTable.astro';
+
+interface Props {
+  drivers: Awaited<ReturnType<typeof getAllDriverCareerStatsAsOf>>;
+  activeGrid: SeasonGridRow[];
+  activeTitle: string;
+  pit: PointInTime;
+}
+
+const { drivers, activeGrid, activeTitle, pit } = Astro.props;
+---
+
+<div class="mt-10">
+  <div class="mb-3 flex items-center gap-1 rounded-lg border border-border bg-bg-alt p-1 w-fit">
+    <button
+      id="stats-view-all"
+      aria-pressed="true"
+      class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors aria-pressed:bg-bg aria-pressed:text-fg aria-pressed:shadow-sm text-fg-muted hover:text-fg"
+    >
+      All drivers
+    </button>
+    <button
+      id="stats-view-active"
+      aria-pressed="false"
+      class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors aria-pressed:bg-bg aria-pressed:text-fg aria-pressed:shadow-sm text-fg-muted hover:text-fg"
+    >
+      Active drivers
+    </button>
+  </div>
+
+  <div id="stats-panel-all">
+    <AllDriversTable {drivers} {pit} title="All Drivers with at Least One Start" />
+  </div>
+
+  <div id="stats-panel-active" hidden>
+    <SeasonGridTable title={activeTitle} drivers={activeGrid} {pit} />
+  </div>
+</div>
+
+<script>
+  const btnAll = document.getElementById('stats-view-all') as HTMLButtonElement;
+  const btnActive = document.getElementById('stats-view-active') as HTMLButtonElement;
+  const panelAll = document.getElementById('stats-panel-all') as HTMLElement;
+  const panelActive = document.getElementById('stats-panel-active') as HTMLElement;
+
+  function show(view: 'all' | 'active') {
+    const isAll = view === 'all';
+    btnAll.setAttribute('aria-pressed', String(isAll));
+    btnActive.setAttribute('aria-pressed', String(!isAll));
+    panelAll.hidden = !isAll;
+    panelActive.hidden = isAll;
+  }
+
+  btnAll.addEventListener('click', () => show('all'));
+  btnActive.addEventListener('click', () => show('active'));
+</script>

@@ -2,6 +2,82 @@ import { eq, min, max, count, sql, and, lt, asc } from 'drizzle-orm';
 import { db } from '../../db/client';
 import { races, raceResults, roundEntries, drivers, teams, circuits } from '../../db/schema';
 import { stripYearPrefix } from '../format';
+import { getAllDriverCareerStatsAsOf } from './drivers';
+
+export interface SeasonGridRow {
+  car_number: number | null;
+  driver_slug: string;
+  full_name: string;
+  team_name: string | null;
+  team_slug: string | null;
+  primary_color: string | null;
+  age: number | null;
+  seasons: number;
+  career: {
+    starts: number;
+    wins: number;
+    podiums: number;
+    points: number;
+    championships: number;
+  };
+  bestChamp: number | null;
+}
+
+function computeAge(dob: string | null, atDate: string): number | null {
+  if (!dob) return null;
+  const d = new Date(dob);
+  const r = new Date(atDate);
+  let age = r.getFullYear() - d.getFullYear();
+  const m = r.getMonth() - d.getMonth();
+  if (m < 0 || (m === 0 && r.getDate() < d.getDate())) age--;
+  return age;
+}
+
+export async function getActiveGridStats({
+  participantRaceNumber,
+  statsAsOfRaceNumber,
+  atDate,
+}: {
+  participantRaceNumber: number;
+  statsAsOfRaceNumber: number;
+  atDate: string;
+}): Promise<SeasonGridRow[]> {
+  const [grid, allStats] = await Promise.all([
+    getSeasonGrid(participantRaceNumber),
+    getAllDriverCareerStatsAsOf(statsAsOfRaceNumber),
+  ]);
+
+  const byId = new Map(allStats.map((s) => [s.driver_id, s]));
+
+  const rows: SeasonGridRow[] = grid.map((d) => {
+    const s = byId.get(d.driver_id);
+    return {
+      car_number: d.car_number,
+      driver_slug: d.driver_slug,
+      full_name: d.full_name,
+      team_name: d.team_name,
+      team_slug: d.team_slug,
+      primary_color: d.primary_color,
+      age: computeAge(d.date_of_birth, atDate),
+      seasons: s?.seasons ?? 0,
+      career: {
+        starts: s?.starts ?? 0,
+        wins: s?.wins ?? 0,
+        podiums: s?.podiums ?? 0,
+        points: s?.points ?? 0,
+        championships: s?.championships ?? 0,
+      },
+      bestChamp: s?.best_championship_pos ?? null,
+    };
+  });
+
+  rows.sort((a, b) => {
+    if (a.team_name !== b.team_name) return (a.team_name ?? '').localeCompare(b.team_name ?? '');
+    return b.career.points - a.career.points;
+  });
+
+  return rows;
+}
 
 export async function getSeasonBookends(season: number) {
   const bounds = await db

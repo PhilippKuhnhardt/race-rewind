@@ -2,37 +2,19 @@
 import { formatPts, ordinal } from '../../lib/format';
 import { driverLinkAt, teamLinkAt } from '../../lib/nav';
 import type { PointInTime } from '../../lib/point-in-time';
-
-interface DriverRow {
-  car_number: number | null;
-  driver_slug: string;
-  full_name: string;
-  team_name: string | null;
-  team_slug: string | null;
-  primary_color: string | null;
-  age: number | null;
-  seasons: number;
-  career: {
-    starts: number;
-    wins: number;
-    podiums: number;
-    points: number;
-    championships: number;
-  };
-  bestChamp: number | null;
-}
+import type { SeasonGridRow } from '../../lib/queries/seasons';
 
 interface Props {
   title: string;
-  drivers: DriverRow[];
+  drivers: SeasonGridRow[];
   pit: PointInTime;
 }
 
 const { title, drivers, pit } = Astro.props;
-
 ---
 
-<section class="mt-10">
+{drivers.length > 0 && (
+<section>
   <h2 class="mb-3 border-b border-border pb-2 text-lg font-semibold text-fg">{title}</h2>
   <div class="overflow-x-auto rounded-lg border border-border">
     <table class="w-full border-collapse text-sm" data-sortable>
@@ -88,3 +70,4 @@ const { title, drivers, pit } = Astro.props;
     </table>
   </div>
 </section>
+)}
