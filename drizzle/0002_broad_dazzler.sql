@@ -1,0 +1,1 @@
+ALTER TABLE `races` ADD `pole_driver_id` integer REFERENCES drivers(id);

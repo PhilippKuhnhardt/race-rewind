@@ -1,6 +1,6 @@
 import { eq, min, max, count, sql, and, lt, asc } from 'drizzle-orm';
 import { db } from '../../db/client';
-import { races, raceResults, qualifyingResults, roundEntries, drivers, teams, circuits } from '../../db/schema';
+import { races, raceResults, roundEntries, drivers, teams, circuits } from '../../db/schema';
 import { stripYearPrefix } from '../format';
 
 export async function getSeasonBookends(season: number) {
@@ -122,18 +122,16 @@ export async function getSeasonStoryRows(season: number, asOfRaceNumber: number)
 
     db
       .select({
-        raceNumber: qualifyingResults.raceNumber,
+        raceNumber: races.raceNumber,
         driver_slug: drivers.slug,
         driver_surname: drivers.surname,
       })
-      .from(qualifyingResults)
-      .innerJoin(races, eq(races.raceNumber, qualifyingResults.raceNumber))
-      .innerJoin(drivers, eq(drivers.id, qualifyingResults.driverId))
+      .from(races)
+      .innerJoin(drivers, eq(drivers.id, races.poleDriverId))
       .where(
         and(
           eq(races.season, season),
-          lt(qualifyingResults.raceNumber, asOfRaceNumber),
-          sql`${qualifyingResults.position} = 1`,
+          lt(races.raceNumber, asOfRaceNumber),
         ),
       ),
   ]);

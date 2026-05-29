@@ -101,6 +101,7 @@ export const races = sqliteTable("races", {
 	hasSprint: integer("has_sprint").default(0).notNull(),
 	prevRaceInSeason: integer("prev_race_in_season"),
 	isFinalRound: integer("is_final_round").default(0).notNull(),
+	poleDriverId: integer("pole_driver_id").references(() => drivers.id),
 	wikipedia: text(),
 },
 (table) => [

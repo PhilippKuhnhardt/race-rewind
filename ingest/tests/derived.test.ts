@@ -74,6 +74,73 @@ it('is_final_round race matches MAX(race_number) for that season', async () => {
 });
 
 // ---------------------------------------------------------------------------
+// pole_driver_id — canonical pole source (qualifying P1 or grid P1 fallback)
+// ---------------------------------------------------------------------------
+
+it('1979 Argentine GP has Laffite as pole_driver_id (grid fallback)', async () => {
+  const skip = skipIfNoDb(); if (skip || !handle) return;
+
+  const race = await handle.db
+    .select({ raceNumber: schema.races.raceNumber, poleDriverId: schema.races.poleDriverId })
+    .from(schema.races)
+    .where(eq(schema.races.slug, '1979-argentine-grand-prix'))
+    .get();
+  if (!race) return;
+
+  expect(race.poleDriverId, '1979 Argentine GP should have a pole driver').not.toBeNull();
+
+  const driver = await handle.client.execute(
+    `SELECT surname FROM drivers WHERE id = ${race.poleDriverId}`
+  );
+  expect(driver.rows[0].surname).toBe('Laffite');
+});
+
+it('all 15 races in 1979 have a pole_driver_id', async () => {
+  const skip = skipIfNoDb(); if (skip || !handle) return;
+  const result = await handle.client.execute(`
+    SELECT COUNT(*) AS n FROM races WHERE season = 1979 AND pole_driver_id IS NULL
+  `);
+  expect(result.rows[0].n).toBe(0);
+});
+
+it('no race has more than one pole_driver_id (each race has at most one pole)', async () => {
+  // pole_driver_id is a single column on races — by definition unique per race.
+  // This test verifies the progression side: cum_poles delta per race is 0 or 1.
+  const skip = skipIfNoDb(); if (skip || !handle) return;
+  const result = await handle.client.execute(`
+    SELECT COUNT(*) AS n FROM (
+      SELECT race_number, SUM(is_pole) AS poles
+      FROM (
+        SELECT dcp.race_number,
+               dcp.cum_poles - COALESCE(LAG(dcp.cum_poles) OVER (PARTITION BY dcp.driver_id ORDER BY dcp.race_number), 0) AS is_pole
+        FROM driver_career_progression dcp
+      )
+      GROUP BY race_number
+      HAVING poles > 1
+    )
+  `);
+  expect(result.rows[0].n).toBe(0);
+});
+
+it('Laffite cum_poles is positive at the end of the 1979 season', async () => {
+  const skip = skipIfNoDb(); if (skip || !handle) return;
+
+  const driver = await handle.client.execute(
+    `SELECT id FROM drivers WHERE slug LIKE 'jacques-laffite%' LIMIT 1`
+  );
+  if (!driver.rows.length) return;
+  const driverId = driver.rows[0].id as number;
+
+  const result = await handle.client.execute(`
+    SELECT MAX(cum_poles) AS poles
+    FROM driver_career_progression dcp
+    JOIN races r ON r.race_number = dcp.race_number
+    WHERE dcp.driver_id = ${driverId} AND r.season = 1979
+  `);
+  expect(result.rows[0].poles as number).toBeGreaterThan(0);
+});
+
+// ---------------------------------------------------------------------------
 // driver_career_progression
 // ---------------------------------------------------------------------------
 

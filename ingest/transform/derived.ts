@@ -7,6 +7,7 @@ const CHUNK = 1000;
 export async function buildDerived(db: LibSQLDatabase<typeof schema>, client: Client): Promise<void> {
   await buildPrevRaceInSeason(client);
   await buildIsFinalRound(client);
+  await buildPoleDriver(client);
   await buildDriverCareerProgression(db, client);
   await buildTeamCareerProgression(db, client);
 }
@@ -33,6 +34,39 @@ async function buildIsFinalRound(client: Client) {
   `);
 }
 
+async function buildPoleDriver(client: Client) {
+  // Canonical pole per race: qualifying P1 when available (1994+), else grid=1.
+  // When multiple grid=1 rows exist (5 ancient data quirks), pick the best race
+  // finisher (lowest position), then lowest driver_id for determinism.
+  await client.execute(`
+    UPDATE races
+    SET pole_driver_id = (
+      SELECT cand.driver_id
+      FROM (
+        SELECT qr.driver_id,
+               0 AS src_rank,
+               1 AS finish
+        FROM qualifying_results qr
+        WHERE qr.race_number = races.race_number
+          AND qr.position = 1
+        UNION ALL
+        SELECT rr.driver_id,
+               1 AS src_rank,
+               COALESCE(rr.position, 9999) AS finish
+        FROM race_results rr
+        WHERE rr.race_number = races.race_number
+          AND rr.grid = 1
+          AND NOT EXISTS (
+            SELECT 1 FROM qualifying_results q
+            WHERE q.race_number = races.race_number
+          )
+      ) cand
+      ORDER BY cand.src_rank ASC, cand.finish ASC, cand.driver_id ASC
+      LIMIT 1
+    )
+  `);
+}
+
 async function buildDriverCareerProgression(db: LibSQLDatabase<typeof schema>, client: Client) {
   // One row per (driver_id, race_number) via round_entries (covers all participation).
   // Cumulative stats are running totals INCLUDING that race_number.
@@ -52,7 +86,7 @@ async function buildDriverCareerProgression(db: LibSQLDatabase<typeof schema>, c
         1 AS is_start,
         CASE WHEN rr.position = 1 THEN 1 ELSE 0 END AS is_win,
         CASE WHEN rr.position BETWEEN 1 AND 3 THEN 1 ELSE 0 END AS is_podium,
-        CASE WHEN qr.position = 1 THEN 1 ELSE 0 END AS is_pole,
+        CASE WHEN r.pole_driver_id = p.driver_id THEN 1 ELSE 0 END AS is_pole,
         CASE WHEN rr.fastest_lap_rank = 1 THEN 1 ELSE 0 END AS is_fl,
         COALESCE(rr.points, 0) + COALESCE(sr.points, 0) AS race_pts,
         CASE WHEN ds.position = 1 AND r.is_final_round = 1 THEN 1 ELSE 0 END AS is_champ
@@ -62,8 +96,6 @@ async function buildDriverCareerProgression(db: LibSQLDatabase<typeof schema>, c
              ON rr.race_number = p.race_number AND rr.driver_id = p.driver_id
       LEFT JOIN sprint_results sr
              ON sr.race_number = p.race_number AND sr.driver_id = p.driver_id
-      LEFT JOIN qualifying_results qr
-             ON qr.race_number = p.race_number AND qr.driver_id = p.driver_id
       LEFT JOIN driver_standings ds
              ON ds.race_number = p.race_number AND ds.driver_id = p.driver_id
     )
@@ -124,8 +156,10 @@ async function buildTeamCareerProgression(db: LibSQLDatabase<typeof schema>, cli
           WHERE rr.race_number = p.race_number AND rr.team_id = p.team_id AND rr.position BETWEEN 1 AND 3
         ) THEN 1 ELSE 0 END AS is_podium,
         CASE WHEN EXISTS (
-          SELECT 1 FROM qualifying_results qr
-          WHERE qr.race_number = p.race_number AND qr.team_id = p.team_id AND qr.position = 1
+          SELECT 1 FROM races r
+          JOIN round_entries re
+            ON re.race_number = r.race_number AND re.driver_id = r.pole_driver_id
+          WHERE r.race_number = p.race_number AND re.team_id = p.team_id
         ) THEN 1 ELSE 0 END AS is_pole,
         CASE WHEN EXISTS (
           SELECT 1 FROM race_results rr
