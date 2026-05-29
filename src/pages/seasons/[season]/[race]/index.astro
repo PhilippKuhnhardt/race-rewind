@@ -1,19 +1,19 @@
 ---
-import RaceNewsCard from '../../../../components/race/RaceNewsCard.astro';
 import PreRaceLeaders from '../../../../components/race/PreRaceLeaders.astro';
+import RaceNewsCard from '../../../../components/race/RaceNewsCard.astro';
 import RecentFormStrip from '../../../../components/season/RecentFormStrip.astro';
 import DriverStandingsTable from '../../../../components/standings/DriverStandingsTable.astro';
 import TeamStandingsTable from '../../../../components/standings/TeamStandingsTable.astro';
 import RaceSessionLayout from '../../../../layouts/RaceSessionLayout.astro';
 import { raceLink } from '../../../../lib/format';
 import { pitForRace } from '../../../../lib/point-in-time';
-import { getRaceNews } from '../../../../lib/race-news';
 import {
   getAllRaces,
   getDriverStandingsBeforeRace,
   getRecentFormRows,
   getTeamStandingsBeforeRace,
 } from '../../../../lib/queries';
+import { getRaceNews } from '../../../../lib/race-news';
 import { getRacePageBase } from '../../../../lib/race-page';
 
 export async function getStaticPaths() {
@@ -74,8 +74,8 @@ const description = `${race.season} ${race.name} at ${race.circuit_name}${race.c
   activeId="overview"
 >
   <div class="space-y-8">
-    {newsEntry && <RaceNewsCard entry={newsEntry} />}
     <PreRaceLeaders {driverLeader} {teamLeader} season={race.season} {raceSlug} />
+    {newsEntry && <RaceNewsCard entry={newsEntry} />}
 
     <RecentFormStrip rows={recentForm} {pit} />
 

@@ -10,9 +10,11 @@ const { entry, heading } = Astro.props;
 const { source_url, source_title, license, phase } = entry.data;
 
 const defaultHeading =
-  phase === 'preseason' ? 'Before the season'
-  : phase === 'postseason' ? 'Season summary'
-  : 'Going into this race';
+  phase === 'preseason'
+    ? 'Before the season'
+    : phase === 'postseason'
+      ? 'Season summary'
+      : 'Pre-Race Report';
 ---
 
 <section>
@@ -35,7 +37,11 @@ const defaultHeading =
     <a href={source_url} class="text-accent hover:underline" rel="noopener">
       &ldquo;{source_title}&rdquo; on Wikipedia
     </a>, used under
-    <a href="https://creativecommons.org/licenses/by-sa/4.0/" class="text-accent hover:underline" rel="noopener license">
+    <a
+      href="https://creativecommons.org/licenses/by-sa/4.0/"
+      class="text-accent hover:underline"
+      rel="noopener license"
+    >
       {license}
     </a>. Modifications: summarised and spoiler-trimmed.
   </p>
