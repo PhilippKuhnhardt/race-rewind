@@ -9,5 +9,8 @@ export default defineConfig({
   trailingSlash: 'always',
   build: { format: 'directory' },
   integrations: [sitemap(), svelte()],
-  vite: { plugins: [tailwindcss()] },
+  vite: {
+    plugins: [tailwindcss()],
+    server: { watch: { ignored: ['**/content/**'] } },
+  },
 });
