@@ -34,7 +34,7 @@
   const triggerFlag = $derived(() => {
     if (currentChainSlug === 'preseason' || currentChainSlug === 'postseason') return '🏁';
     const race = seasonRaces.find((r) => r.slug === currentChainSlug);
-    return (race && raceFlag(race.name.replace(/ Grand Prix$/, ''))) || '🏁';
+    return (race && raceFlag(race.name)) || '🏁';
   });
 </script>
 
@@ -85,7 +85,7 @@
             aria-current={race.slug === currentChainSlug ? 'page' : undefined}
           >
             <span class="w-6 text-right text-xs tabular-nums text-fg-muted">{i + 1}</span>
-            <span>{emojify(race.name.replace(/ Grand Prix$/, ''))}</span>
+            <span>{emojify(race.name)}</span>
           </a>
         {/each}
 

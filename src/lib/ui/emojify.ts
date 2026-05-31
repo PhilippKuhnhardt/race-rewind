@@ -16,8 +16,6 @@ function customRaceName(countryName: string): string | null {
       return '🇺🇸';
     case countryName.includes('Styrian'):
       return '🇦🇹';
-    case countryName.includes('Austrian'):
-      return '🇦🇹';
     case countryName.includes('Tuscan'):
       return '🇮🇹';
     case countryName.includes('Pescara'):
@@ -42,18 +40,17 @@ function customRaceName(countryName: string): string | null {
       return '🇪🇺';
     case countryName.includes('Barcelona'):
       return '🇪🇸';
-    case countryName.includes('Australian'):
-      return '🇦🇺';
     default:
       return null;
   }
 }
 
-export function raceFlag(countryName: string): string | null {
-  return customRaceName(countryName) ?? flag(countryName) ?? null;
+export function raceFlag(name: string): string | null {
+  const base = name.replace(/ (Grand Prix|GP)$/i, '').trim();
+  return customRaceName(base) ?? flag(base) ?? flag(base.slice(0, -1)) ?? null;
 }
 
-export function emojify(countryName: string): string {
-  const calculatedFlag = raceFlag(countryName);
-  return calculatedFlag ? `${calculatedFlag} ${countryName}` : countryName;
+export function emojify(name: string): string {
+  const calculatedFlag = raceFlag(name);
+  return calculatedFlag ? `${calculatedFlag} ${name}` : name;
 }
