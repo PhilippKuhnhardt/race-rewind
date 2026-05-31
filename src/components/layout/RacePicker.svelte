@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Dialog } from 'bits-ui';
   import type { RaceNavEntry } from '../../lib/queries/races';
-  import { emojify } from '../../lib/ui/emojify';
+  import { emojify, raceFlag } from '../../lib/ui/emojify';
 
   interface Props {
     byseason: Record<number, RaceNavEntry[]>;
@@ -30,6 +30,12 @@
     const race = seasonRaces.find((r) => r.slug === currentChainSlug);
     return race ? emojify(race.name.replace(/ Grand Prix$/, ' GP')) : 'Race';
   });
+
+  const triggerFlag = $derived(() => {
+    if (currentChainSlug === 'preseason' || currentChainSlug === 'postseason') return '🏁';
+    const race = seasonRaces.find((r) => r.slug === currentChainSlug);
+    return (race && raceFlag(race.name.replace(/ Grand Prix$/, ''))) || '🏁';
+  });
 </script>
 
 <Dialog.Root bind:open>
@@ -37,10 +43,7 @@
     class="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg hover:bg-bg-hover transition-colors"
     aria-label="Pick race"
   >
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-fg-muted" aria-hidden="true">
-      <circle cx="12" cy="12" r="10"/>
-      <polyline points="12 6 12 12 16 14"/>
-    </svg>
+    <span class="sm:hidden text-base leading-none">{triggerFlag()}</span>
     <span class="hidden sm:inline max-w-[14ch] truncate">{triggerLabel()}</span>
   </Dialog.Trigger>
 

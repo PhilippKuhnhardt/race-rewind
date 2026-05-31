@@ -49,7 +49,11 @@ function customRaceName(countryName: string): string | null {
   }
 }
 
+export function raceFlag(countryName: string): string | null {
+  return customRaceName(countryName) ?? flag(countryName) ?? null;
+}
+
 export function emojify(countryName: string): string {
-  const calculatedFlag = customRaceName(countryName) ?? flag(countryName);
+  const calculatedFlag = raceFlag(countryName);
   return calculatedFlag ? `${calculatedFlag} ${countryName}` : countryName;
 }
