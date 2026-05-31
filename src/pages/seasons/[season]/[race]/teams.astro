@@ -1,11 +1,11 @@
 ---
-import Base from '../../../../layouts/Base.astro';
 import RaceHeroCard from '../../../../components/race/RaceHeroCard.astro';
 import TeamStandingsTable from '../../../../components/standings/TeamStandingsTable.astro';
-import { getAllRaces, getTeamStandingsBeforeRace } from '../../../../lib/queries';
-import { getRacePageBase } from '../../../../lib/race-page';
+import Base from '../../../../layouts/Base.astro';
 import { raceLink } from '../../../../lib/format';
 import { pitForRace } from '../../../../lib/point-in-time';
+import { getAllRaces, getTeamStandingsBeforeRace } from '../../../../lib/queries';
+import { getRacePageBase } from '../../../../lib/race-page';
 
 export async function getStaticPaths() {
   return (await getAllRaces()).map((r) => ({
@@ -25,7 +25,12 @@ const title = `${race.season} ${race.name} — Teams`;
 const description = `Constructor championship standings going into the ${race.season} ${race.name}.`;
 ---
 
-<Base title={title} description={description} canonical={`${raceLink(season, raceSlug)}teams/`} {pageContext}>
+<Base
+  title={title}
+  description={description}
+  canonical={`${raceLink(season, raceSlug)}teams/`}
+  {pageContext}
+>
   <RaceHeroCard
     name={race.name}
     season={race.season}
@@ -38,7 +43,7 @@ const description = `Constructor championship standings going into the ${race.se
   />
 
   <TeamStandingsTable
-    title="Constructors' Championship — Going Into This Race"
+    title="Constructors' Championship"
     rows={preRaceTeamChamp}
     {pit}
     emptyNote="First race of the season — championship not yet started."

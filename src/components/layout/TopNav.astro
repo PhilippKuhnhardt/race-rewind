@@ -2,6 +2,7 @@
 import ThemeToggle from '../primitives/ThemeToggle.svelte';
 import YearPicker from './YearPicker.svelte';
 import RacePicker from './RacePicker.svelte';
+import MobileNav from './MobileNav.svelte';
 import type { RaceNavEntry } from '../../lib/queries/races';
 
 interface Props {
@@ -45,6 +46,8 @@ function isActive(id: string): boolean {
   if (id === 'race')    return firstSeg === 'seasons' && !['drivers', 'teams', 'season'].includes(lastSeg);
   return false;
 }
+
+const activeId = navLinks.find((l) => isActive(l.id))?.id;
 ---
 
 <header class="sticky top-0 z-40 border-b border-border bg-bg/90 backdrop-blur-sm">
@@ -72,6 +75,7 @@ function isActive(id: string): boolean {
 
     <!-- Right side controls -->
     <div class="ml-auto flex items-center gap-1">
+      <MobileNav links={navLinks} {activeId} client:load />
       <ThemeToggle client:idle />
       <YearPicker {seasons} {currentSeason} {section} client:load />
       <RacePicker {byseason} {currentSeason} currentChainSlug={currentChainSlug ?? ''} {section} client:load />

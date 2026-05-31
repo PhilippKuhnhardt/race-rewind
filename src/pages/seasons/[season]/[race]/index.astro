@@ -81,7 +81,7 @@ const description = `${race.season} ${race.name} at ${race.circuit_name}${race.c
 
     <!-- Pre-race standings truncated — link to full Drivers/Teams tabs -->
     <DriverStandingsTable
-      title="Drivers' Championship — Going Into This Race"
+      title="Drivers' Championship"
       rows={preRaceDriverChamp.slice(0, 10)}
       {pit}
       emptyNote="First race of the season — championship not yet started."
@@ -89,7 +89,7 @@ const description = `${race.season} ${race.name} at ${race.circuit_name}${race.c
     />
 
     <TeamStandingsTable
-      title="Constructors' Championship — Going Into This Race"
+      title="Constructors' Championship"
       rows={preRaceTeamChamp.slice(0, 5)}
       {pit}
       viewAllHref={`/seasons/${race.season}/${raceSlug}/teams/`}
