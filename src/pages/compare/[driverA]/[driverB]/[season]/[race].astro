@@ -1,8 +1,9 @@
 ---
 import Base from '../../../../../layouts/Base.astro';
 import ComparisonTable from '../../../../../components/compare/ComparisonTable.astro';
+import DriverPickerForm from '../../../../../components/compare/DriverPickerForm.svelte';
 import { buildDriverAtRacePayload } from '../../../../../lib/payloads/driver-at-race';
-import { getAllRacesBySeason, getSeasonBounds } from '../../../../../lib/queries';
+import { getAllRacesBySeason, getSeasonBounds, getAllDriversForPicker } from '../../../../../lib/queries';
 import { getDriverBySlug, getDriverCareerStats } from '../../../../../lib/queries';
 import { raceLink, preseasonLink, postseasonLink } from '../../../../../lib/format';
 import type { PageContext } from '../../../../../lib/types';
@@ -14,6 +15,8 @@ const { driverA, driverB, season: seasonStr, race: raceSlug } = Astro.params;
 const season = Number(seasonStr);
 
 const isBoundary = raceSlug === 'preseason' || raceSlug === 'postseason';
+
+const drivers = await getAllDriversForPicker();
 
 let payloadA: DriverAtRacePayload;
 let payloadB: DriverAtRacePayload;
@@ -140,6 +143,18 @@ const canonical = `/compare/${payloadA.driver.slug}/${payloadB.driver.slug}/${se
       {payloadA.driver.full_name} <span class="text-fg-muted font-normal">vs</span> {payloadB.driver.full_name}
     </h1>
     <p class="text-sm text-fg-muted mt-1">Career stats — {subLabel}</p>
+  </div>
+
+  <div class="mb-6">
+    <DriverPickerForm
+      client:load
+      {season}
+      raceSlug={raceSlug!}
+      {drivers}
+      prefillA={payloadA.driver.slug}
+      prefillB={payloadB.driver.slug}
+      autoNavigate
+    />
   </div>
 
   <ComparisonTable a={payloadA} b={payloadB} />

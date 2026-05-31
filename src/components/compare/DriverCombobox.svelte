@@ -21,10 +21,20 @@
   });
 
   const filtered = $derived(
-    inputValue && !selected
+    inputValue && (!selected || inputValue !== selected.full_name)
       ? drivers.filter((d) => d.full_name.toLowerCase().includes(inputValue.toLowerCase()))
       : drivers,
   );
+
+  // The text field can be populated by typing, by browser autofill, or
+  // programmatically — none of which go through Combobox.Item selection. Treat
+  // any text that uniquely matches a driver's name as a real selection, so the
+  // source of the text doesn't matter.
+  function syncFromText(text: string) {
+    inputValue = text;
+    const match = drivers.find((d) => d.full_name.toLowerCase() === text.trim().toLowerCase());
+    if (match && match.slug !== value) onselect(match.slug);
+  }
 </script>
 
 <div class="flex flex-col gap-1">
@@ -41,7 +51,7 @@
       <Combobox.Input
         class="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-2 focus:ring-accent/40"
         placeholder="Search driver…"
-        oninput={(e) => { inputValue = (e.target as HTMLInputElement).value; }}
+        oninput={(e) => syncFromText((e.target as HTMLInputElement).value)}
       />
     </div>
     <Combobox.Content
