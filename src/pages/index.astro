@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import ContinueButton from '../components/ContinueButton.svelte';
 import { getAllSeasons, getLatestRace } from '../lib/queries';
 import { stripYearPrefix } from '../lib/format';
 
@@ -23,8 +24,10 @@ const latestRaceSlug = stripYearPrefix(latest.slug, latest.season);
       standings, and how the championship looked going into every round.
     </p>
 
+    <ContinueButton client:only="svelte" />
+
     <!-- Season picker -->
-    <div class="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+    <div class="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
       <label for="home-season" class="text-sm font-medium text-fg-muted">
         Pick a season
       </label>

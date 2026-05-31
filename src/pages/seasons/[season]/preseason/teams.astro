@@ -39,3 +39,7 @@ const description = `Constructor championship standings going into the ${season}
     emptyNote="No championship data before the season starts."
   />
 </Base>
+
+<script is:inline define:vars={{ season, kind: 'preseason' }}>
+  try { localStorage.setItem('lastRace', JSON.stringify({ kind, season })); } catch { /* ignore */ }
+</script>

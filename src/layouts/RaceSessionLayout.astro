@@ -3,6 +3,7 @@ import Base from './Base.astro';
 import RaceHeroCard from '../components/race/RaceHeroCard.astro';
 import RaceSubNav from '../components/race/RaceSubNav.astro';
 import type { PageContext } from '../lib/types';
+import { raceFlag } from '../lib/ui/emojify';
 
 interface Props {
   race: {
@@ -28,6 +29,7 @@ interface Props {
 }
 
 const { race, raceCount, raceSlug, hasQuali, hasSprintQualifying, sessionOrder, pageContext, title, description, canonical, activeId } = Astro.props;
+const circuitFlag = race.circuit_country ? (raceFlag(race.circuit_country) ?? null) : null;
 ---
 
 <Base {title} {description} {canonical} {pageContext}>
@@ -55,3 +57,9 @@ const { race, raceCount, raceSlug, hasQuali, hasSprintQualifying, sessionOrder, 
 
   <slot />
 </Base>
+
+<script is:inline define:vars={{ season: race.season, raceSlug, raceName: race.name, circuitFlag }}>
+  try {
+    localStorage.setItem('lastRace', JSON.stringify({ kind: 'race', season, raceSlug, name: raceName, flag: circuitFlag }));
+  } catch { /* localStorage unavailable */ }
+</script>

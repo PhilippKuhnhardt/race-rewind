@@ -40,3 +40,7 @@ const description = `${season} F1 season calendar: all ${bookends.raceCount} rou
     latestCompletedRound={bookends.latestCompletedRound}
   />
 </Base>
+
+<script is:inline define:vars={{ season, kind: 'preseason' }}>
+  try { localStorage.setItem('lastRace', JSON.stringify({ kind, season })); } catch { /* ignore */ }
+</script>

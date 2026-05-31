@@ -47,3 +47,7 @@ const description = isComplete
     emptyNote="No results available yet for this season."
   />
 </Base>
+
+<script is:inline define:vars={{ season, kind: 'postseason' }}>
+  try { localStorage.setItem('lastRace', JSON.stringify({ kind, season })); } catch { /* ignore */ }
+</script>

@@ -53,3 +53,7 @@ const description = isComplete
     latestCompletedRound={bookends.latestCompletedRound}
   />
 </Base>
+
+<script is:inline define:vars={{ season, kind: 'postseason' }}>
+  try { localStorage.setItem('lastRace', JSON.stringify({ kind, season })); } catch { /* ignore */ }
+</script>

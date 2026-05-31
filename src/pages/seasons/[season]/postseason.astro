@@ -102,3 +102,7 @@ const newsEntry = await getRaceNews(`${season}-postseason`, 'postseason');
 <script>
   import '../../../scripts/sortable-table.ts';
 </script>
+
+<script is:inline define:vars={{ season, kind: 'postseason' }}>
+  try { localStorage.setItem('lastRace', JSON.stringify({ kind, season })); } catch { /* ignore */ }
+</script>

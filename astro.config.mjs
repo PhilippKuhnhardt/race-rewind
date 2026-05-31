@@ -11,6 +11,6 @@ export default defineConfig({
   integrations: [sitemap(), svelte()],
   vite: {
     plugins: [tailwindcss()],
-    server: { watch: { ignored: ['**/content/**'] } },
+    server: { watch: { ignored: ['**/content/**', '**/.venv/**'] } },
   },
 });
