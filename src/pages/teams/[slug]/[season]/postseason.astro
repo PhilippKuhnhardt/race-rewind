@@ -1,6 +1,7 @@
 ---
 import DriversFieldedTable from '../../../../components/driver/DriversFieldedTable.astro';
 import TeamColorSwatch from '../../../../components/primitives/TeamColorSwatch.astro';
+import TeamDriverHeroCards from '../../../../components/team/TeamDriverHeroCards.astro';
 import TeamSeasonOverviewTable from '../../../../components/team/TeamSeasonOverviewTable.astro';
 import Base from '../../../../layouts/Base.astro';
 import { teamLinkAt, driverLinkAt, raceLinkAt } from '../../../../lib/nav';
@@ -9,6 +10,7 @@ import { formatPts, stripYearPrefix } from '../../../../lib/format';
 import {
   getTeamBySlug,
   getTeamCareerStats,
+  getTeamDriverHeroes,
   getTeamDriversFielded,
   getTeamSeasonOverview,
   getSeasonBookends,
@@ -29,8 +31,9 @@ const pit = pitForPostseason(season);
 const asOf = resolveAsOfRaceNumber(pit, bookends);
 const lastRaceSlug = stripYearPrefix(bookends.lastSlug, season);
 
-const [stats, seasonOverview, driversFielded] = await Promise.all([
+const [stats, driverHeroes, seasonOverview, driversFielded] = await Promise.all([
   getTeamCareerStats(team.id, asOf),
+  getTeamDriverHeroes(team.id, asOf),
   getTeamSeasonOverview(team.id, asOf),
   getTeamDriversFielded(team.id, asOf),
 ]);
@@ -95,6 +98,11 @@ const description = `${team.name}'s stats after the ${season} season: ${stats.wi
       }
     </div>
   </section>
+
+  <TeamDriverHeroCards
+    drivers={driverHeroes}
+    driverHref={(dSlug) => driverLinkAt(dSlug, pit)}
+  />
 
   <TeamSeasonOverviewTable teamSlug={slug} rows={seasonOverview} {pit} />
 

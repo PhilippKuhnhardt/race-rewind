@@ -1,6 +1,7 @@
 ---
 import DriversFieldedTable from '../../../../components/driver/DriversFieldedTable.astro';
 import TeamColorSwatch from '../../../../components/primitives/TeamColorSwatch.astro';
+import TeamDriverHeroCards from '../../../../components/team/TeamDriverHeroCards.astro';
 import TeamSeasonOverviewTable from '../../../../components/team/TeamSeasonOverviewTable.astro';
 import Base from '../../../../layouts/Base.astro';
 import { driverLink, formatPts, raceLink, stripYearPrefix, teamLink } from '../../../../lib/format';
@@ -10,6 +11,7 @@ import {
   getRaceBySlug,
   getTeamBySlug,
   getTeamCareerStats,
+  getTeamDriverHeroes,
   getTeamDriversFielded,
   getTeamSeasonOverview,
 } from '../../../../lib/queries';
@@ -29,8 +31,9 @@ if (!race) throw new Error(`Race not found: ${fullSlug}`);
 
 const raceNavSlug = stripYearPrefix(race.slug, race.season);
 const pit = pitForRace(race, raceNavSlug);
-const [stats, seasonOverview, driversFielded, { byseason }] = await Promise.all([
+const [stats, driverHeroes, seasonOverview, driversFielded, { byseason }] = await Promise.all([
   getTeamCareerStats(team.id, race.race_number),
+  getTeamDriverHeroes(team.id, race.race_number),
   getTeamSeasonOverview(team.id, race.race_number),
   getTeamDriversFielded(team.id, race.race_number),
   getAllRacesBySeason(),
@@ -104,6 +107,11 @@ const description = `${team.name}'s career going into the ${race.season} ${race.
       }
     </div>
   </section>
+
+  <TeamDriverHeroCards
+    drivers={driverHeroes}
+    driverHref={(dSlug) => driverLink(dSlug, race.season, raceNavSlug)}
+  />
 
   <TeamSeasonOverviewTable teamSlug={slug} rows={seasonOverview} {pit} />
 

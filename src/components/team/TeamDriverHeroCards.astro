@@ -1,0 +1,62 @@
+---
+import type { getTeamDriverHeroes } from '../../lib/queries';
+import { emojify } from '../../lib/ui/emojify';
+
+interface Props {
+  drivers: Awaited<ReturnType<typeof getTeamDriverHeroes>>;
+  driverHref?: (slug: string) => string;
+}
+
+const { drivers, driverHref = (slug) => `/drivers/${slug}/` } = Astro.props;
+
+const reasonLabels: Record<(typeof drivers)[number]['reason'], string> = {
+  most_successful: 'Most successful',
+  most_wins: 'Most wins',
+  last_champion: 'Last champion',
+  most_starts: 'Most starts',
+  notable_driver: 'Notable driver',
+};
+---
+
+{drivers.length > 0 && (
+  <section class="mb-6">
+    <h2 class="mb-4 text-lg font-semibold text-fg">Successful Drivers</h2>
+    <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      {drivers.map((driver) => (
+        <article class="rounded-lg border border-border bg-bg-alt p-4">
+          <div class="mb-3 flex min-h-16 flex-col justify-between gap-2">
+            <div class="text-xs font-semibold uppercase tracking-wide text-accent">
+              {reasonLabels[driver.reason]}
+              {driver.reason === 'last_champion' && driver.last_championship_season != null && (
+                <span class="text-fg-muted"> · {driver.last_championship_season}</span>
+              )}
+            </div>
+            <div>
+              <a href={driverHref(driver.driver_slug)} class="text-lg font-bold leading-tight text-fg hover:text-accent">
+                {driver.full_name}
+              </a>
+              <div class="mt-1 text-sm text-fg-muted">
+                {driver.years}
+                {driver.nationality && <span> · {emojify(driver.nationality)}</span>}
+              </div>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-2 border-t border-border pt-3">
+            <div>
+              <div class="text-xs uppercase tracking-wide text-fg-muted">Starts</div>
+              <div class="mt-1 text-lg font-bold tabular-nums text-fg">{driver.starts}</div>
+            </div>
+            <div>
+              <div class="text-xs uppercase tracking-wide text-fg-muted">Wins</div>
+              <div class="mt-1 text-lg font-bold tabular-nums text-fg">{driver.wins}</div>
+            </div>
+            <div>
+              <div class="text-xs uppercase tracking-wide text-fg-muted">Titles</div>
+              <div class="mt-1 text-lg font-bold tabular-nums text-fg">{driver.driver_championships}</div>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+)}

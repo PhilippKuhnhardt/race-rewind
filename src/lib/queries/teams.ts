@@ -230,13 +230,21 @@ export interface TeamDriverRecord {
   team_championships: number;
 }
 
-export async function getTeamDriversFielded(teamId: number, beforeRaceNumber: number): Promise<TeamDriverRecord[]> {
+interface TeamDriverStatsRecord extends TeamDriverRecord {
+  driver_id: number;
+  first_season: number;
+  nationality: string | null;
+  last_championship_season: number | null;
+}
+
+async function getTeamDriverStats(teamId: number, beforeRaceNumber: number): Promise<TeamDriverStatsRecord[]> {
   const [seasonRows, statsRows, wdcRows, wccRows] = await Promise.all([
     db
       .selectDistinct({
         driver_id: drivers.id,
         driver_slug: drivers.slug,
         full_name: drivers.fullName,
+        nationality: drivers.nationality,
         season: races.season,
       })
       .from(roundEntries)
@@ -256,7 +264,7 @@ export async function getTeamDriversFielded(teamId: number, beforeRaceNumber: nu
       .groupBy(raceResults.driverId),
 
     db
-      .select({ driver_id: driverStandings.driverId, season: races.season })
+      .select({ driver_id: driverStandings.driverId, season: races.season, team_id: driverStandings.teamId })
       .from(driverStandings)
       .innerJoin(races, and(eq(races.raceNumber, driverStandings.raceNumber), eq(races.isFinalRound, 1)))
       .where(and(eq(driverStandings.position, 1), lt(driverStandings.raceNumber, beforeRaceNumber))),
@@ -273,30 +281,35 @@ export async function getTeamDriversFielded(teamId: number, beforeRaceNumber: nu
     statsMap.set(row.driver_id, { starts: row.starts, wins: Number(row.wins ?? 0), points: Number(row.points ?? 0) });
   }
 
-  const wdcMap = new Map<number, Set<number>>();
+  const wdcMap = new Map<number, { season: number; team_id: number | null }[]>();
   for (const row of wdcRows) {
-    if (!wdcMap.has(row.driver_id)) wdcMap.set(row.driver_id, new Set());
-    wdcMap.get(row.driver_id)!.add(row.season);
+    if (!wdcMap.has(row.driver_id)) wdcMap.set(row.driver_id, []);
+    wdcMap.get(row.driver_id)!.push({ season: row.season, team_id: row.team_id });
   }
 
   const wccSeasons = new Set(wccRows.map((r) => r.season));
 
-  const driverMap = new Map<number, { driver_slug: string; full_name: string; seasons: number[] }>();
+  const driverMap = new Map<number, { driver_slug: string; full_name: string; nationality: string | null; seasons: number[] }>();
   for (const row of seasonRows) {
     if (!driverMap.has(row.driver_id)) {
-      driverMap.set(row.driver_id, { driver_slug: row.driver_slug, full_name: row.full_name, seasons: [] });
+      driverMap.set(row.driver_id, { driver_slug: row.driver_slug, full_name: row.full_name, nationality: row.nationality, seasons: [] });
     }
     driverMap.get(row.driver_id)!.seasons.push(row.season);
   }
 
   return Array.from(driverMap.entries())
-    .map(([driverId, { driver_slug, full_name, seasons }]) => {
+    .map(([driverId, { driver_slug, full_name, nationality, seasons }]) => {
       const stats = statsMap.get(driverId) ?? { starts: 0, wins: 0, points: 0 };
-      const driverChamps = seasons.filter((s) => wdcMap.get(driverId)?.has(s)).length;
+      const championshipSeasons = (wdcMap.get(driverId) ?? [])
+        .filter((championship) => championship.team_id === teamId || (championship.team_id == null && seasons.includes(championship.season)))
+        .map((championship) => championship.season);
+      const driverChamps = championshipSeasons.length;
       const teamChamps = seasons.filter((s) => wccSeasons.has(s)).length;
       return {
+        driver_id: driverId,
         driver_slug,
         full_name,
+        nationality,
         first_season: Math.min(...seasons),
         years: formatYearRanges(seasons),
         starts: stats.starts,
@@ -304,9 +317,87 @@ export async function getTeamDriversFielded(teamId: number, beforeRaceNumber: nu
         points: stats.points,
         driver_championships: driverChamps,
         team_championships: teamChamps,
+        last_championship_season: championshipSeasons.length > 0 ? Math.max(...championshipSeasons) : null,
       };
     })
     .filter((d) => d.starts > 0)
-    .sort((a, b) => a.first_season - b.first_season || a.full_name.localeCompare(b.full_name))
-    .map(({ first_season: _fs, ...rest }) => rest);
+    .sort((a, b) => a.first_season - b.first_season || a.full_name.localeCompare(b.full_name));
+}
+
+export async function getTeamDriversFielded(teamId: number, beforeRaceNumber: number): Promise<TeamDriverRecord[]> {
+  return (await getTeamDriverStats(teamId, beforeRaceNumber))
+    .map(({
+      driver_id: _driverId,
+      first_season: _firstSeason,
+      nationality: _nationality,
+      last_championship_season: _lastChampionshipSeason,
+      ...rest
+    }) => rest);
+}
+
+export type TeamDriverHeroReason = 'most_successful' | 'most_wins' | 'last_champion' | 'most_starts' | 'notable_driver';
+
+export interface TeamDriverHeroRecord {
+  reason: TeamDriverHeroReason;
+  driver_slug: string;
+  full_name: string;
+  nationality: string | null;
+  years: string;
+  starts: number;
+  wins: number;
+  driver_championships: number;
+  last_championship_season: number | null;
+}
+
+function rankNotableDrivers(a: TeamDriverStatsRecord, b: TeamDriverStatsRecord): number {
+  if (b.driver_championships !== a.driver_championships) return b.driver_championships - a.driver_championships;
+  if (b.wins !== a.wins) return b.wins - a.wins;
+  if (b.starts !== a.starts) return b.starts - a.starts;
+  return a.full_name.localeCompare(b.full_name);
+}
+
+function toHeroRecord(driver: TeamDriverStatsRecord, reason: TeamDriverHeroReason): TeamDriverHeroRecord {
+  return {
+    reason,
+    driver_slug: driver.driver_slug,
+    full_name: driver.full_name,
+    nationality: driver.nationality,
+    years: driver.years,
+    starts: driver.starts,
+    wins: driver.wins,
+    driver_championships: driver.driver_championships,
+    last_championship_season: driver.last_championship_season,
+  };
+}
+
+export async function getTeamDriverHeroes(teamId: number, beforeRaceNumber: number): Promise<TeamDriverHeroRecord[]> {
+  const driversForTeam = await getTeamDriverStats(teamId, beforeRaceNumber);
+  const selected = new Map<number, TeamDriverHeroRecord>();
+
+  function addMetricLeader(reason: Exclude<TeamDriverHeroReason, 'notable_driver'>, leader: TeamDriverStatsRecord | undefined) {
+    if (!leader || selected.has(leader.driver_id)) return;
+    selected.set(leader.driver_id, toHeroRecord(leader, reason));
+  }
+
+  const byChampionships = [...driversForTeam].sort(rankNotableDrivers);
+  const byWins = [...driversForTeam].sort((a, b) => b.wins - a.wins || rankNotableDrivers(a, b));
+  const byLastChampion = [...driversForTeam]
+    .filter((driver) => driver.last_championship_season != null)
+    .sort((a, b) =>
+      (b.last_championship_season ?? 0) - (a.last_championship_season ?? 0) || rankNotableDrivers(a, b)
+    );
+  const byStarts = [...driversForTeam].sort((a, b) => b.starts - a.starts || rankNotableDrivers(a, b));
+
+  addMetricLeader('most_successful', byChampionships.find((driver) => driver.driver_championships > 0));
+  addMetricLeader('most_wins', byWins[0]);
+  addMetricLeader('last_champion', byLastChampion[0]);
+  addMetricLeader('most_starts', byStarts[0]);
+
+  for (const driver of byChampionships) {
+    if (selected.size >= 4) break;
+    if (selected.has(driver.driver_id)) continue;
+    selected.set(driver.driver_id, toHeroRecord(driver, 'notable_driver'));
+  }
+
+  return Array.from(selected.values());
 }
