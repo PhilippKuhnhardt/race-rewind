@@ -60,7 +60,7 @@ export const TEAM_COLORS: Record<string, TeamColorSpan[]> = {
     { from: 2022, to: 2023, color: '#6CD3BF' },
     { from: 2018, to: 2021, color: '#00D2BE' },
     { from: 2017, to: 2017, color: '#00CFBA' },
-    { from: 2013, to: 2016, color: '#2AB4A5' },
+    { from: 2010, to: 2016, color: '#2AB4A5' }, // Petronas teal accent on silver works cars
     { from: 1954, to: 1955, color: '#C0C0C0' }, // Silberpfeil
   ],
   mclaren: [
@@ -87,6 +87,7 @@ export const TEAM_COLORS: Record<string, TeamColorSpan[]> = {
     { from: 2018, to: 2018, color: '#00327D' },
     { from: 2016, to: 2017, color: '#00007D' },
     { from: 2013, to: 2015, color: '#4F1AAB' },
+    { from: 2005, to: 2012, color: '#1E2A5A' }, // dark blue Red Bull era, before Infiniti purple/blue
   ],
   williams: [
     { from: 2025, color: '#1868DB' },
@@ -150,6 +151,7 @@ export const TEAM_COLORS: Record<string, TeamColorSpan[]> = {
     { from: 2018, to: 2018, color: '#0032FF' },
     { from: 2016, to: 2017, color: '#0000FF' },
     { from: 2013, to: 2015, color: '#0005C1' },
+    { from: 2006, to: 2012, color: '#001E62' }, // dark blue with red/gold charging bull
   ],
   // Renault: works team 1977–1985 + 2002–2011, then 2016–2020 (Alpine after)
   renault: [
@@ -164,7 +166,7 @@ export const TEAM_COLORS: Record<string, TeamColorSpan[]> = {
   force_india: [
     { from: 2018, to: 2018, color: '#F596C8' },
     { from: 2017, to: 2017, color: '#FF80C7' },
-    { from: 2013, to: 2016, color: '#FF5F0F' },
+    { from: 2008, to: 2016, color: '#FF5F0F' }, // orange/green/white tricolour livery
   ],
   // Racing Point 2019–2020 (Aston Martin after)
   racing_point: [{ from: 2019, to: 2020, color: '#F596C8' }],
@@ -176,6 +178,10 @@ export const TEAM_COLORS: Record<string, TeamColorSpan[]> = {
     { from: 2016, to: 2017, color: '#006EFF' },
     { from: 2015, to: 2015, color: '#0063FF' },
     { from: 2013, to: 2014, color: '#8899A8' },
+    { from: 2010, to: 2012, color: '#4A4A4A' }, // white/dark grey with red accents after BMW exit
+    { from: 2001, to: 2005, color: '#003DA5' }, // Petronas blue
+    { from: 1997, to: 2000, color: '#1E2A5A' }, // Red Bull dark blue
+    { from: 1993, to: 1996, color: '#1A1A1A' }, // early black Sauber cars
   ],
   // Alfa Romeo / Alfa Romeo Racing 2019–2023 (Sauber before and after)
   // The original Alfa Romeo works team raced 1950-1951 under Italian colours.
@@ -185,18 +191,35 @@ export const TEAM_COLORS: Record<string, TeamColorSpan[]> = {
     { from: 2021, to: 2021, color: '#900000' },
     { from: 2020, to: 2020, color: '#960000' },
     { from: 2019, to: 2019, color: '#9B0000' },
+    { from: 1979, to: 1985, color: '#CC0000' }, // Marlboro-era works Alfa red/white
+    { from: 1963, to: 1965, color: '#CC0000' },
     { to: 1951, color: '#CC0000' }, // Rosso Corsa (1950-1951 works team)
   ],
   // Lotus F1 2012–2015
-  lotus_f1: [{ from: 2013, to: 2015, color: '#FFB800' }],
+  lotus_f1: [{ from: 2012, to: 2015, color: '#FFB800' }], // black/gold JPS-inspired livery
   // Caterham 2012–2014
-  caterham: [{ from: 2013, to: 2014, color: '#006633' }],
+  caterham: [
+    { from: 2013, to: 2014, color: '#006633' },
+    { from: 2012, to: 2012, color: '#004225' }, // BRG, inherited from Lotus/Team Lotus identity
+  ],
   // Marussia 2012–2014 → Manor Marussia 2015–2016
-  marussia: [{ from: 2013, to: 2014, color: '#6E0000' }],
+  marussia: [{ from: 2012, to: 2014, color: '#6E0000' }], // deep red/black
   manor: [
     { from: 2016, to: 2016, color: '#323232' },
     { from: 2015, to: 2015, color: '#6E0000' },
   ],
+  // New-team era backmarkers, 2010–2012.
+  lotus_racing: [{ from: 2010, to: 2011, color: '#004225' }], // British racing green with yellow trim
+  hrt: [
+    { from: 2012, to: 2012, color: '#8B1A1A' }, // red/gold
+    { from: 2011, to: 2011, color: '#D50000' }, // white car, red accent used as visible UI color
+    { from: 2010, to: 2010, color: '#3A3A3A' }, // dark grey with red/white/orange trim
+  ],
+  virgin: [{ from: 2010, to: 2011, color: '#C00000' }], // black/red with white trim
+  super_aguri: [{ from: 2006, to: 2008, color: '#D50000' }], // white/red Honda-backed livery
+  spyker: [{ from: 2007, to: 2007, color: '#FF6A00' }], // Dutch orange
+  spyker_mf1: [{ from: 2006, to: 2006, color: '#FF6A00' }], // late-2006 Spyker orange
+  mf1: [{ from: 2006, to: 2006, color: '#C00000' }], // Midland red/white/silver
 
   // ── National racing era (pre-1968) ───────────────────────────────────────
   // Until 1967 (inclusive) cars raced in national colours. Teams that retired
@@ -221,12 +244,23 @@ export const TEAM_COLORS: Record<string, TeamColorSpan[]> = {
   'de_tomaso-alfa_romeo': [{ color: '#CC0000' }],
   'de_tomaso-ferrari': [{ color: '#CC0000' }],
   'de_tomaso-osca': [{ color: '#CC0000' }],
-  tomaso: [{ to: 1967, color: '#CC0000' }], // ran until 1970
-  // 1963 Italian ATS (distinct from 1977-1984 German ATS — same DB slug, capped)
-  ats: [{ from: 1963, to: 1963, color: '#CC0000' }],
+  tomaso: [
+    { from: 1970, to: 1970, color: '#CC0000' },
+    { to: 1967, color: '#CC0000' },
+  ], // ran until 1970
+  // 1963 Italian ATS and 1977-1984 German ATS share the same DB slug.
+  ats: [
+    { from: 1977, to: 1984, color: '#003DA5' }, // German ATS blue/white era
+    { from: 1963, to: 1963, color: '#CC0000' },
+  ],
 
   // ── British ──────────────────────────────────────────────────────────────
-  brm: [{ to: 1967, color: '#004225' }], // ran until 1977
+  brm: [
+    { from: 1972, to: 1977, color: '#D50032' }, // Marlboro/Stanley BRM red
+    { from: 1970, to: 1971, color: '#FFFFFF' }, // Yardley white
+    { from: 1968, to: 1969, color: '#004225' },
+    { to: 1967, color: '#004225' },
+  ], // ran until 1977
   vanwall: [{ color: '#004225' }],
   team_lotus: [
     { from: 1991, to: 1994, color: '#00482B' }, // late green revival (Tamiya/Hitachi)
@@ -235,7 +269,15 @@ export const TEAM_COLORS: Record<string, TeamColorSpan[]> = {
     { from: 1968, to: 1971, color: '#C8102E' }, // Gold Leaf red/white/gold
     { to: 1967, color: '#004225' }, // BRG
   ],
-  lola: [{ to: 1967, color: '#004225' }], // ran until 1997
+  lola: [
+    { from: 1997, to: 1997, color: '#D50032' }, // MasterCard red/gold
+    { from: 1993, to: 1993, color: '#D40000' }, // BMS Scuderia Italia red
+    { from: 1986, to: 1991, color: '#D40000' }, // Larrousse-Calmels red/white Lola entries
+    { from: 1985, to: 1985, color: '#D50032' }, // Haas/Lola red/white
+    { from: 1974, to: 1975, color: '#D50032' }, // Embassy Hill red/white Lola entries
+    { from: 1968, to: 1968, color: '#FFFFFF' }, // Honda/Lola white
+    { to: 1967, color: '#004225' },
+  ], // ran until 1997
   connaught: [{ color: '#004225' }],
   hwm: [{ color: '#004225' }],
   alta: [{ color: '#004225' }],
@@ -262,6 +304,7 @@ export const TEAM_COLORS: Record<string, TeamColorSpan[]> = {
   'cooper-ford': [{ color: '#004225' }],
   'cooper-osca': [{ color: '#004225' }],
   'cooper-ats': [{ color: '#004225' }],
+  'cooper-brm': [{ color: '#004225' }],
   brabham: [
     { from: 1988, to: 1992, color: '#3B7DD8' }, // revival-era light blue
     { from: 1978, to: 1987, color: '#FFFFFF' }, // Parmalat white/blue (Piquet titles '81/'83)
@@ -270,11 +313,23 @@ export const TEAM_COLORS: Record<string, TeamColorSpan[]> = {
   ],
   'brabham-brm': [{ color: '#004225' }],
   'brabham-climax': [{ color: '#004225' }],
-  'brabham-ford': [{ to: 1967, color: '#004225' }], // ran until 1979
-  'brabham-repco': [{ to: 1967, color: '#004225' }], // ran until 1969
-  'mclaren-brm': [{ color: '#004225' }],
-  'mclaren-ford': [{ color: '#004225' }],
-  'mclaren-seren': [{ color: '#004225' }],
+  'brabham-ford': [
+    { from: 1978, to: 1979, color: '#FFFFFF' }, // Parmalat white/blue
+    { from: 1968, to: 1977, color: '#004225' }, // Brabham green
+    { to: 1967, color: '#004225' },
+  ], // ran until 1979
+  'brabham-repco': [{ to: 1969, color: '#004225' }], // ran until 1969
+  'brm-ford': [{ from: 1969, to: 1969, color: '#004225' }],
+  'mclaren-brm': [
+    { from: 1968, to: 1968, color: '#FF7200' }, // papaya orange
+    { from: 1967, to: 1967, color: '#D50032' }, // red/silver 1967 cars
+  ],
+  'mclaren-ford': [
+    { from: 1968, to: 1970, color: '#FF7200' }, // papaya orange
+    { from: 1967, to: 1967, color: '#D50032' }, // red/silver 1967 cars
+    { from: 1966, to: 1966, color: '#FFFFFF' }, // white/dark green debut livery
+  ],
+  'mclaren-seren': [{ from: 1966, to: 1966, color: '#FFFFFF' }], // white/dark green debut livery
   'mclaren-alfa_romeo': [{ color: '#004225' }],
   'lotus-climax': [{ color: '#004225' }],
   'lotus-ford': [
@@ -284,6 +339,7 @@ export const TEAM_COLORS: Record<string, TeamColorSpan[]> = {
   'lotus-brm': [{ color: '#004225' }],
   'lotus-maserati': [{ color: '#004225' }],
   'lotus-borgward': [{ color: '#004225' }],
+  'lotus-pw': [{ from: 1971, to: 1971, color: '#C8102E' }], // Gold Leaf turbine car
 
   // ── German ───────────────────────────────────────────────────────────────
   porsche: [{ color: '#C0C0C0' }],
@@ -342,6 +398,7 @@ export const TEAM_COLORS: Record<string, TeamColorSpan[]> = {
   honda: [
     { from: 2007, to: 2008, color: '#3A7DC9' }, // "Earth Car" globe livery
     { from: 2006, to: 2006, color: '#FFFFFF' }, // white/red Honda (Button's Hungary '06 win)
+    { from: 1968, to: 1968, color: '#FFFFFF' },
     { to: 1967, color: '#FFFFFF' }, // 1960s works Honda — national white
   ],
 
@@ -349,10 +406,13 @@ export const TEAM_COLORS: Record<string, TeamColorSpan[]> = {
   // Iconic constructors that ran after the national-colour era.
   tyrrell: [{ from: 1970, to: 1998, color: '#003DA5' }], // Elf blue (Stewart titles, P34 six-wheeler)
   shadow: [{ from: 1973, to: 1980, color: '#1A1A1A' }], // UOP black
+  'shadow-ford': [{ from: 1973, to: 1975, color: '#1A1A1A' }],
+  'shadow-matra': [{ from: 1975, to: 1975, color: '#1A1A1A' }],
   hesketh: [{ from: 1974, to: 1978, color: '#FFFFFF' }], // white "the Bear" (Hunt's '75 Zandvoort win)
   wolf: [{ from: 1976, to: 1979, color: '#0E2C5C' }], // Walter Wolf navy & gold (Scheckter won debut)
   ligier: [{ from: 1976, to: 1996, color: '#0F4FA8' }], // Gitanes French blue
   arrows: [
+    { from: 1991, to: 1996, color: '#D50032' }, // Footwork red/white years
     { from: 2000, to: 2002, color: '#FF6A00' }, // Orange Arrows
     { from: 1978, to: 1999, color: '#1A1A1A' }, // black/gold early era
   ],
@@ -372,6 +432,71 @@ export const TEAM_COLORS: Record<string, TeamColorSpan[]> = {
   brawn: [{ from: 2009, to: 2009, color: '#DCE000' }], // fluoro-yellow & white (Button's title)
   minardi: [{ from: 1985, to: 2005, color: '#1A1A1A' }], // black (later Australian-flag livery)
   prost: [{ from: 1997, to: 2001, color: '#0A3A82' }], // Gauloises blue
+  footwork: [{ from: 1991, to: 1996, color: '#D50032' }], // red/white Footwork-Arrows era
+  forti: [{ from: 1995, to: 1996, color: '#FFD400' }], // yellow
+  pacific: [{ from: 1994, to: 1995, color: '#003DA5' }], // dark blue/silver
+  simtek: [{ from: 1994, to: 1995, color: '#1A1A1A' }], // black with purple/gold accents
+  larrousse: [{ from: 1987, to: 1994, color: '#D40000' }], // red/white Larrousse-Lola identity
+  dallara: [{ from: 1988, to: 1992, color: '#D40000' }], // Scuderia Italia red
+  fondmetal: [{ from: 1991, to: 1992, color: '#D40000' }], // Fondmetal red/yellow
+  march: [
+    { from: 1992, to: 1992, color: '#003DA5' },
+    { from: 1987, to: 1991, color: '#6FD8E8' }, // Leyton House turquoise
+    { from: 1970, to: 1982, color: '#003DA5' },
+  ],
+  leyton: [{ from: 1990, to: 1991, color: '#6FD8E8' }], // Leyton House turquoise
+  moda: [{ from: 1992, to: 1992, color: '#1A1A1A' }], // Andrea Moda black
+  lambo: [{ from: 1991, to: 1991, color: '#003DA5' }], // Modena Team blue
+  life: [{ from: 1990, to: 1990, color: '#CC0000' }], // red
+  ags: [{ from: 1986, to: 1991, color: '#0055A4' }], // French blue/white privateer
+  coloni: [{ from: 1987, to: 1991, color: '#FFD400' }], // yellow late-era Coloni
+  eurobrun: [{ from: 1988, to: 1990, color: '#D40000' }], // white/red
+  onyx: [{ from: 1989, to: 1990, color: '#003DA5' }], // blue/pink
+  osella: [{ from: 1980, to: 1990, color: '#0055A4' }], // blue/white Italian privateer
+  rial: [{ from: 1988, to: 1989, color: '#003DA5' }], // blue
+  zakspeed: [{ from: 1985, to: 1989, color: '#D50032' }], // red/white West-backed cars
+  ram: [{ from: 1983, to: 1985, color: '#003DA5' }], // blue/white
+  spirit: [{ from: 1983, to: 1985, color: '#003DA5' }], // blue/white Honda/Hart era
+  toleman: [
+    { from: 1985, to: 1985, color: '#00A551' }, // Benetton green/multicolour
+    { from: 1981, to: 1984, color: '#FFFFFF' }, // white/blue Toleman
+  ],
+  ensign: [{ from: 1973, to: 1982, color: '#003DA5' }], // blue/white sponsor liveries
+  fittipaldi: [{ from: 1975, to: 1982, color: '#FFD400' }], // Copersucar/Fittipaldi yellow
+  theodore: [{ from: 1977, to: 1983, color: '#D50032' }], // red/white
+  'brabham-alfa_romeo': [{ from: 1976, to: 1979, color: '#FFFFFF' }], // Martini/Parmalat white
+  surtees: [{ from: 1970, to: 1978, color: '#D50032' }], // red sponsor-era Surtees
+  iso_marlboro: [{ from: 1973, to: 1974, color: '#D50032' }], // Marlboro red/white
+  penske: [{ from: 1974, to: 1977, color: '#003DA5' }], // blue/white/red Penske entries
+  parnelli: [{ from: 1974, to: 1976, color: '#003DA5' }], // blue/red/white
+  hill: [{ from: 1975, to: 1975, color: '#D50032' }], // Embassy red/white
+  lyncar: [{ from: 1974, to: 1975, color: '#003DA5' }], // blue
+  maki: [{ from: 1974, to: 1976, color: '#FFFFFF' }], // Japanese white
+  kojima: [{ from: 1976, to: 1977, color: '#FFFFFF' }], // Japanese white/green
+  tecno: [{ from: 1972, to: 1973, color: '#CC0000' }], // Italian red
+  politoys: [{ from: 1972, to: 1972, color: '#003DA5' }], // Frank Williams blue
+  connew: [{ from: 1972, to: 1972, color: '#FFFFFF' }], // white
+  bellasi: [{ from: 1970, to: 1971, color: '#D50032' }], // Swiss red/white
+  'march-ford': [{ from: 1971, to: 1971, color: '#D50032' }], // STP red March
+  'march-alfa_romeo': [{ from: 1971, to: 1971, color: '#D50032' }],
+  amon: [{ from: 1974, to: 1974, color: '#003DA5' }],
+  token: [{ from: 1974, to: 1974, color: '#D50032' }],
+  trojan: [{ from: 1974, to: 1974, color: '#D50032' }],
+  boro: [{ from: 1976, to: 1977, color: '#FF6A00' }], // Dutch orange
+  lec: [{ from: 1977, to: 1977, color: '#003DA5' }],
+  mcguire: [{ from: 1977, to: 1977, color: '#FFFFFF' }],
+  apollon: [{ from: 1977, to: 1977, color: '#FFFFFF' }],
+  martini: [{ from: 1978, to: 1978, color: '#0055A4' }], // French blue
+  merzario: [{ from: 1978, to: 1979, color: '#CC0000' }], // Italian red
+  rebaque: [{ from: 1979, to: 1979, color: '#1A1A1A' }], // black/gold Lotus-derived car
+  kauhsen: [{ from: 1979, to: 1979, color: '#FFFFFF' }],
+  lds: [{ from: 1962, to: 1968, color: '#004225' }], // South African green
+  'lds-climax': [{ from: 1965, to: 1967, color: '#004225' }],
+  'lds-alfa_romeo': [{ from: 1965, to: 1965, color: '#004225' }],
+  re: [{ from: 1965, to: 1965, color: '#004225' }], // Rhodesian green
+  stebro: [{ from: 1963, to: 1963, color: '#FFFFFF' }], // Canadian white/red
+  enb: [{ from: 1962, to: 1962, color: '#FFD400' }], // Belgian racing yellow
+  mbm: [{ from: 1961, to: 1961, color: '#D50032' }], // Swiss red/white
   'matra-ford': [{ color: '#0055A4' }], // French blue (Stewart's '69 title)
 };
 
