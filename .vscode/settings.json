@@ -12,6 +12,14 @@
   "files.associations": {
     "*.css": "tailwindcss"
   },
+  "files.watcherExclude": {
+    "**/.astro/**": true,
+    "**/.opencode/**": true,
+    "**/.venv/**": true,
+    "**/content/**": true,
+    "**/dist/**": true,
+    "**/node_modules/**": true
+  },
   "editor.quickSuggestions": {
     "strings": "on"
   },
