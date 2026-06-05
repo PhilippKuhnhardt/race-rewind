@@ -38,6 +38,17 @@ function parseRaceTime(t: string): number {
   return (parseInt(parts[0]) * 60 + parseFloat(parts[1])) * 1000;
 }
 
+/** Format a race time as "H:MM:SS.mmm". Input format from DB: "HH:MM:SS[.fff]". */
+export function formatRaceTime(t: string | null | undefined): string {
+  if (t == null) return '—';
+  const m = /^(\d+):(\d+):(\d+(?:\.\d+)?)$/.exec(t);
+  if (!m) return t;
+  const hours = parseInt(m[1], 10);
+  const minutes = m[2].padStart(2, '0');
+  const seconds = m[3].padStart(2, '0');
+  return `${hours}:${minutes}:${seconds}`;
+}
+
 /** Compute the gap string for a finisher relative to the winner: "+9.433s", "+1:02.456s". */
 export function computeGap(winnerTime: string, rowTime: string): string {
   const ms = parseRaceTime(rowTime) - parseRaceTime(winnerTime);
@@ -100,7 +111,7 @@ export function formatGap(
   winnerTime: string | null,
   row: { position: number | null; time: string | null; detail: string | null }
 ): string {
-  if (row.position === 1) return row.time ?? '—';
+  if (row.position === 1) return formatRaceTime(row.time);
   if (row.time != null && winnerTime != null) return computeGap(winnerTime, row.time);
   if (isLapDetail(row.detail)) return row.detail!;
   return '—';

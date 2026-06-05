@@ -1,5 +1,5 @@
 ---
-import { driverLink, teamLink } from '../../lib/format';
+import { driverLink, formatRaceTime, teamLink } from '../../lib/format';
 
 interface PodiumRow {
   position: number | null;
@@ -54,7 +54,7 @@ for (const row of podium) {
                     : <span>{row.team_name}</span>
                   }
                 </div>
-                {row.time && <div class="mt-2 font-mono text-xs text-fg-muted">{row.time}</div>}
+                {row.time && <div class="mt-2 font-mono text-xs text-fg-muted">{formatRaceTime(row.time)}</div>}
               </div>
             ))}
           </div>
