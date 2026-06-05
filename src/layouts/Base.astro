@@ -93,17 +93,19 @@ const section: 'seasons' | 'stats' = pageContext?.kind === 'stats' ? 'stats' : '
   </head>
   <body class="min-h-screen bg-bg font-sans text-fg antialiased">
     <div class="flex min-h-screen flex-col">
-      <TopNav
-        {seasons}
-        {byseason}
-        {currentSeason}
-        {currentRaceSlug}
-        {currentChainSlug}
-        {compareSlug}
-        {section}
-      />
+      <div class="sticky top-0 z-40">
+        <TopNav
+          {seasons}
+          {byseason}
+          {currentSeason}
+          {currentRaceSlug}
+          {currentChainSlug}
+          {compareSlug}
+          {section}
+        />
 
-      {pageContext && <TimeTravelBar {pageContext} />}
+        {pageContext && <TimeTravelBar {pageContext} />}
+      </div>
 
       <main class="mx-auto w-full max-w-[var(--container-narrow)] flex-1 px-4 py-8 sm:px-6">
         <slot />
