@@ -4,6 +4,14 @@
   type PostEntry = { kind: 'postseason'; season: number };
   type LastRace = RaceEntry | PreEntry | PostEntry;
 
+  interface Props {
+    seasons: number[];
+  }
+
+  let { seasons }: Props = $props();
+
+  const sortedSeasons = $derived([...seasons].sort((a, b) => b - a));
+
   function isLastRace(v: unknown): v is LastRace {
     if (typeof v !== 'object' || v === null) return false;
     const o = v as Record<string, unknown>;
@@ -38,14 +46,33 @@
     if (r.kind === 'preseason') return `${r.season} Pre-Season`;
     return `${r.season} Season`;
   }
+
+  function startSeason(event: Event) {
+    const season = (event.target as HTMLSelectElement).value;
+    if (season) window.location.href = `/seasons/${season}/preseason/`;
+  }
 </script>
 
 {#if entry}
   <a
     href={getHref(entry)}
-    class="mt-8 inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-90 transition-opacity no-underline"
+    class="inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-opacity no-underline hover:opacity-90"
   >
     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
     {getLabel(entry)}
   </a>
+{:else}
+  <div class="flex flex-col items-center justify-center gap-2 sm:flex-row">
+    <select
+      id="home-season"
+      aria-label="Season"
+      class="w-full max-w-56 rounded-lg border border-border bg-bg px-4 py-2.5 text-base font-medium text-fg shadow-sm focus:outline-none focus:ring-2 focus:ring-accent sm:w-48"
+      onchange={startSeason}
+    >
+      <option value="" disabled selected>Pick a season</option>
+      {#each sortedSeasons as season}
+        <option value={season}>{season}</option>
+      {/each}
+    </select>
+  </div>
 {/if}

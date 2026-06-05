@@ -2,16 +2,20 @@
 race_slug: 1988-japanese-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1988_Japanese_Grand_Prix&oldid=1346087528
-source_revision: "1346087528"
+source_revision: '1346087528'
 source_title: 1988 Japanese Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-26"
-model: "claude-sonnet-4-6"
+generated_at: '2026-05-26'
+model: 'claude-sonnet-4-6'
 ---
 
 ### Championship standings
 
 Senna goes into Suzuka pursuing his eighth win of the season, which would break the single-season record of seven victories — a mark shared by Jim Clark (1963) and Alain Prost (1984). The championship itself could be decided this weekend.
+
+### Championship permutations
+
+If Senna wins at Suzuka, he clinches the Drivers' Championship regardless of where Prost finishes. Under the 1988 best-results scoring system, Prost can only add a limited number of points from the final two races, so a Senna victory would put the title beyond his teammate's reach.
 
 ### Between-race developments
 
