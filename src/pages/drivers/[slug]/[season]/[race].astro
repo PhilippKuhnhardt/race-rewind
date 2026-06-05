@@ -1,11 +1,14 @@
 ---
+import DriverSeasonOverviewTable from '../../../../components/driver/DriverSeasonOverviewTable.astro';
 import TeamsDrivenTable from '../../../../components/team/TeamsDrivenTable.astro';
 import Base from '../../../../layouts/Base.astro';
 import { driverLink, formatPts, raceLink, stripYearPrefix, teamLink } from '../../../../lib/format';
+import { pitForRace } from '../../../../lib/point-in-time';
 import {
   getAllRacesBySeason,
   getDriverBySlug,
   getDriverCareerStats,
+  getDriverSeasonOverview,
   getDriverPriorSeasons,
   getDriverTeamsDriven,
   getRaceBySlug,
@@ -25,8 +28,10 @@ const race = season && raceSlug && (await getRaceBySlug(fullSlug));
 if (!race) throw new Error(`Race not found: ${fullSlug}`);
 
 const raceNavSlug = stripYearPrefix(race.slug, race.season);
-const [stats, teamsDriven, { byseason }, priorSeasons] = await Promise.all([
+const pit = pitForRace(race, raceNavSlug);
+const [stats, seasonOverview, teamsDriven, { byseason }, priorSeasons] = await Promise.all([
   getDriverCareerStats(driver.id, race.race_number),
+  getDriverSeasonOverview(driver.id, race.race_number),
   getDriverTeamsDriven(driver.id, race.race_number),
   getAllRacesBySeason(),
   getDriverPriorSeasons(driver.id, race.race_number),
@@ -110,6 +115,8 @@ const description = `${driver.full_name}'s career going into the ${race.season} 
       }
     </div>
   </section>
+
+  <DriverSeasonOverviewTable driverSlug={slug} rows={seasonOverview} {pit} />
 
   <TeamsDrivenTable
     teams={teamsDriven}

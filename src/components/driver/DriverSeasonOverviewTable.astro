@@ -1,0 +1,76 @@
+---
+import type { getDriverSeasonOverview } from '../../lib/queries';
+import { formatPts, ordinal } from '../../lib/format';
+import { driverLinkAt, teamLinkAt } from '../../lib/nav';
+import { pitForPostseason, type PointInTime } from '../../lib/point-in-time';
+import TeamColorSwatch from '../primitives/TeamColorSwatch.astro';
+
+interface Props {
+  driverSlug: string;
+  rows: Awaited<ReturnType<typeof getDriverSeasonOverview>>;
+  pit: PointInTime;
+  title?: string;
+}
+
+const { driverSlug, rows, pit, title = 'Season Overview' } = Astro.props;
+
+function pitForRowSeason(season: number): PointInTime {
+  return season === pit.season ? pit : pitForPostseason(season);
+}
+---
+
+{rows.length > 0 && (
+  <section class="mb-6">
+    <h2 class="mb-4 text-lg font-semibold text-fg">{title}</h2>
+    <div class="overflow-x-auto rounded-lg border border-border">
+      <table class="w-full border-collapse text-sm" data-sortable>
+        <thead>
+          <tr>
+            <th data-sort-key="season" class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Season</th>
+            <th data-sort-key="team" class="bg-bg-alt px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Team</th>
+            <th data-sort-key="starts" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Starts</th>
+            <th data-sort-key="wins" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Wins</th>
+            <th data-sort-key="podiums" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Podiums</th>
+            <th data-sort-key="poles" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Poles</th>
+            <th data-sort-key="points" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Points</th>
+            <th data-sort-key="championship" class="bg-bg-alt px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted border-b border-border whitespace-nowrap">Championship</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => {
+            const rowPit = pitForRowSeason(row.season);
+            return (
+              <tr class="border-b border-border last:border-0 hover:bg-bg-hover transition-colors">
+                <td class="px-3 py-2.5 font-medium tabular-nums">
+                  <a href={driverLinkAt(driverSlug, rowPit)} class="text-accent hover:underline">
+                    {row.season}
+                  </a>
+                </td>
+                <td class="px-3 py-2.5" data-sort-value={row.team_name}>
+                  <span class="inline-flex items-center gap-2">
+                    <TeamColorSwatch slug={row.team_slug} season={row.season} variant="dot" />
+                    <a href={teamLinkAt(row.team_slug, rowPit)} class="text-accent hover:underline font-medium whitespace-nowrap">
+                      {row.team_name}
+                    </a>
+                  </span>
+                </td>
+                <td class="px-3 py-2.5 text-right tabular-nums text-fg">{row.starts}</td>
+                <td class="px-3 py-2.5 text-right tabular-nums text-fg">{row.wins}</td>
+                <td class="px-3 py-2.5 text-right tabular-nums text-fg">{row.podiums}</td>
+                <td class="px-3 py-2.5 text-right tabular-nums text-fg">{row.poles}</td>
+                <td class="px-3 py-2.5 text-right tabular-nums text-fg">{formatPts(row.points)}</td>
+                <td class="px-3 py-2.5 text-right tabular-nums text-fg-muted" data-sort-value={row.championship_position ?? ''}>
+                  {row.championship_position != null ? ordinal(row.championship_position) : '—'}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  </section>
+)}
+
+<script>
+  import '../../scripts/sortable-table.ts';
+</script>

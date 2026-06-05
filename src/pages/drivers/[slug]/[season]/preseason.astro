@@ -1,4 +1,5 @@
 ---
+import DriverSeasonOverviewTable from '../../../../components/driver/DriverSeasonOverviewTable.astro';
 import TeamsDrivenTable from '../../../../components/team/TeamsDrivenTable.astro';
 import Base from '../../../../layouts/Base.astro';
 import { driverLinkAt, teamLinkAt, raceLinkAt } from '../../../../lib/nav';
@@ -8,6 +9,7 @@ import {
   getDriverBySlug,
   getDriverCareerStats,
   getDriverPriorSeasons,
+  getDriverSeasonOverview,
   getDriverTeamsDriven,
   getSeasonBookends,
 } from '../../../../lib/queries';
@@ -27,8 +29,9 @@ const pit = pitForPreseason(season);
 const asOf = resolveAsOfRaceNumber(pit, bookends);
 const firstRaceSlug = stripYearPrefix(bookends.firstSlug, season);
 
-const [stats, teamsDriven, priorSeasons] = await Promise.all([
+const [stats, seasonOverview, teamsDriven, priorSeasons] = await Promise.all([
   getDriverCareerStats(driver.id, asOf),
+  getDriverSeasonOverview(driver.id, asOf),
   getDriverTeamsDriven(driver.id, asOf),
   getDriverPriorSeasons(driver.id, asOf),
 ]);
@@ -103,6 +106,8 @@ const description = `${driver.full_name}'s career going into the ${season} seaso
       }
     </div>
   </section>
+
+  <DriverSeasonOverviewTable driverSlug={slug} rows={seasonOverview} {pit} />
 
   <TeamsDrivenTable
     teams={teamsDriven}

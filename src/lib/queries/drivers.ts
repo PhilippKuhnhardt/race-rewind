@@ -1,6 +1,6 @@
 import { eq, and, lt, min, max, count, sum, sql } from 'drizzle-orm';
 import { db } from '../../db/client';
-import { drivers, teams, races, raceResults, roundEntries, driverStandings, teamStandings, driverCareerProgression } from '../../db/schema';
+import { drivers, teams, races, raceResults, sprintResults, roundEntries, driverStandings, teamStandings, driverCareerProgression } from '../../db/schema';
 import { stripYearPrefix, formatYearRanges } from '../format';
 
 export async function getDriverBySlug(slug: string) {
@@ -125,6 +125,122 @@ export async function getDriverPriorSeasons(driverId: number, beforeRaceNumber: 
     .innerJoin(races, eq(races.raceNumber, roundEntries.raceNumber))
     .where(and(eq(roundEntries.driverId, driverId), lt(roundEntries.raceNumber, beforeRaceNumber)));
   return rows.length;
+}
+
+export interface DriverSeasonOverviewRow {
+  season: number;
+  team_slug: string;
+  team_name: string;
+  starts: number;
+  wins: number;
+  podiums: number;
+  poles: number;
+  points: number;
+  championship_position: number | null;
+}
+
+export async function getDriverSeasonOverview(driverId: number, beforeRaceNumber: number): Promise<DriverSeasonOverviewRow[]> {
+  const latestVisibleRaceBySeason = db
+    .select({
+      season: races.season,
+      raceNumber: max(races.raceNumber).as('max_race_number'),
+    })
+    .from(races)
+    .where(lt(races.raceNumber, beforeRaceNumber))
+    .groupBy(races.season)
+    .as('latest_visible_race_by_season');
+
+  const [entryRows, raceRows, sprintRows, poleRows, standingRows] = await Promise.all([
+    db
+      .select({
+        season: races.season,
+        team_id: teams.id,
+        team_slug: teams.slug,
+        team_name: teams.name,
+        first_race_number: min(roundEntries.raceNumber),
+        starts: sql<number>`COUNT(DISTINCT ${roundEntries.raceNumber})`,
+      })
+      .from(roundEntries)
+      .innerJoin(races, eq(races.raceNumber, roundEntries.raceNumber))
+      .innerJoin(teams, eq(teams.id, roundEntries.teamId))
+      .where(and(eq(roundEntries.driverId, driverId), lt(roundEntries.raceNumber, beforeRaceNumber)))
+      .groupBy(races.season, teams.id, teams.slug, teams.name),
+
+    db
+      .select({
+        season: races.season,
+        team_id: raceResults.teamId,
+        wins: sql<number>`SUM(CASE WHEN ${raceResults.position} = 1 THEN 1 ELSE 0 END)`,
+        podiums: sql<number>`SUM(CASE WHEN ${raceResults.position} BETWEEN 1 AND 3 THEN 1 ELSE 0 END)`,
+        points: sum(raceResults.points),
+      })
+      .from(raceResults)
+      .innerJoin(races, eq(races.raceNumber, raceResults.raceNumber))
+      .where(and(eq(raceResults.driverId, driverId), lt(raceResults.raceNumber, beforeRaceNumber)))
+      .groupBy(races.season, raceResults.teamId),
+
+    db
+      .select({
+        season: races.season,
+        team_id: sprintResults.teamId,
+        points: sum(sprintResults.points),
+      })
+      .from(sprintResults)
+      .innerJoin(races, eq(races.raceNumber, sprintResults.raceNumber))
+      .where(and(eq(sprintResults.driverId, driverId), lt(sprintResults.raceNumber, beforeRaceNumber)))
+      .groupBy(races.season, sprintResults.teamId),
+
+    db
+      .select({
+        season: races.season,
+        team_id: roundEntries.teamId,
+        poles: sql<number>`COUNT(DISTINCT ${races.raceNumber})`,
+      })
+      .from(races)
+      .innerJoin(roundEntries, and(
+        eq(roundEntries.raceNumber, races.raceNumber),
+        eq(roundEntries.driverId, driverId),
+      ))
+      .where(and(eq(races.poleDriverId, driverId), lt(races.raceNumber, beforeRaceNumber)))
+      .groupBy(races.season, roundEntries.teamId),
+
+    db
+      .select({
+        season: latestVisibleRaceBySeason.season,
+        position: driverStandings.position,
+      })
+      .from(latestVisibleRaceBySeason)
+      .innerJoin(driverStandings, and(
+        eq(driverStandings.raceNumber, latestVisibleRaceBySeason.raceNumber),
+        eq(driverStandings.driverId, driverId),
+      )),
+  ]);
+
+  const keyFor = (season: number, teamId: number) => `${season}:${teamId}`;
+  const raceMap = new Map(raceRows.map((row) => [keyFor(row.season, row.team_id), row]));
+  const sprintPointMap = new Map(sprintRows.map((row) => [keyFor(row.season, row.team_id), Number(row.points ?? 0)]));
+  const poleMap = new Map(poleRows.map((row) => [keyFor(row.season, row.team_id), Number(row.poles ?? 0)]));
+  const standingMap = new Map(standingRows.map((row) => [row.season, row.position]));
+
+  return entryRows
+    .map((row) => {
+      const key = keyFor(row.season, row.team_id);
+      const race = raceMap.get(key);
+      return {
+        season: row.season,
+        team_slug: row.team_slug,
+        team_name: row.team_name,
+        first_race_number: row.first_race_number ?? 0,
+        starts: Number(row.starts ?? 0),
+        wins: Number(race?.wins ?? 0),
+        podiums: Number(race?.podiums ?? 0),
+        poles: poleMap.get(key) ?? 0,
+        points: Number(race?.points ?? 0) + (sprintPointMap.get(key) ?? 0),
+        championship_position: standingMap.get(row.season) ?? null,
+      };
+    })
+    .sort((a, b) => a.season - b.season || a.first_race_number - b.first_race_number || a.team_name.localeCompare(b.team_name))
+    .map(({ first_race_number: _firstRaceNumber, ...row }) => row);
 }
 
 export async function getDriverBestChampionshipPos(driverId: number, beforeRaceNumber: number): Promise<number | null> {
