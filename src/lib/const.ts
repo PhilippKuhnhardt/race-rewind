@@ -1,1 +1,1 @@
-export const SITE_URL = 'https://f1-history.example.com';
+export const SITE_URL = 'https://racerewind.net';

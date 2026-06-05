@@ -1,11 +1,11 @@
 ---
 name: race-news
-description: Use ONLY when creating Wikipedia-derived race preview content for the F1 History app. Covers the end-to-end workflow of sourcing, extracting, and writing race preview markdown files. Triggered by requests like "create race news for season X" or "generate previews for all 2024 races". Also handles preseason content.
+description: Use ONLY when creating Wikipedia-derived race preview content for the app. Covers the end-to-end workflow of sourcing, extracting, and writing race preview markdown files. Triggered by requests like "create race news for season X" or "generate previews for all 2024 races". Also handles preseason content.
 ---
 
 # Race News Creation
 
-The F1 History app exists so people can rewatch past seasons and experience them as if
+The app "Race Rewind" exists so people can rewatch past seasons and experience them as if
 they were live. No spoilers, no hindsight — just the information you would have had
 going into that weekend. The goal is immersion: capture the vibe and atmosphere of a
 season so thoroughly that a viewer rewatching 2000 or 2024 feels the championship
@@ -34,8 +34,8 @@ after three retirements in four races" — tells you what the number means for t
 you're about to watch.
 
 This is not a request for colour commentary, hype, or speculation. The voice remains
-factual, sourced from Wikipedia, and tight. The difference is between *reporting numbers*
-and *reporting what the numbers mean*. Some guidelines:
+factual, sourced from Wikipedia, and tight. The difference is between _reporting numbers_
+and _reporting what the numbers mean_. Some guidelines:
 
 - **Championship standings:** The app shows the actual points table, so don't
   duplicate it. Focus on the story the numbers tell — is the gap growing or shrinking?
@@ -59,7 +59,7 @@ and *reporting what the numbers mean*. Some guidelines:
 - **Direct quotes:** Wikipedia frequently includes verbatim lines from drivers,
   principals, and stewards. Use them when the speaker is named, the quote is short
   (one or two sentences at most), and it adds mood the surrounding facts cannot.
-  Attribute inline: `Häkkinen called it "one of the hardest weekends of my career."` 
+  Attribute inline: `Häkkinen called it "one of the hardest weekends of my career."`
   Embed the quote inside the section it belongs to — `### Previous race`,
   `### Between-race developments`, etc. Never create a standalone Quotes heading.
 - **Story tidbits:** The small human-interest details Wikipedia weaves into
@@ -93,10 +93,10 @@ the next race, so cross-reference.
 
 ## Phase overview
 
-| Phase | Slug pattern | File path | Page rendered on |
-|---|---|---|---|
-| `preseason` | `{year}-preseason` | `content/race-news/{year}-preseason/preseason.md` | `/seasons/{year}/preseason/` |
-| `preview` | `{year}-{race-slug}` | `content/race-news/{year}-{race-slug}/preview.md` | `/seasons/{year}/{race-slug}/` |
+| Phase       | Slug pattern         | File path                                         | Page rendered on               |
+| ----------- | -------------------- | ------------------------------------------------- | ------------------------------ |
+| `preseason` | `{year}-preseason`   | `content/race-news/{year}-preseason/preseason.md` | `/seasons/{year}/preseason/`   |
+| `preview`   | `{year}-{race-slug}` | `content/race-news/{year}-{race-slug}/preview.md` | `/seasons/{year}/{race-slug}/` |
 
 When no entry exists, the section is silently omitted from the page.
 
@@ -127,9 +127,13 @@ what rules are different? Think of it as the briefing you'd want before pressing
 
 ```markdown
 ### Driver changes
+
 ### Team changes
+
 ### Calendar
+
 ### Regulation changes
+
 ### Pre-season testing
 ```
 
@@ -154,6 +158,7 @@ Similarly, if no driver changes occurred, omit the section entirely.
   incidents. Keep this brief — two to three sentences.
 
 **Do NOT include:**
+
 - Driver or constructor standings (the season hasn't started)
 - In-season changes or race results (they haven't happened yet)
 - Predictions or form assessments ("Red Bull are expected to dominate")
@@ -189,6 +194,7 @@ The `slug` column is the directory name: `2024-bahrain-grand-prix`, etc.
 
 Fetch the season Wikipedia page (e.g. `https://en.wikipedia.org/wiki/2024_Formula_One_World_Championship`).
 From it, extract:
+
 - Regulation and technical changes for the season
 - Driver market movements (who changed teams, rookies entering)
 - Team principal / management changes
@@ -202,9 +208,11 @@ Process races in round order. For each:
 1. **Fetch the race article** using the webfetch tool (text format).
 
 2. **Capture the revision ID** — fetch the Wikipedia API to get the current revision:
+
    ```
    https://en.wikipedia.org/w/api.php?action=query&titles={Article_Title}&prop=revisions&rvprop=ids&format=json
    ```
+
    Extract the `revid` field from the response. Use this for `source_revision` and the
    `oldid` parameter in `source_url`. Do this for every article fetched (including the
    season overview for preseason/postseason).
@@ -247,20 +255,20 @@ model: "{model_id}"
 
 ### What belongs in a preview
 
-| Category | Example | Source |
-|---|---|---|
-| **Championship implications** | "Verstappen can clinch the title if he outscores Norris by 3 points and Leclerc fails to win." | Race article Background only — must be stated explicitly by Wikipedia, never calculated |
-| **Between-race developments** | "After his crash at Monza, Magnussen was replaced by Bearman for this race." | Race article Background |
-| **Regulation / technical** | "The FIA issued a technical directive banning asymmetric braking ahead of this race." | Season overview / race article |
-| **Driver changes** | "This is Colapinto's debut, replacing Sargeant for the remainder of the season." | Season overview / race article |
-| **Political / team news** | "Red Bull announced Wheatley's departure to Audi. He will begin gardening leave after this race." | Season overview / race article |
-| **Milestones** | "Hamilton starts his 300th Grand Prix this weekend." | Race article |
-| **Weather** | "Clear skies and 28 °C are expected for race day." | Race article — extract from the Weather field in the race details infobox. Present in forecast tense ("conditions are expected", "rain is forecast"). Always include when available. |
-| **Practice sessions** | "Hamilton topped FP1 (Piastri, Russell); Leclerc led FP2 and FP3. Zhou caused a red flag in FP1 after hitting the wall at turn 1." | Race article Practice section |
-| **Circuit-specific format notes** (only if unusual) | "This is the third running of the Las Vegas Grand Prix on the Strip circuit." | Race article |
-| **Car upgrades** | "Eight of ten teams bring upgrades: Red Bull adjusts the floor and upper sidepod; McLaren modifies the front wing and brake ducts." | Race article Background (only when listed) |
-| **Direct quotes** | `Häkkinen said the win "felt like it was meant to be after everything that happened in Monaco."` | Race article — named speaker only; do not quote unnamed sources |
-| **Story tidbits** | "Sainz races two weeks after an appendectomy." / "Coulthard survived a plane crash at Lyon the week before Spain." | Race article Background or Between-race section |
+| Category                                            | Example                                                                                                                             | Source                                                                                                                                                                               |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Championship implications**                       | "Verstappen can clinch the title if he outscores Norris by 3 points and Leclerc fails to win."                                      | Race article Background only — must be stated explicitly by Wikipedia, never calculated                                                                                              |
+| **Between-race developments**                       | "After his crash at Monza, Magnussen was replaced by Bearman for this race."                                                        | Race article Background                                                                                                                                                              |
+| **Regulation / technical**                          | "The FIA issued a technical directive banning asymmetric braking ahead of this race."                                               | Season overview / race article                                                                                                                                                       |
+| **Driver changes**                                  | "This is Colapinto's debut, replacing Sargeant for the remainder of the season."                                                    | Season overview / race article                                                                                                                                                       |
+| **Political / team news**                           | "Red Bull announced Wheatley's departure to Audi. He will begin gardening leave after this race."                                   | Season overview / race article                                                                                                                                                       |
+| **Milestones**                                      | "Hamilton starts his 300th Grand Prix this weekend."                                                                                | Race article                                                                                                                                                                         |
+| **Weather**                                         | "Clear skies and 28 °C are expected for race day."                                                                                  | Race article — extract from the Weather field in the race details infobox. Present in forecast tense ("conditions are expected", "rain is forecast"). Always include when available. |
+| **Practice sessions**                               | "Hamilton topped FP1 (Piastri, Russell); Leclerc led FP2 and FP3. Zhou caused a red flag in FP1 after hitting the wall at turn 1."  | Race article Practice section                                                                                                                                                        |
+| **Circuit-specific format notes** (only if unusual) | "This is the third running of the Las Vegas Grand Prix on the Strip circuit."                                                       | Race article                                                                                                                                                                         |
+| **Car upgrades**                                    | "Eight of ten teams bring upgrades: Red Bull adjusts the floor and upper sidepod; McLaren modifies the front wing and brake ducts." | Race article Background (only when listed)                                                                                                                                           |
+| **Direct quotes**                                   | `Häkkinen said the win "felt like it was meant to be after everything that happened in Monaco."`                                    | Race article — named speaker only; do not quote unnamed sources                                                                                                                      |
+| **Story tidbits**                                   | "Sainz races two weeks after an appendectomy." / "Coulthard survived a plane crash at Lyon the week before Spain."                  | Race article Background or Between-race section                                                                                                                                      |
 
 ### What does NOT belong
 
@@ -269,8 +277,8 @@ model: "{model_id}"
 - **Generic circuit descriptions** — Everyone knows Monaco has no overtaking. Do not describe circuit characteristics unless something changed.
 - **Vague paddock chatter** — "Several contracts are up for renewal" is filler. Name the specific drivers/teams.
 - **Invented weather** — Do not invent forecasts. Use only the weather description from Wikipedia's race details infobox or text (see Weather row above).
-- **Current-race spoilers** — Never mention who won the current race, its podium finishers, or any event from qualifying or the race itself. The Background and Practice sections are your boundary. Results and events from *previous* races are expected and desirable for immersion — see the tense table and "Previous race events" section below.
-- **Implicit spoilers via aggregate statements** — Aggregate claims about streaks or trends can reveal the current race result even without naming it. Before writing any statement of the form "the last N races have all been won by…" or "constructor X has won every race so far," verify that N counts only completed rounds *before* this race. If this race is one of the N, the sentence is a spoiler and must be cut or reworded to cover only the rounds that have already happened. Example: writing "the first three races have all been won by Cooper or Lotus" in the Monaco preview (Round 2) implicitly reveals that Monaco will also be won by Cooper or Lotus — cut to "Argentina was won by Cooper."
+- **Current-race spoilers** — Never mention who won the current race, its podium finishers, or any event from qualifying or the race itself. The Background and Practice sections are your boundary. Results and events from _previous_ races are expected and desirable for immersion — see the tense table and "Previous race events" section below.
+- **Implicit spoilers via aggregate statements** — Aggregate claims about streaks or trends can reveal the current race result even without naming it. Before writing any statement of the form "the last N races have all been won by…" or "constructor X has won every race so far," verify that N counts only completed rounds _before_ this race. If this race is one of the N, the sentence is a spoiler and must be cut or reworded to cover only the rounds that have already happened. Example: writing "the first three races have all been won by Cooper or Lotus" in the Monaco preview (Round 2) implicitly reveals that Monaco will also be won by Cooper or Lotus — cut to "Argentina was won by Cooper."
 - **Speculation** — "Ferrari should excel here" or "Red Bull has been dominant" without sourcing is fluff. If Wikipedia states a fact (e.g., "Red Bull won 7 of the first 8 races"), cite it directly.
 - **Flourishes** — No "jewel in the crown" or "iconic street circuit" filler. Just the facts.
 - **Invented or paraphrased quotes** — Only use quotation marks for wording Wikipedia attributes verbatim to a named person. Do not put your own words in someone's mouth, and do not quote unnamed sources ("a Ferrari engineer said…"). If Wikipedia paraphrases rather than quotes, paraphrase too — without quotation marks.
@@ -288,28 +296,28 @@ model: "{model_id}"
 
 ### Tense
 
-| Phase | Tense |
-|---|---|
-| `preseason` | Present tense — the season is about to begin. |
-| `preview` | Present tense for the state going into this race. Past tense for events that happened at a previous race. |
+| Phase       | Tense                                                                                                     |
+| ----------- | --------------------------------------------------------------------------------------------------------- |
+| `preseason` | Present tense — the season is about to begin.                                                             |
+| `preview`   | Present tense for the state going into this race. Past tense for events that happened at a previous race. |
 
-| Present (state into this race) | Past (events at the previous race) |
-|---|---|
-| "Verstappen leads by 48 points." | "At Imola, Verstappen took pole." |
-| "Red Bull leads the Constructors'." | "Norris finished second." |
-| "Pirelli brings the softest compounds." | "Pérez qualified 11th." |
-| "No stand-in drivers are entered." | "Leclerc moved into second in the standings." |
+| Present (state into this race)          | Past (events at the previous race)            |
+| --------------------------------------- | --------------------------------------------- |
+| "Verstappen leads by 48 points."        | "At Imola, Verstappen took pole."             |
+| "Red Bull leads the Constructors'."     | "Norris finished second."                     |
+| "Pirelli brings the softest compounds." | "Pérez qualified 11th."                       |
+| "No stand-in drivers are entered."      | "Leclerc moved into second in the standings." |
 
 ### Tightness test
 
 After writing, delete every sentence that doesn't convey a specific, Wikipedia-sourced fact.
 
-Passes | Fails |
-|---|---|
+| Passes                                                                                                           | Fails                                                                                               |
+| ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
 | "Hamilton's 300th Grand Prix start. He joins Barrichello and Alonso as the third driver to reach the milestone." | "Monaco is the most glamorous event on the calendar, attracting celebrities from around the world." |
-| "Verstappen leads Norris by 62 points. If he wins and Norris finishes 3rd or lower, the title is decided." | "The championship battle is heating up as we enter the final third of the season." |
-| "Heavy rain is forecast for Sunday with a 70% chance of thunderstorms." (from Wikipedia infobox or text) | "Early forecasts suggest warm conditions with no rain expected." (invented, not from Wikipedia) |
-| `Schumacher called the win "a relief after Hockenheim" — his first finish in four races.` | "Schumacher was reportedly pleased with the result." (unattributed, adds nothing) |
+| "Verstappen leads Norris by 62 points. If he wins and Norris finishes 3rd or lower, the title is decided."       | "The championship battle is heating up as we enter the final third of the season."                  |
+| "Heavy rain is forecast for Sunday with a 70% chance of thunderstorms." (from Wikipedia infobox or text)         | "Early forecasts suggest warm conditions with no rain expected." (invented, not from Wikipedia)     |
+| `Schumacher called the win "a relief after Hockenheim" — his first finish in four races.`                        | "Schumacher was reportedly pleased with the result." (unattributed, adds nothing)                   |
 
 ### Previous race → next race preview
 
@@ -324,7 +332,7 @@ This goes under `### Previous race`. Example:
 > gap in the final 15 laps. Piastri received a grid penalty for impeding Magnussen
 > in Q1.
 
-**Separately**, actual developments that happened *between* races — driver dropped,
+**Separately**, actual developments that happened _between_ races — driver dropped,
 team announcement, regulation change, contract news — go under
 `### Between-race developments`. This section is omitted if nothing happened between
 races beyond the normal post-race activity.
@@ -355,19 +363,31 @@ Use `###` level-3 headings. Omit any heading that has no content for a given rac
 Within a season, keep headings consistent.
 
 ```markdown
-### Championship standings       <!-- Required from Round 2 onward: narrative context, not a points table (the app already shows the table) -->
-### Previous race                <!-- Short recap: who won, standout moments, the mood — not a full play-by-play -->
-### Between-race developments    <!-- Only if something happened between races: driver changes, penalties, news -->
-### Championship permutations    <!-- Only when a title can be clinched at this race -->
-### Entrants                     <!-- Only at the race where a change happens; do not repeat at subsequent races -->
-### Penalties                    <!-- Only when grid penalties carry forward -->
-### Milestones                   <!-- Driver/team records achieved or reachable at this event -->
-### Weather                      <!-- From Wikipedia race infobox, presented as forecast -->
-### Tyre choices                 <!-- When available (modern era) -->
-### Track changes                <!-- Only if the circuit was modified -->
-### Sprint format                <!-- Only at sprint weekends: explain the weekend structure -->
-### Car upgrades                 <!-- Only when Wikipedia's Background lists team upgrades -->
-### Practice                     <!-- FP session results, incidents, red flags -->
+### Championship standings <!-- Required from Round 2 onward: narrative context, not a points table (the app already shows the table) -->
+
+### Previous race <!-- Short recap: who won, standout moments, the mood — not a full play-by-play -->
+
+### Between-race developments <!-- Only if something happened between races: driver changes, penalties, news -->
+
+### Championship permutations <!-- Only when a title can be clinched at this race -->
+
+### Entrants <!-- Only at the race where a change happens; do not repeat at subsequent races -->
+
+### Penalties <!-- Only when grid penalties carry forward -->
+
+### Milestones <!-- Driver/team records achieved or reachable at this event -->
+
+### Weather <!-- From Wikipedia race infobox, presented as forecast -->
+
+### Tyre choices <!-- When available (modern era) -->
+
+### Track changes <!-- Only if the circuit was modified -->
+
+### Sprint format <!-- Only at sprint weekends: explain the weekend structure -->
+
+### Car upgrades <!-- Only when Wikipedia's Background lists team upgrades -->
+
+### Practice <!-- FP session results, incidents, red flags -->
 ```
 
 ## File path scheme

@@ -10,7 +10,7 @@ const latestRaceSlug = stripYearPrefix(latest.slug, latest.season);
 ---
 
 <Base
-  title="F1 History — Race by race, 1950 to today"
+  title="Race Rewind — Race by race, 1950 to today"
   description="Race-by-race timeline of Formula 1 history. Driver career snapshots, standings as of any race, 1950–2026."
   canonical="/"
 >
@@ -20,17 +20,15 @@ const latestRaceSlug = stripYearPrefix(latest.slug, latest.season);
       Formula 1 <span class="text-accent">History</span>
     </h1>
     <p class="mx-auto mt-6 max-w-2xl text-lg text-fg-muted">
-      Race-by-race timeline of F1 from 1950 to today. Explore driver career arcs, team
-      standings, and how the championship looked going into every round.
+      Race-by-race timeline of F1 from 1950 to today. Explore driver career arcs, team standings,
+      and how the championship looked going into every round.
     </p>
 
     <ContinueButton client:only="svelte" />
 
     <!-- Season picker -->
     <div class="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-      <label for="home-season" class="text-sm font-medium text-fg-muted">
-        Pick a season
-      </label>
+      <label for="home-season" class="text-sm font-medium text-fg-muted"> Pick a season </label>
       <select
         id="home-season"
         aria-label="Season"
@@ -44,17 +42,23 @@ const latestRaceSlug = stripYearPrefix(latest.slug, latest.season);
 
   <!-- Recent seasons quick-access grid -->
   <section class="mt-4">
-    <h2 class="mb-4 text-base font-semibold text-fg-muted uppercase tracking-wider text-sm">Recent Seasons</h2>
+    <h2 class="mb-4 text-base font-semibold text-fg-muted uppercase tracking-wider text-sm">
+      Recent Seasons
+    </h2>
     <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
-      {recentSeasons.map((y) => (
-        <a
-          href={`/seasons/${y}/preseason/`}
-          class="group flex flex-col rounded-xl border border-border bg-bg-alt p-4 no-underline transition-all hover:border-accent hover:bg-bg-hover"
-        >
-          <span class="text-2xl font-bold text-fg group-hover:text-accent transition-colors">{y}</span>
-          <span class="mt-1 text-xs text-fg-muted">Season overview</span>
-        </a>
-      ))}
+      {
+        recentSeasons.map((y) => (
+          <a
+            href={`/seasons/${y}/preseason/`}
+            class="group flex flex-col rounded-xl border border-border bg-bg-alt p-4 no-underline transition-all hover:border-accent hover:bg-bg-hover"
+          >
+            <span class="text-2xl font-bold text-fg group-hover:text-accent transition-colors">
+              {y}
+            </span>
+            <span class="mt-1 text-xs text-fg-muted">Season overview</span>
+          </a>
+        ))
+      }
     </div>
   </section>
 
@@ -65,7 +69,19 @@ const latestRaceSlug = stripYearPrefix(latest.slug, latest.season);
       class="flex flex-col gap-2 rounded-xl border border-border bg-bg-alt p-5 no-underline transition-all hover:border-accent hover:bg-bg-hover group"
     >
       <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 text-accent">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          ><circle cx="12" cy="8" r="5"></circle><path d="M20 21a8 8 0 0 0-16 0"></path></svg
+        >
       </div>
       <span class="font-semibold text-fg group-hover:text-accent transition-colors">Drivers</span>
       <span class="text-sm text-fg-muted">879 drivers, career stats at any point in time</span>
@@ -76,7 +92,21 @@ const latestRaceSlug = stripYearPrefix(latest.slug, latest.season);
       class="flex flex-col gap-2 rounded-xl border border-border bg-bg-alt p-5 no-underline transition-all hover:border-accent hover:bg-bg-hover group"
     >
       <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 text-accent">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          ><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"
+          ></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"
+          ></path></svg
+        >
       </div>
       <span class="font-semibold text-fg group-hover:text-accent transition-colors">Teams</span>
       <span class="text-sm text-fg-muted">All constructors with driver rosters, race by race</span>
@@ -87,7 +117,19 @@ const latestRaceSlug = stripYearPrefix(latest.slug, latest.season);
       class="flex flex-col gap-2 rounded-xl border border-border bg-bg-alt p-5 no-underline transition-all hover:border-accent hover:bg-bg-hover group"
     >
       <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 text-accent">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l5.1 5.1M4 4l5 5"/></svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          ><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l5.1 5.1M4 4l5 5"></path></svg
+        >
       </div>
       <span class="font-semibold text-fg group-hover:text-accent transition-colors">Compare</span>
       <span class="text-sm text-fg-muted">Any two drivers, at any race in history</span>

@@ -1,4 +1,4 @@
-# F1 History Site — Architecture Overview
+# Race Rewind — Architecture Overview
 
 A time-travel F1 stats site: pick any historic race and see standings, driver/team stats, and championship context _as they were at that point in time_. Built for rewatching old seasons without spoilers.
 
