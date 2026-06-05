@@ -4,10 +4,10 @@ import { createClient } from '@libsql/client';
 import { drizzle } from 'drizzle-orm/libsql';
 import * as schema from '../../src/db/schema';
 
-const DB_PATH = path.resolve('data/f1-history.sqlite');
+const DB_PATH = path.resolve('data/race-rewind.sqlite');
 
 export function skipIfNoDb() {
-  if (!existsSync(DB_PATH)) return 'data/f1-history.sqlite not found — run pnpm ingest first';
+  if (!existsSync(DB_PATH)) return 'data/race-rewind.sqlite not found - run pnpm ingest first';
   return null;
 }
 

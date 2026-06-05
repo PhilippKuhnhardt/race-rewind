@@ -1,9 +1,9 @@
 /**
- * Entry point: CSV dump → data/f1-history.sqlite
+ * Entry point: CSV dump -> data/race-rewind.sqlite
  *
  * Usage:
  *   pnpm ingest
- *   pnpm tsx ingest/build_db.ts --dump ingest/jolpica-dump/2026-04-02 --out data/f1-history.sqlite
+ *   pnpm tsx ingest/build_db.ts --dump ingest/jolpica-dump/2026-04-02 --out data/race-rewind.sqlite
  */
 import { existsSync, rmSync } from 'node:fs';
 import path from 'node:path';
@@ -21,7 +21,7 @@ import { buildDerived } from './transform/derived';
 function parseArgs() {
   const args = process.argv.slice(2);
   let dumpDir = 'ingest/jolpica-dump/2026-04-02';
-  let outPath = 'data/f1-history.sqlite';
+  let outPath = 'data/race-rewind.sqlite';
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--dump' && args[i + 1]) dumpDir = args[++i];
     if (args[i] === '--out' && args[i + 1]) outPath = args[++i];

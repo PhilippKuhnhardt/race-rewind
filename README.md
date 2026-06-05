@@ -23,7 +23,7 @@ uv sync
 # Build the SQLite database from the committed CSV dump (~1.5s)
 uv run python -m ingestion.build_db \
   --dump ingestion/jolpica-dump/2026-04-02 \
-  --out  data/f1-history.sqlite
+  --out  data/race-rewind.sqlite
 
 # Start the Astro dev server
 pnpm dev
@@ -33,13 +33,13 @@ The SQLite file is committed to the repo, so if you just want to run the fronten
 
 ## Ingestion
 
-The ingestion pipeline converts the Jolpica CSV dump into `data/f1-history.sqlite`. It is a full drop-and-rebuild — safe to re-run at any time.
+The ingestion pipeline converts the Jolpica CSV dump into `data/race-rewind.sqlite`. It is a full drop-and-rebuild — safe to re-run at any time.
 
 ```bash
 # Rebuild the database
 uv run python -m ingestion.build_db \
   --dump ingestion/jolpica-dump/2026-04-02 \
-  --out  data/f1-history.sqlite
+  --out  data/race-rewind.sqlite
 
 # Run the invariant test suite
 uv run pytest
@@ -49,7 +49,7 @@ To ingest a new dump: add the new Jolpica CSV folder under `ingestion/jolpica-du
 
 ## Data source
 
-Race data comes from the [Jolpica F1 API](https://api.jolpi.ca/docs/#) (Ergast successor). The raw CSV export lives in `ingestion/jolpica-dump/<date>/` and is the source of truth; `data/f1-history.sqlite` is a fully derived artifact.
+Race data comes from the [Jolpica F1 API](https://api.jolpi.ca/docs/#) (Ergast successor). The raw CSV export lives in `ingestion/jolpica-dump/<date>/` and is the source of truth; `data/race-rewind.sqlite` is a fully derived artifact.
 
 DB schema docs: https://dbdocs.io/jolpica/jolpica-f1?view=relationships
 

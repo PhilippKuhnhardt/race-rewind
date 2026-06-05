@@ -2,6 +2,6 @@ import { defineConfig } from 'drizzle-kit';
 
 export default defineConfig({
   dialect: 'turso',
-  dbCredentials: { url: 'file:data/f1-history.sqlite' },
+  dbCredentials: { url: 'file:data/race-rewind.sqlite' },
   schema: 'src/db/schema.ts',
 });

@@ -84,7 +84,7 @@ Every fact must be verifiable against one of these Wikipedia pages:
    — championship context, regulation changes, driver market, team changes, mid-season developments,
    final standings. This is the primary source for preseason content.
 2. **Race article:** `https://en.wikipedia.org/wiki/{year}_{Title_Case_Grand_Prix_Name}`
-   (from the `wikipedia` column of the `races` table in `data/f1-history.sqlite`)
+   (from the `wikipedia` column of the `races` table in `data/race-rewind.sqlite`)
    — pre-race build-up, "Background" section, weather, practice/qualifying format notes.
 
 Read the season overview first (once), then each race article in calendar order.
@@ -184,7 +184,7 @@ model: "{model_id}"
 Query the races table to get all slugs and Wikipedia URLs:
 
 ```bash
-sqlite3 data/f1-history.sqlite \
+sqlite3 data/race-rewind.sqlite \
   "SELECT slug, name, wikipedia, round FROM races WHERE season = {year} ORDER BY round;"
 ```
 
