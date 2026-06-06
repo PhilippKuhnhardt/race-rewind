@@ -18,6 +18,7 @@ export default defineConfig({
           !pathname.startsWith('/drivers/')
           && !pathname.startsWith('/teams/')
           && !pathname.startsWith('/compare/')
+          && !pathname.startsWith('/legal/')
           && pathname !== '/stats/'
         );
       },

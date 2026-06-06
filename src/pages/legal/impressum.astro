@@ -1,0 +1,76 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+
+<Base
+  title="Impressum - Race Rewind"
+  description="Impressum von Race Rewind."
+  canonical="/legal/impressum/"
+  robots="noindex"
+  lang="de"
+>
+  <article class="mx-auto max-w-2xl">
+    <header class="mb-8">
+      <p class="text-sm font-semibold uppercase tracking-wider text-accent">Rechtliches</p>
+      <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-fg sm:text-4xl">Impressum</h1>
+    </header>
+
+    <section class="space-y-3 text-base leading-7 text-fg">
+      <h2 class="text-xl font-bold tracking-tight text-fg">Anbieter</h2>
+      <p>
+        Philipp Kuhnhardt<br />
+        Bebelstr. 52<br />
+        70193 Stuttgart
+      </p>
+    </section>
+
+    <section class="mt-8 space-y-3 text-base leading-7 text-fg">
+      <h2 class="text-xl font-bold tracking-tight text-fg">Kontakt</h2>
+      <p>
+        E-Mail: racerewind@posteo.de<br />
+        Über das nachfolgende Formular erreichen Sie mich ebenfalls.
+      </p>
+
+      <form
+        action="https://formspree.io/f/mnjyjewv"
+        method="POST"
+        class="mt-6 flex flex-col gap-4 rounded-lg border border-border bg-bg-alt p-5"
+      >
+        <label class="flex flex-col gap-1.5 text-sm font-medium text-fg">
+          <span>Ihre E-Mail-Adresse</span>
+          <input
+            type="email"
+            name="email"
+            required
+            autocomplete="email"
+            class="rounded-md border border-border bg-surface px-3 py-2 text-fg outline-none transition-colors focus:border-accent"
+          />
+        </label>
+        <label class="flex flex-col gap-1.5 text-sm font-medium text-fg">
+          <span>Betreff</span>
+          <input
+            type="text"
+            name="subject"
+            class="rounded-md border border-border bg-surface px-3 py-2 text-fg outline-none transition-colors focus:border-accent"
+          />
+        </label>
+        <label class="flex flex-col gap-1.5 text-sm font-medium text-fg">
+          <span>Ihre Nachricht</span>
+          <textarea
+            name="message"
+            rows="6"
+            required
+            class="resize-y rounded-md border border-border bg-surface px-3 py-2 text-fg outline-none transition-colors focus:border-accent"
+          ></textarea>
+        </label>
+        <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="hidden" />
+        <button
+          type="submit"
+          class="self-start rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent-hover"
+        >
+          Nachricht senden
+        </button>
+      </form>
+    </section>
+  </article>
+</Base>
