@@ -11,7 +11,7 @@ model: "claude-opus-4-5"
 
 ### Championship standings
 
-Häkkinen leads after winning Brazil, with Schumacher second. The McLarens have been the class of the field in practice at both opening rounds but their reliability record is two retirements from two starts — in Australia both cars failed, and in Brazil Coulthard stalled on the grid and never ran competitively. Häkkinen's win in Brazil was the team's only points finish so far.
+Irvine leads the championship after scoring in both opening rounds, two points ahead of Häkkinen and Frentzen. Häkkinen has momentum from winning Brazil, but McLaren's reliability record is still uneven: in Australia both cars failed, and in Brazil Coulthard stalled on the grid and never ran competitively. Häkkinen's win in Brazil is the team's only points finish so far.
 
 ### Previous race
 

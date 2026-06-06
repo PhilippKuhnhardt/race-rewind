@@ -11,7 +11,7 @@ model: "claude-opus-4-5"
 
 ### Championship standings
 
-Michael Schumacher leads with 16 points, four ahead of Irvine on 12. Häkkinen is third on 10, level with Frentzen and Ralf Schumacher. Ferrari lead the Constructors' with 28 points; McLaren are second with 16; Jordan third with 13.
+Michael Schumacher leads with 16 points, four ahead of Irvine on 12. Häkkinen and Frentzen are next on 10, with Ralf Schumacher fifth on 7. Ferrari lead the Constructors' with 28 points; McLaren are second with 16; Jordan third with 13.
 
 ### Previous race
 

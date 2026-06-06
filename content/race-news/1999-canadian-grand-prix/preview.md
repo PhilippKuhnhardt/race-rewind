@@ -11,7 +11,7 @@ model: "claude-opus-4-5"
 
 ### Championship standings
 
-Häkkinen leads after winning Spain — his first win since Brazil — with Coulthard second and Schumacher third finishing the Spanish podium. The McLarens completed a 1-2 for the first time this season. Schumacher remains the championship leader on 30 points, but Häkkinen has moved to within striking distance.
+Schumacher remains the championship leader on 30 points, but Häkkinen's Spain win has cut the gap to six. Irvine is third on 21. The McLarens completed a 1-2 for the first time this season at Barcelona, moving McLaren closer to Ferrari in the Constructors' Championship.
 
 ### Previous race
 

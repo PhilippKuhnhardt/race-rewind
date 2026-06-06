@@ -11,7 +11,7 @@ model: "claude-opus-4-5"
 
 ### Championship standings
 
-Irvine leads the championship after Australia, where both McLarens retired — Coulthard with a gearbox failure and Häkkinen with throttle problems. Frentzen and Ralf Schumacher scored the other points finishes.
+Irvine leads the championship after Australia, where both McLarens retired — Coulthard with a gearbox failure and Häkkinen with throttle problems. Frentzen is second, with Ralf Schumacher third.
 
 ### Previous race
 
