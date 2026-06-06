@@ -7,32 +7,32 @@ const seasons = await getAllSeasons();
 
 const featuredMoments = [
   {
-    label: 'Suzuka, 1988',
-    title: 'Can Senna end it here?',
+    label: 'Suzuka, 1989',
+    title: 'Can Senna catch up?',
     description:
       'Understand the championship implications of the legendary Japanese Grand Prix, with McLaren teammates fighting over a title.',
-    href: '/seasons/1988/japanese-grand-prix/',
-  },
-  {
-    label: 'Preseason, 2012',
-    title: 'The title-heavy grid',
-    description:
-      'Experience one of the most exciting seasons with six World Champions on the grid, fourteen titles between them, and Alonso and Vettel chasing a third crown.',
-    href: '/seasons/2012/preseason/',
-  },
-  {
-    label: 'Abu Dhabi, 2021',
-    title: 'Level into the finale',
-    description:
-      'Step into the final round with Verstappen and Hamilton tied on points, immersing yourself into the story before the race starts.',
-    href: '/seasons/2021/abu-dhabi-grand-prix/',
+    href: '/seasons/1989/japanese-grand-prix/',
   },
   {
     label: 'Ferrari, 1996',
     title: 'Ferrari before Schumi',
     description:
-      "Which footsteps did Schumi follow when joining Ferrari in 1996? Investigate the state of the Scuderia at the start of Schumacher's first season.",
+      "Whose footsteps did Schumi follow when joining Ferrari in 1996? Investigate the state of the Scuderia at the start of Schumacher's first season.",
     href: '/teams/ferrari/1996/preseason/',
+  },
+  {
+    label: 'Hamilton, 2013',
+    title: 'A rising star',
+    description:
+      'How successful was Sir Lewis Hamilton before his legendary run at Mercedes? Travel back to 2013 to find out.',
+    href: '/drivers/lewis-hamilton/2013/preseason/',
+  },
+  {
+    label: 'Postseason, 1984',
+    title: 'The legends of the past',
+    description:
+      '1984 saw a season-long duel between the legends of Lauda and Prost, while a young Senna made his debut. But who were the GOATs of the time? Check the historic stats to find out.',
+    href: '/stats/1984/postseason/',
   },
 ];
 ---
@@ -47,9 +47,13 @@ const featuredMoments = [
     <h1 class="text-4xl font-extrabold tracking-tight text-fg sm:text-5xl lg:text-6xl">
       Race <span class="text-accent">Rewind</span>
     </h1>
-    <p class="mx-auto mt-6 max-w-2xl text-lg text-fg-muted">
+    <p class="mx-auto mt-6 max-w-2xl text-lg text-fg">
       Open Formula 1 history at the exact weekend it happened. Standings, lineups, stats and context
       stay locked to that moment, with future outcomes hidden.
+    </p>
+    <p class="mx-auto mt-4 max-w-2xl text-lg text-fg">
+      Built as the perfect companion for race rewatches, Race Rewind gives you the championship
+      picture and period context before you press play, without spoiling what comes next.
     </p>
 
     <div class="mt-8">
