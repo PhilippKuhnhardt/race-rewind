@@ -3,7 +3,7 @@
    viewBox="0 0 32 32"
    version="1.1"
    id="svg4"
-   sodipodi:docname="favicon.svg"
+   sodipodi:docname="favicon_light.svg"
    inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -34,7 +34,8 @@
      height="32"
      rx="6"
      fill="#0b0b0c"
-     id="rect1" />
+     id="rect1"
+     style="fill:#ffffff;fill-opacity:1" />
   <path
      d="M 2.9736527,15 0.77365269,16.8 H 5.4736527 l 2.2,-1.8 z"
      fill="#e10600"
@@ -42,7 +43,8 @@
   <path
      d="M18.7 7.6 8.2 16l10.5 8.4v-5.8l7.1 5.7V7.7l-7.1 5.7Z"
      fill="#fff"
-     id="path2" />
+     id="path2"
+     style="fill:#000000;fill-opacity:1" />
   <path
      d="M5.8 10.3 3.6 12.1h4.7l2.2-1.8Z"
      fill="#e10600"

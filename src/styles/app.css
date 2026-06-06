@@ -41,5 +41,17 @@
   /* accent/fl/up/down are distinct enough on dark backgrounds */
 }
 
+.logo-mark-dark {
+  display: none;
+}
+
+[data-theme="dark"] .logo-mark-light {
+  display: none;
+}
+
+[data-theme="dark"] .logo-mark-dark {
+  display: block;
+}
+
 /* Prevent flash of wrong theme by reading localStorage before first paint */
 /* Inline in <head> — do not move this to a separate JS bundle */

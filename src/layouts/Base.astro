@@ -20,10 +20,7 @@ interface Props {
 const { title, description, canonical, lang = 'en', robots, pageContext } = Astro.props;
 const canonicalURL = new URL(canonical, SITE_URL).href;
 
-const [{ seasons, byseason }, latest] = await Promise.all([
-  getAllRacesBySeason(),
-  getLatestRace(),
-]);
+const [{ seasons, byseason }, latest] = await Promise.all([getAllRacesBySeason(), getLatestRace()]);
 
 const { currentSeason, currentRaceSlug, currentChainSlug, compareSlug, section } =
   resolvePageNavState(pageContext, latest);
@@ -39,9 +36,11 @@ const { currentSeason, currentRaceSlug, currentChainSlug, compareSlug, section }
     <!-- Anti-flash: read theme from localStorage before first paint -->
     <script is:inline>
       try {
-        const t = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        const t =
+          localStorage.getItem('theme') ||
+          (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         document.documentElement.setAttribute('data-theme', t);
-      // eslint-disable-next-line no-empty
+        // eslint-disable-next-line no-empty
       } catch {}
     </script>
 
