@@ -384,7 +384,10 @@ Required because the site is commercial (ads) and operated from Germany:
 - **Datenschutzerklärung** (privacy policy): generated via e-recht24 or similar
 - **Cookie consent banner**: triggered by AdSense cookies. Use Klaro! or Cookiebot free tier
 - **ads.txt** at root (required by AdSense)
-- Footer disclaimer: "Independent fan site — not affiliated with Formula One Group, FIA, or any team"
+- Footer disclaimer: Race Rewind is independent and unofficial, not affiliated with the Formula 1 companies, Formula One
+  Management, Formula One World Championship Limited, Formula One Licensing B.V., the FIA, any team/constructor, driver,
+  circuit, or race promoter; Formula 1-related marks are acknowledged as trade marks of Formula One Licensing B.V. and
+  other marks as property of their respective owners.
 
 Cloudflare Web Analytics alone does not require a cookie banner; AdSense does.
 
