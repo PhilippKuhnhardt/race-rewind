@@ -1,3 +1,26 @@
 User-agent: *
 Allow: /
-Sitemap: https://racerewind.net/sitemap-index.xml
+Disallow: /compare/
+Disallow: /*?prefill=
+
+User-agent: AhrefsBot
+Disallow: /drivers/
+Disallow: /teams/
+Disallow: /compare/
+
+User-agent: SemrushBot
+Disallow: /drivers/
+Disallow: /teams/
+Disallow: /compare/
+
+User-agent: DotBot
+Disallow: /drivers/
+Disallow: /teams/
+Disallow: /compare/
+
+User-agent: MJ12bot
+Disallow: /drivers/
+Disallow: /teams/
+Disallow: /compare/
+
+Sitemap: https://racerewind.org/sitemap-index.xml

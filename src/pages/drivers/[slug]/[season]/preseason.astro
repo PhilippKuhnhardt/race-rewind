@@ -4,6 +4,7 @@ import TeamsDrivenTable from '../../../../components/team/TeamsDrivenTable.astro
 import Base from '../../../../layouts/Base.astro';
 import { driverLinkAt, teamLinkAt, raceLinkAt } from '../../../../lib/nav';
 import { pitForPreseason, resolveAsOfRaceNumber } from '../../../../lib/point-in-time';
+import { NOINDEX_FOLLOW, setLongEdgeCache, setNoindexFollow } from '../../../../lib/response';
 import { formatPts, stripYearPrefix } from '../../../../lib/format';
 import {
   getDriverBySlug,
@@ -17,6 +18,9 @@ import type { PageContext } from '../../../../lib/types';
 import { emojify } from '../../../../lib/ui/emojify';
 
 export const prerender = false;
+
+setNoindexFollow(Astro.response.headers);
+setLongEdgeCache(Astro.response.headers);
 
 const { slug, season: seasonStr } = Astro.params;
 const season = Number(seasonStr);
@@ -53,6 +57,7 @@ const description = `${driver.full_name}'s career going into the ${season} seaso
   title={title}
   description={description}
   canonical={driverLinkAt(slug, pit)}
+  robots={NOINDEX_FOLLOW}
   {pageContext}
 >
   <div class="mb-4">

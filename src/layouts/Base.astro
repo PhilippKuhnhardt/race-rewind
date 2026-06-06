@@ -12,10 +12,11 @@ interface Props {
   title: string;
   description: string;
   canonical: string;
+  robots?: string;
   pageContext?: PageContext;
 }
 
-const { title, description, canonical, pageContext } = Astro.props;
+const { title, description, canonical, robots, pageContext } = Astro.props;
 const canonicalURL = new URL(canonical, SITE_URL).href;
 
 const [{ seasons, byseason }, latest] = await Promise.all([
@@ -84,7 +85,9 @@ const section: 'seasons' | 'stats' = pageContext?.kind === 'stats' ? 'stats' : '
 
     <title>{title}</title>
     <meta name="description" content={description} />
+    {robots && <meta name="robots" content={robots} />}
     <link rel="canonical" href={canonicalURL} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
 
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />

@@ -6,6 +6,7 @@ import TeamSeasonOverviewTable from '../../../../components/team/TeamSeasonOverv
 import Base from '../../../../layouts/Base.astro';
 import { teamLinkAt, driverLinkAt, raceLinkAt } from '../../../../lib/nav';
 import { pitForPostseason, resolveAsOfRaceNumber } from '../../../../lib/point-in-time';
+import { NOINDEX_FOLLOW, setLongEdgeCache, setNoindexFollow } from '../../../../lib/response';
 import { formatPts, stripYearPrefix } from '../../../../lib/format';
 import {
   getTeamBySlug,
@@ -19,6 +20,9 @@ import type { PageContext } from '../../../../lib/types';
 import { emojify } from '../../../../lib/ui/emojify';
 
 export const prerender = false;
+
+setNoindexFollow(Astro.response.headers);
+setLongEdgeCache(Astro.response.headers);
 
 const { slug, season: seasonStr } = Astro.params;
 const season = Number(seasonStr);
@@ -55,6 +59,7 @@ const description = `${team.name}'s stats after the ${season} season: ${stats.wi
   title={title}
   description={description}
   canonical={teamLinkAt(slug, pit)}
+  robots={NOINDEX_FOLLOW}
   {pageContext}
 >
   <div class="mb-4">

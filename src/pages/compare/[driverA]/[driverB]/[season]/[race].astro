@@ -6,10 +6,14 @@ import { buildDriverAtRacePayload } from '../../../../../lib/payloads/driver-at-
 import { getAllRacesBySeason, getSeasonBounds, getAllDriversForPicker } from '../../../../../lib/queries';
 import { getDriverBySlug, getDriverCareerStats } from '../../../../../lib/queries';
 import { raceLink, preseasonLink, postseasonLink } from '../../../../../lib/format';
+import { NOINDEX_FOLLOW, setNoSharedCache, setNoindexFollow } from '../../../../../lib/response';
 import type { PageContext } from '../../../../../lib/types';
 import type { DriverAtRacePayload } from '../../../../../lib/api-types';
 
 export const prerender = false;
+
+setNoindexFollow(Astro.response.headers);
+setNoSharedCache(Astro.response.headers);
 
 const { driverA, driverB, season: seasonStr, race: raceSlug } = Astro.params;
 const season = Number(seasonStr);
@@ -131,7 +135,7 @@ const description = `Compare ${payloadA.driver.full_name} and ${payloadB.driver.
 const canonical = `/compare/${payloadA.driver.slug}/${payloadB.driver.slug}/${season}/${raceSlug}/`;
 ---
 
-<Base {title} {description} {canonical} {pageContext}>
+<Base {title} {description} {canonical} robots={NOINDEX_FOLLOW} {pageContext}>
   <div class="mb-4">
     <a href={backHref} class="text-sm text-fg-muted hover:text-accent transition-colors">
       &larr; {backLabel}

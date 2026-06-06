@@ -4,6 +4,7 @@ import TeamsDrivenTable from '../../../../components/team/TeamsDrivenTable.astro
 import Base from '../../../../layouts/Base.astro';
 import { driverLink, formatPts, raceLink, stripYearPrefix, teamLink } from '../../../../lib/format';
 import { pitForRace } from '../../../../lib/point-in-time';
+import { NOINDEX_FOLLOW, setLongEdgeCache, setNoindexFollow } from '../../../../lib/response';
 import {
   getAllRacesBySeason,
   getDriverBySlug,
@@ -17,6 +18,9 @@ import type { PageContext } from '../../../../lib/types';
 import { emojify } from '../../../../lib/ui/emojify';
 
 export const prerender = false;
+
+setNoindexFollow(Astro.response.headers);
+setLongEdgeCache(Astro.response.headers);
 
 const { slug, season, race: raceSlug } = Astro.params;
 
@@ -61,6 +65,7 @@ const description = `${driver.full_name}'s career going into the ${race.season} 
   title={title}
   description={description}
   canonical={driverLink(slug, season, raceSlug)}
+  robots={NOINDEX_FOLLOW}
   {pageContext}
 >
   <div class="mb-4">

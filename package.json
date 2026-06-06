@@ -16,6 +16,7 @@
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
     "@astrojs/svelte": "^8.1.2",
+    "@astrojs/vercel": "^10.0.8",
     "@libsql/client": "^0.17.3",
     "@tailwindcss/vite": "^4.3.0",
     "astro": "^6.4.2",

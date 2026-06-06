@@ -4,11 +4,27 @@ import svelte from '@astrojs/svelte';
 import tailwindcss from '@tailwindcss/vite';
 import { SITE_URL } from './src/lib/const.ts';
 
+import vercel from '@astrojs/vercel';
+
 export default defineConfig({
   site: SITE_URL,
   trailingSlash: 'always',
   build: { format: 'directory' },
-  integrations: [sitemap(), svelte()],
+  integrations: [
+    sitemap({
+      filter: (page) => {
+        const pathname = page.startsWith(SITE_URL) ? page.slice(SITE_URL.length) : page;
+        return (
+          !pathname.startsWith('/drivers/')
+          && !pathname.startsWith('/teams/')
+          && !pathname.startsWith('/compare/')
+          && pathname !== '/stats/'
+        );
+      },
+    }),
+    svelte(),
+  ],
+
   vite: {
     plugins: [tailwindcss()],
     server: {
@@ -24,4 +40,12 @@ export default defineConfig({
       },
     },
   },
+
+  adapter: vercel({
+    includeFiles: ['data/race-rewind.sqlite'],
+    isr: {
+      expiration: 60 * 60 * 24 * 30,
+      exclude: [/^\/compare(?:\/.*)?$/],
+    },
+  }),
 });

@@ -29,6 +29,6 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ['dist/', '.astro/', 'node_modules/', '**/*.d.ts'],
+    ignores: ['dist/', '.vercel/', '.astro/', 'node_modules/', '**/*.d.ts'],
   }
 );
