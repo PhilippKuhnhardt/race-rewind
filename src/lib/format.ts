@@ -64,6 +64,13 @@ export function isLapDetail(detail: string | null | undefined): boolean {
   return detail != null && /^\+\d+ Lap/i.test(detail);
 }
 
+/** Format a completed-laps deficit as a race gap, e.g. "+1 Lap", "+3 Laps". */
+function formatLapDeficit(winnerLaps: number, rowLaps: number): string | null {
+  const deficit = winnerLaps - rowLaps;
+  if (deficit <= 0) return null;
+  return `+${deficit} ${deficit === 1 ? 'Lap' : 'Laps'}`;
+}
+
 /** Format a standings position delta for display, e.g. +2, -1, = */
 export function formatDelta(before: number | null, after: number | null): string {
   if (before == null || after == null) return '—';
@@ -109,10 +116,20 @@ export function formatYearRanges(years: number[]): string {
 /** Compute the "Time / Gap" cell value for a race result row. */
 export function formatGap(
   winnerTime: string | null,
-  row: { position: number | null; time: string | null; detail: string | null }
+  row: {
+    position: number | null;
+    time: string | null;
+    detail: string | null;
+    laps_completed?: number | null;
+  },
+  winnerLaps?: number | null,
 ): string {
   if (row.position === 1) return formatRaceTime(row.time);
   if (row.time != null && winnerTime != null) return computeGap(winnerTime, row.time);
   if (isLapDetail(row.detail)) return row.detail!;
+  if (winnerLaps != null && row.laps_completed != null) {
+    const lapGap = formatLapDeficit(winnerLaps, row.laps_completed);
+    if (lapGap != null) return lapGap;
+  }
   return '—';
 }

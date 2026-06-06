@@ -1,5 +1,5 @@
 ---
-import { formatPts, formatPos, formatGap, driverLink, teamLink } from '../../lib/format';
+import { formatPts, formatPos, formatGap, isLapDetail, driverLink, teamLink } from '../../lib/format';
 import type { getRaceResults } from '../../lib/queries';
 import TeamColorSwatch from '../primitives/TeamColorSwatch.astro';
 
@@ -11,7 +11,9 @@ interface Props {
 }
 
 const { results, season, raceSlug, isSprint = false } = Astro.props;
-const winnerTime = results.find((r) => r.position === 1)?.time ?? null;
+const winner = results.find((r) => r.position === 1);
+const winnerTime = winner?.time ?? null;
+const winnerLaps = winner?.laps_completed ?? null;
 ---
 
 {results.length > 0 ? (
@@ -34,8 +36,8 @@ const winnerTime = results.find((r) => r.position === 1)?.time ?? null;
         </thead>
         <tbody>
           {results.map((row) => {
-            const gap = formatGap(winnerTime, row);
-            const status = row.is_classified ? 'Finished' : (row.detail ?? '—');
+            const gap = formatGap(winnerTime, row, winnerLaps);
+            const status = row.detail != null && !isLapDetail(row.detail) ? row.detail : row.is_classified ? 'Finished' : '—';
             const isFl = row.fastest_lap_rank === 1;
             return (
               <tr class="border-b border-border last:border-0 hover:bg-bg-hover transition-colors">
