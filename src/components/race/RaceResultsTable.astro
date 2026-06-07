@@ -14,6 +14,7 @@ const { results, season, raceSlug, isSprint = false } = Astro.props;
 const winner = results.find((r) => r.position === 1);
 const winnerTime = winner?.time ?? null;
 const winnerLaps = winner?.laps_completed ?? null;
+const hasFastestLap = results.some((r) => r.fastest_lap_rank === 1);
 ---
 
 {results.length > 0 ? (
@@ -69,7 +70,9 @@ const winnerLaps = winner?.laps_completed ?? null;
         </tbody>
       </table>
     </div>
-    <p class="mt-2 text-xs text-fg-muted"><span class="text-fl font-medium">Purple</span> driver name = set fastest lap of the race.</p>
+    {hasFastestLap && (
+      <p class="mt-2 text-xs text-fg-muted"><span class="text-fl font-medium">Purple</span> driver name = set fastest lap of the race.</p>
+    )}
   </div>
 ) : (
   <p class="text-sm text-fg-muted">No results available yet.</p>
