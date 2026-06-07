@@ -1,0 +1,75 @@
+---
+import Base from '../../layouts/Base.astro';
+import datenschutzerklaerungHtml from './datenschutzerklärung.html?raw';
+---
+
+<Base
+  title="Datenschutzerklärung - Race Rewind"
+  description="Datenschutzerklärung von Race Rewind."
+  canonical="/legal/datenschutzerklaerung/"
+  robots="noindex"
+  lang="de"
+>
+  <article class="legal-copy mx-auto max-w-3xl" set:html={datenschutzerklaerungHtml} />
+</Base>
+
+<style>
+  .legal-copy {
+    color: var(--color-fg);
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  .legal-copy :global(h1) {
+    margin: 0 0 2rem;
+    color: var(--color-fg);
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+  }
+
+  .legal-copy :global(h2) {
+    margin: 2rem 0 0.75rem;
+    color: var(--color-fg);
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  .legal-copy :global(h3) {
+    margin: 1.5rem 0 0.5rem;
+    color: var(--color-fg);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .legal-copy :global(p) {
+    margin: 0.875rem 0;
+  }
+
+  .legal-copy :global(ul) {
+    margin: 0.875rem 0;
+    padding-left: 1.25rem;
+    list-style: disc;
+  }
+
+  .legal-copy :global(li) {
+    margin: 0.375rem 0;
+  }
+
+  .legal-copy :global(a) {
+    color: var(--color-accent);
+    font-weight: 500;
+    overflow-wrap: anywhere;
+    text-underline-offset: 4px;
+  }
+
+  .legal-copy :global(a:hover) {
+    text-decoration: underline;
+  }
+
+  .legal-copy :global(.index) {
+    margin: 1rem 0 2rem;
+  }
+</style>
