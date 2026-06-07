@@ -1,0 +1,31 @@
+---
+import ContactForm from '../components/legal/ContactForm.astro';
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="Contact - Race Rewind"
+  description="Contact Race Rewind by email or contact form."
+  canonical="/contact/"
+>
+  <article class="mx-auto max-w-2xl">
+    <header class="mb-8">
+      <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-fg sm:text-4xl">Contact</h1>
+    </header>
+
+    <section class="space-y-3 text-base leading-7 text-fg">
+      <h2 class="text-xl font-bold tracking-tight text-fg">Email</h2>
+      <p>
+        You can reach Race Rewind at <a
+          href="mailto:racerewind@posteo.de"
+          class="font-medium text-accent underline-offset-4 hover:underline">racerewind@posteo.de</a
+        >
+      </p>
+    </section>
+
+    <section class="mt-8 space-y-3 text-base leading-7 text-fg">
+      <h2 class="text-xl font-bold tracking-tight text-fg">Contact form</h2>
+      <ContactForm />
+    </section>
+  </article>
+</Base>

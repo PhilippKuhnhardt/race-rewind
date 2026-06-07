@@ -1,0 +1,39 @@
+<form
+  action="https://formspree.io/f/mnjyjewv"
+  method="POST"
+  class="mt-6 flex flex-col gap-4 rounded-lg border border-border bg-bg-alt p-5"
+>
+  <label class="flex flex-col gap-1.5 text-sm font-medium text-fg">
+    <span>Your email address</span>
+    <input
+      type="email"
+      name="email"
+      autocomplete="email"
+      class="rounded-md border border-border bg-surface px-3 py-2 text-fg outline-none transition-colors focus:border-accent"
+    />
+  </label>
+  <label class="flex flex-col gap-1.5 text-sm font-medium text-fg">
+    <span>Subject</span>
+    <input
+      type="text"
+      name="subject"
+      class="rounded-md border border-border bg-surface px-3 py-2 text-fg outline-none transition-colors focus:border-accent"
+    />
+  </label>
+  <label class="flex flex-col gap-1.5 text-sm font-medium text-fg">
+    <span>Your message *</span>
+    <textarea
+      name="message"
+      rows="6"
+      required
+      class="resize-y rounded-md border border-border bg-surface px-3 py-2 text-fg outline-none transition-colors focus:border-accent"
+    ></textarea>
+  </label>
+  <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="hidden" />
+  <button
+    type="submit"
+    class="self-start rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent-hover"
+  >
+    Send message
+  </button>
+</form>
