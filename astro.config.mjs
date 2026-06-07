@@ -44,9 +44,5 @@ export default defineConfig({
 
   adapter: vercel({
     includeFiles: ['data/race-rewind.sqlite'],
-    isr: {
-      expiration: 60 * 60 * 24 * 30,
-      exclude: [/^\/compare(?:\/.*)?$/],
-    },
   }),
 });
