@@ -2,11 +2,10 @@
 race_slug: 1957-preseason
 phase: preseason
 source_url: https://en.wikipedia.org/w/index.php?title=1957_Formula_One_season&oldid=1356321865
-source_revision: "1356321865"
+source_revision: '1356321865'
 source_title: 1957 Formula One season
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Driver changes

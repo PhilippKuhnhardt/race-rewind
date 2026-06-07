@@ -2,11 +2,10 @@
 race_slug: 2024-preseason
 phase: preseason
 source_url: https://en.wikipedia.org/w/index.php?title=2024_Formula_One_World_Championship&oldid=1355079916
-source_revision: "1355079916"
+source_revision: '1355079916'
 source_title: 2024 Formula One World Championship
 license: CC-BY-SA-4.0
-generated_at: "2026-05-26"
-model: github-copilot/claude-opus-4.6
+generated_at: '2026-05-26'
 ---
 
 The 75th running of the Formula One World Championship, contested over a record twenty-four Grands Prix. Max Verstappen enters as the defending Drivers' Champion and Red Bull Racing-Honda RBPT as the defending Constructors' Champion. Every driver and team combination that competed in the final round of the previous season remains unchanged — the first time in championship history that the entire grid carries over.

@@ -2,11 +2,10 @@
 race_slug: 1983-south-african-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1983_South_African_Grand_Prix&oldid=1346086504
-source_revision: "1346086504"
+source_revision: '1346086504'
 source_title: 1983 South African Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings

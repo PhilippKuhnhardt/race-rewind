@@ -2,11 +2,10 @@
 race_slug: 2002-australian-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2002_Australian_Grand_Prix&oldid=1354770014
-source_revision: "1354770014"
+source_revision: '1354770014'
 source_title: 2002 Australian Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 The opening round of seventeen in the 2002 Formula One World Championship. The Albert Park Circuit was confirmed on the calendar only after a coroner's report ruled the death of marshal Graham Beveridge in the 2001 race "avoidable." For 2002 the circuit has been upgraded: safety fences raised to 3.8 m, protective cages installed for race officials, and access openings reduced in size.

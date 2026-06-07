@@ -2,11 +2,10 @@
 race_slug: 2010-italian-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2010_Italian_Grand_Prix&oldid=1346094120
-source_revision: "1346094120"
+source_revision: '1346094120'
 source_title: 2010 Italian Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings

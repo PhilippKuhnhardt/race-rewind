@@ -2,11 +2,10 @@
 race_slug: 2018-brazilian-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2018_Brazilian_Grand_Prix&oldid=1346109037
-source_revision: "1346109037"
+source_revision: '1346109037'
 source_title: 2018 Brazilian Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: claude-opus-4-5
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings

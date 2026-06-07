@@ -2,11 +2,10 @@
 race_slug: 1987-san-marino-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1987_San_Marino_Grand_Prix&oldid=1349008446
-source_revision: "1349008446"
+source_revision: '1349008446'
 source_title: 1987 San Marino Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings

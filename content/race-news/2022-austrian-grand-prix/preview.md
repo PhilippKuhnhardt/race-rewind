@@ -2,11 +2,10 @@
 race_slug: 2022-austrian-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2022_Austrian_Grand_Prix&oldid=1333433736
-source_revision: "1333433736"
+source_revision: '1333433736'
 source_title: 2022 Austrian Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings

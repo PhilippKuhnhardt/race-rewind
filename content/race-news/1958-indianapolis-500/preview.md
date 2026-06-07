@@ -2,11 +2,10 @@
 race_slug: 1958-indianapolis-500
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1958_Indianapolis_500&oldid=1356325115
-source_revision: "1356325115"
+source_revision: '1356325115'
 source_title: 1958 Indianapolis 500
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings

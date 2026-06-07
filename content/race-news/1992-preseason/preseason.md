@@ -2,11 +2,10 @@
 race_slug: 1992-preseason
 phase: preseason
 source_url: https://en.wikipedia.org/w/index.php?title=1992_Formula_One_World_Championship&oldid=1347754922
-source_revision: "1347754922"
+source_revision: '1347754922'
 source_title: 1992 Formula One World Championship
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Driver changes

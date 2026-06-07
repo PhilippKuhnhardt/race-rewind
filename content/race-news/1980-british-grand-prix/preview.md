@@ -2,11 +2,10 @@
 race_slug: 1980-british-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1980_British_Grand_Prix&oldid=1346084330
-source_revision: "1346084330"
+source_revision: '1346084330'
 source_title: 1980 British Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Previous race
@@ -24,5 +23,3 @@ Brabham have replaced Ricardo Zunino with Mexican driver Héctor Rebaque for the
 ### Entrants
 
 RAM Racing has entered a pair of year-old Williams FW07s for Rupert Keegan and South African driver Desiré Wilson — the fourth woman to enter a Formula One World Championship event, after Maria Teresa de Filippis, Lella Lombardi, and Divina Galica.
-
-

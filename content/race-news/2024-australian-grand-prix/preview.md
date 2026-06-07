@@ -2,11 +2,10 @@
 race_slug: 2024-australian-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2024_Australian_Grand_Prix&oldid=1354754786
-source_revision: "1354754786"
+source_revision: '1354754786'
 source_title: 2024 Australian Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-26"
-model: github-copilot/claude-opus-4.6
+generated_at: '2026-05-26'
 ---
 
 The 87th running of the Australian Grand Prix, held at the Albert Park Circuit in Melbourne across 22–24 March. This is the third round of the 2024 season and the 27th time the circuit hosts the event.

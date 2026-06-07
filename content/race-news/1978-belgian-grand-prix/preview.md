@@ -2,11 +2,10 @@
 race_slug: 1978-belgian-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1978_Belgian_Grand_Prix&oldid=1346101432
-source_revision: "1346101432"
+source_revision: '1346101432'
 source_title: 1978 Belgian Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-26"
-model: "claude-opus-4-5"
+generated_at: '2026-05-26'
 ---
 
 ### Championship standings

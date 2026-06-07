@@ -2,11 +2,10 @@
 race_slug: 2024-saudi-arabian-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2024_Saudi_Arabian_Grand_Prix&oldid=1346098623
-source_revision: "1346098623"
+source_revision: '1346098623'
 source_title: 2024 Saudi Arabian Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-26"
-model: github-copilot/claude-opus-4.6
+generated_at: '2026-05-26'
 ---
 
 The fourth running of the Saudi Arabian Grand Prix, held at the Jeddah Corniche Circuit across 7–9 March. The Grand Prix is the second round of the 2024 season and takes place on Saturday to accommodate Ramadan, which begins on 10 March.

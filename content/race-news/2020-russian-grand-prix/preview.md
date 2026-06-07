@@ -2,11 +2,10 @@
 race_slug: 2020-russian-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2020_Russian_Grand_Prix&oldid=1346110304
-source_revision: "1346110304"
+source_revision: '1346110304'
 source_title: 2020 Russian Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Previous race

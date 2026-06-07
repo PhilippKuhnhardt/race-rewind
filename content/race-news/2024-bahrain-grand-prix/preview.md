@@ -2,11 +2,10 @@
 race_slug: 2024-bahrain-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2024_Bahrain_Grand_Prix&oldid=1324431872
-source_revision: "1324431872"
+source_revision: '1324431872'
 source_title: 2024 Bahrain Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-26"
-model: github-copilot/claude-opus-4.6
+generated_at: '2026-05-26'
 ---
 
 The 20th running of the Bahrain Grand Prix and the opening round of the 2024 Formula One World Championship, held at the Bahrain International Circuit.

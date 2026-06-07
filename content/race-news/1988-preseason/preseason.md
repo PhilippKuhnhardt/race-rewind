@@ -2,11 +2,10 @@
 race_slug: 1988-preseason
 phase: preseason
 source_url: https://en.wikipedia.org/w/index.php?title=1988_Formula_One_World_Championship&oldid=1347269124
-source_revision: "1347269124"
+source_revision: '1347269124'
 source_title: 1988 Formula One World Championship
 license: CC-BY-SA-4.0
-generated_at: "2026-05-26"
-model: "claude-sonnet-4-6"
+generated_at: '2026-05-26'
 ---
 
 ### Driver changes

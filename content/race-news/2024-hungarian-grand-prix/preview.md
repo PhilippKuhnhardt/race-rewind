@@ -2,11 +2,10 @@
 race_slug: 2024-hungarian-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2024_Hungarian_Grand_Prix&oldid=1355079947
-source_revision: "1355079947"
+source_revision: '1355079947'
 source_title: 2024 Hungarian Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-26"
-model: github-copilot/claude-opus-4.6
+generated_at: '2026-05-26'
 ---
 
 ### Championship standings

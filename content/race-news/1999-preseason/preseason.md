@@ -2,11 +2,10 @@
 race_slug: 1999-preseason
 phase: preseason
 source_url: https://en.wikipedia.org/w/index.php?title=1999_Formula_One_World_Championship&oldid=1346176829
-source_revision: "1346176829"
+source_revision: '1346176829'
 source_title: 1999 Formula One World Championship
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 The 1999 FIA Formula One World Championship is the 53rd season of Formula One motor racing. Sixteen races are scheduled, beginning in Australia in March and concluding in Japan in October. Mika Häkkinen defends his Drivers' title; McLaren defend the Constructors' title.

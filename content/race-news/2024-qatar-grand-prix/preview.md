@@ -2,11 +2,10 @@
 race_slug: 2024-qatar-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2024_Qatar_Grand_Prix&oldid=1354628651
-source_revision: "1354628651"
+source_revision: '1354628651'
 source_title: 2024 Qatar Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-26"
-model: github-copilot/claude-opus-4.6
+generated_at: '2026-05-26'
 ---
 
 ### Championship standings

@@ -2,11 +2,10 @@
 race_slug: 2003-austrian-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2003_Austrian_Grand_Prix&oldid=1349165680
-source_revision: "1349165680"
+source_revision: '1349165680'
 source_title: 2003 Austrian Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings
@@ -20,5 +19,3 @@ In Spain, Michael Schumacher won from pole â€” his second consecutive victory â€
 ### Milestones
 
 It was announced in January 2003 that the Austrian Grand Prix will be dropped from the Formula One calendar in 2004, three years before the contract was due to expire. An exit clause was triggered by the European Union's push to advance the tobacco advertising ban to October 2005. This is therefore the final Austrian Grand Prix until the circuit is eventually renamed and the race returns.
-
-

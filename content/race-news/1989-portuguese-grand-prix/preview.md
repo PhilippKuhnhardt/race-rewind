@@ -2,11 +2,10 @@
 race_slug: 1989-portuguese-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1989_Portuguese_Grand_Prix&oldid=1346087771
-source_revision: "1346087771"
+source_revision: '1346087771'
 source_title: 1989 Portuguese Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings
@@ -26,4 +25,3 @@ Having announced he was leaving for Ferrari, Prost dropped his winner's trophy f
 Williams introduces the new FW13 at Estoril, replacing the FW12C that has been used since the opening race.
 
 Bertrand Gachot has been fired from Onyx after openly criticising the team; Finnish driver JJ Lehto replaces him for Portugal and beyond. Gachot had been a reliable pre-qualifier throughout the season.
-

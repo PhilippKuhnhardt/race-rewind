@@ -2,11 +2,10 @@
 race_slug: 2000-austrian-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2000_Austrian_Grand_Prix&oldid=1349878708
-source_revision: "1349878708"
+source_revision: '1349878708'
 source_title: 2000 Austrian Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-26"
-model: claude-opus-4-7
+generated_at: '2026-05-26'
 ---
 
 ### Championship standings

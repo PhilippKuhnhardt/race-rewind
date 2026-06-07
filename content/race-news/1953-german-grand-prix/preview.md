@@ -2,11 +2,10 @@
 race_slug: 1953-german-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1953_German_Grand_Prix&oldid=1346059676
-source_revision: "1346059676"
+source_revision: '1346059676'
 source_title: 1953 German Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings

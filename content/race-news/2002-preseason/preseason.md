@@ -2,11 +2,10 @@
 race_slug: 2002-preseason
 phase: preseason
 source_url: https://en.wikipedia.org/w/index.php?title=2002_Formula_One_World_Championship&oldid=1356350587
-source_revision: "1356350587"
+source_revision: '1356350587'
 source_title: 2002 Formula One World Championship
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 The 2002 FIA Formula One World Championship is the 56th season of Formula One motor racing. Seventeen races are scheduled, beginning in Australia on 3 March and concluding in Japan in October. Michael Schumacher and Scuderia Ferrari are the defending champions of both the Drivers' and Constructors' titles.

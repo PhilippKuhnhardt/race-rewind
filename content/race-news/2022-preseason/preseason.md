@@ -2,11 +2,10 @@
 race_slug: 2022-preseason
 phase: preseason
 source_url: https://en.wikipedia.org/w/index.php?title=2022_Formula_One_World_Championship&oldid=1347735582
-source_revision: "1347735582"
+source_revision: '1347735582'
 source_title: 2022 Formula One World Championship
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 The 73rd Formula One World Championship runs over twenty-two Grands Prix, ending earlier than in recent years to avoid overlapping with the FIFA World Cup. Max Verstappen enters as defending Drivers' Champion, with Mercedes the defending Constructors' Champions.

@@ -2,11 +2,10 @@
 race_slug: 1994-preseason
 phase: preseason
 source_url: https://en.wikipedia.org/w/index.php?title=1994_Formula_One_World_Championship&oldid=1354970248
-source_revision: "1354970248"
+source_revision: '1354970248'
 source_title: 1994 Formula One World Championship
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 The 1994 FIA Formula One World Championship is the 48th season of Formula One motor racing. Sixteen rounds are scheduled, opening in Brazil on 27 March and closing in Australia on 13 November. Defending drivers' champion Alain Prost has retired from the sport and will not attempt to defend his title. Williams-Renault, three-time consecutive constructors' champions, are the defending team.

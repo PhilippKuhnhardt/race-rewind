@@ -2,11 +2,10 @@
 race_slug: 1965-preseason
 phase: preseason
 source_url: https://en.wikipedia.org/w/index.php?title=1965_Formula_One_season&oldid=1356330381
-source_revision: "1356330381"
+source_revision: '1356330381'
 source_title: 1965 Formula One season
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 The 1965 season is the 19th FIA Formula One season. The World Championship of Drivers runs over ten rounds between 1 January and 24 October, alongside seven non-championship Formula One races.

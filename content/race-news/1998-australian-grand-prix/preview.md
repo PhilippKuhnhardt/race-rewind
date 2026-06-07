@@ -2,11 +2,10 @@
 race_slug: 1998-australian-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1998_Australian_Grand_Prix&oldid=1354769863
-source_revision: "1354769863"
+source_revision: '1354769863'
 source_title: 1998 Australian Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 The season opens at Albert Park — the sixth running of the Australian Grand Prix on this venue and the third at the current circuit layout. The race is the first under two significant rule changes: grooved tyres replace slicks for the first time since 1970, and car track width has been cut from 2,000 mm to 1,800 mm.

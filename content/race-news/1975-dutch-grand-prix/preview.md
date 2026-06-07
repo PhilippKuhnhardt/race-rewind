@@ -2,11 +2,10 @@
 race_slug: 1975-dutch-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1975_Dutch_Grand_Prix&oldid=1350687558
-source_revision: "1350687558"
+source_revision: '1350687558'
 source_title: 1975 Dutch Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings

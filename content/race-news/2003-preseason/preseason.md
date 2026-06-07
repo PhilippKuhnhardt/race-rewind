@@ -2,11 +2,10 @@
 race_slug: 2003-preseason
 phase: preseason
 source_url: https://en.wikipedia.org/w/index.php?title=2003_Formula_One_World_Championship&oldid=1356318981
-source_revision: "1356318981"
+source_revision: '1356318981'
 source_title: 2003 Formula One World Championship
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 The 2003 FIA Formula One World Championship is the 57th season of Formula One motor racing. It features sixteen races, commencing on 9 March in Australia and concluding on 12 October in Japan. Michael Schumacher and Scuderia Ferrari are the defending World Drivers' and Constructors' champions, respectively.

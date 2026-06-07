@@ -2,11 +2,10 @@
 race_slug: 2000-preseason
 phase: preseason
 source_url: https://en.wikipedia.org/w/index.php?title=2000_Formula_One_World_Championship&oldid=1354171724
-source_revision: "1354171724"
+source_revision: '1354171724'
 source_title: 2000 Formula One World Championship
 license: CC-BY-SA-4.0
-generated_at: "2026-05-26"
-model: claude-opus-4-7
+generated_at: '2026-05-26'
 ---
 
 The 2000 FIA Formula One World Championship is the 54th season of Formula One motor racing. It begins on 12 March in Melbourne and runs for seventeen races. Mika Häkkinen is the defending Drivers' Champion, having won back-to-back titles in 1998 and 1999. Ferrari is the defending Constructors' Champion. All teams compete on Bridgestone tyres, the sole supplier.

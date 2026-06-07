@@ -2,11 +2,10 @@
 race_slug: 1960-indianapolis-500
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1960_Indianapolis_500&oldid=1352883442
-source_revision: "1352883442"
+source_revision: '1352883442'
 source_title: 1960 Indianapolis 500
 license: CC-BY-SA-4.0
-generated_at: "2026-05-26"
-model: "claude-sonnet-4-6"
+generated_at: '2026-05-26'
 ---
 
 ### Context

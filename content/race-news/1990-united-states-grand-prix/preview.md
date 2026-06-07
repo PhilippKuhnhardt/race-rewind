@@ -2,11 +2,10 @@
 race_slug: 1990-united-states-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1990_United_States_Grand_Prix&oldid=1347268187
-source_revision: "1347268187"
+source_revision: '1347268187'
 source_title: 1990 United States Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 The season opens on the angular Phoenix Street Circuit in Arizona. The race was moved to March specifically to avoid the 100+ °F heat that made conditions extremely difficult at the 1989 Phoenix race, which was held in June.

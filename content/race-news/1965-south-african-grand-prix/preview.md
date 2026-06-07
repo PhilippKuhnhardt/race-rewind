@@ -2,11 +2,10 @@
 race_slug: 1965-south-african-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1965_South_African_Grand_Prix&oldid=1351063444
-source_revision: "1351063444"
+source_revision: '1351063444'
 source_title: 1965 South African Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 The season opens on New Year's Day at East London. Originally scheduled as the final race of the 1964 season, the South African Grand Prix was moved back a week — which means every car on the grid is a 1964-specification machine, with no time to develop 1965 designs.

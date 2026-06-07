@@ -2,11 +2,10 @@
 race_slug: 1954-belgian-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1954_Belgian_Grand_Prix&oldid=1346059935
-source_revision: "1346059935"
+source_revision: '1346059935'
 source_title: 1954 Belgian Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Previous race
@@ -31,4 +30,4 @@ On the first day only the Ferraris appear. When Fangio arrives on the second day
 
 ### Milestones
 
-A fifteenth car — the Maserati of Emmanuel de Graffenried — is set to start behind the field to film authentic race footage for the upcoming Kirk Douglas film *The Racers*.
+A fifteenth car — the Maserati of Emmanuel de Graffenried — is set to start behind the field to film authentic race footage for the upcoming Kirk Douglas film _The Racers_.

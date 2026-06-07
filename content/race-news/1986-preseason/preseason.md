@@ -2,11 +2,10 @@
 race_slug: 1986-preseason
 phase: preseason
 source_url: https://en.wikipedia.org/w/index.php?title=1986_Formula_One_World_Championship&oldid=1356329032
-source_revision: "1356329032"
+source_revision: '1356329032'
 source_title: 1986 Formula One World Championship
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 The 1986 FIA Formula One World Championship is the 40th season of Formula One motor racing, featuring sixteen races from 23 March in Brazil to 26 October in Australia.

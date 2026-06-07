@@ -2,11 +2,10 @@
 race_slug: 2021-turkish-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2021_Turkish_Grand_Prix&oldid=1352313022
-source_revision: "1352313022"
+source_revision: '1352313022'
 source_title: 2021 Turkish Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings

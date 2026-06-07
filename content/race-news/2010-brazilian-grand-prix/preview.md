@@ -2,11 +2,10 @@
 race_slug: 2010-brazilian-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2010_Brazilian_Grand_Prix&oldid=1350558379
-source_revision: "1350558379"
+source_revision: '1350558379'
 source_title: 2010 Brazilian Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings

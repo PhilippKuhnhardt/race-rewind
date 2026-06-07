@@ -2,11 +2,10 @@
 race_slug: 2012-japanese-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2012_Japanese_Grand_Prix&oldid=1346094929
-source_revision: "1346094929"
+source_revision: '1346094929'
 source_title: 2012 Japanese Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-26"
-model: "claude-sonnet-4-6"
+generated_at: '2026-05-26'
 ---
 
 ### Championship standings

@@ -2,11 +2,10 @@
 race_slug: 1981-preseason
 phase: preseason
 source_url: https://en.wikipedia.org/w/index.php?title=1981_Formula_One_World_Championship&oldid=1356329341
-source_revision: "1356329341"
+source_revision: '1356329341'
 source_title: 1981 Formula One World Championship
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 The 1981 season opens in the aftermath of the FISA–FOCA war — a bitter dispute between the sport's governing body and the constructors' association that threatened to split Formula One into two rival championships. The central issue was FISA's plan to ban aerodynamic ground-effect skirts, devices that sealed the gap between the car's bodywork and the track surface to generate enormous downforce. After months of brinkmanship, FOCA agreed to accept the skirt ban in exchange for guaranteed financial arrangements and a four-year period of regulatory stability. The resulting Concorde Agreement was signed in Paris just days before the season opener.

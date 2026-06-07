@@ -174,7 +174,6 @@ source_revision: "{revision_id}"
 source_title: {year} Formula One World Championship
 license: CC-BY-SA-4.0
 generated_at: "{ISO date}"
-model: "{model_id}"
 ```
 
 ## Workflow — Race previews
@@ -241,7 +240,6 @@ source_revision: "{revision_id}"
 source_title: {Wikipedia article title, spaces not underscores}
 license: CC-BY-SA-4.0
 generated_at: "{ISO date}"
-model: "{model_id}"
 ```
 
 - `source_url` — use the `oldid` permalink, not the bare article URL. Always capture

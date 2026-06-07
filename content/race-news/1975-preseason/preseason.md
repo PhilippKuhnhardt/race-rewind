@@ -2,11 +2,10 @@
 race_slug: 1975-preseason
 phase: preseason
 source_url: https://en.wikipedia.org/w/index.php?title=1975_Formula_One_season&oldid=1356350808
-source_revision: "1356350808"
+source_revision: '1356350808'
 source_title: 1975 Formula One season
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 The 1975 Formula One season is the 29th season of FIA Formula One motor racing, featuring fourteen rounds from 12 January to 5 October. Emerson Fittipaldi defends his drivers' title with McLaren; McLaren also defend the constructors' championship. After a strong finish to 1974, many observers consider Brabham favourites for the new season.

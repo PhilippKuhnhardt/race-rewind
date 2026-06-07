@@ -2,11 +2,10 @@
 race_slug: 1984-san-marino-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1984_San_Marino_Grand_Prix&oldid=1346086793
-source_revision: "1346086793"
+source_revision: '1346086793'
 source_title: 1984 San Marino Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings

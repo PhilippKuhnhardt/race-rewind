@@ -2,11 +2,10 @@
 race_slug: 2005-italian-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2005_Italian_Grand_Prix&oldid=1291231575
-source_revision: "1291231575"
+source_revision: '1291231575'
 source_title: 2005 Italian Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-sonnet-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings

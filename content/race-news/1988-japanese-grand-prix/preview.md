@@ -6,7 +6,6 @@ source_revision: '1346087528'
 source_title: 1988 Japanese Grand Prix
 license: CC-BY-SA-4.0
 generated_at: '2026-05-26'
-model: 'claude-sonnet-4-6'
 ---
 
 ### Championship standings

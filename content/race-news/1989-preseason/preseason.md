@@ -2,11 +2,10 @@
 race_slug: 1989-preseason
 phase: preseason
 source_url: https://en.wikipedia.org/w/index.php?title=1989_Formula_One_World_Championship&oldid=1356328737
-source_revision: "1356328737"
+source_revision: '1356328737'
 source_title: 1989 Formula One World Championship
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Driver changes

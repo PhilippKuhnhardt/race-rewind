@@ -2,11 +2,10 @@
 race_slug: 1983-european-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1983_European_Grand_Prix&oldid=1346086392
-source_revision: "1346086392"
+source_revision: '1346086392'
 source_title: 1983 European Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings
@@ -28,4 +27,3 @@ Eight of the entered drivers are making their second visit of the year to Brands
 Theodore has been unable to fund a second entry; Roberto Guerrero drives the sole remaining car. The team will not appear at the final race. Spirit Racing is also not travelling to Brands Hatch, focusing resources on preparation for its 1984 full season.
 
 Williams had planned to debut the Honda turbo-powered FW09 at this race but has decided to wait until the South African finale. The team does enter a third car for Jonathan Palmer — Formula Two champion and Williams test driver — making his Formula One debut at his home race.
-

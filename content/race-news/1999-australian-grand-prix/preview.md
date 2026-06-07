@@ -2,11 +2,10 @@
 race_slug: 1999-australian-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1999_Australian_Grand_Prix&oldid=1354769891
-source_revision: "1354769891"
+source_revision: '1354769891'
 source_title: 1999 Australian Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 The season opener marks the 50th world championship season in Formula One history. McLaren arrive with the new MP4/14, designed by Adrian Newey — the car is widely regarded as the fastest on the grid, with Häkkinen and Coulthard lapping over a second clear of the rest of the field in practice. Reliability is a separate question.

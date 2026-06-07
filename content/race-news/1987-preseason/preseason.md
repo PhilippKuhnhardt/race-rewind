@@ -2,11 +2,10 @@
 race_slug: 1987-preseason
 phase: preseason
 source_url: https://en.wikipedia.org/w/index.php?title=1987_Formula_One_World_Championship&oldid=1347269450
-source_revision: "1347269450"
+source_revision: '1347269450'
 source_title: 1987 Formula One World Championship
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Driver changes

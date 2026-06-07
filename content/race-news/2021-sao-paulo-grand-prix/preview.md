@@ -2,11 +2,10 @@
 race_slug: 2021-sao-paulo-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/wiki/2021_S%C3%A3o_Paulo_Grand_Prix
-source_revision: ""
+source_revision: ''
 source_title: 2021 São Paulo Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Previous race

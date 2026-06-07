@@ -2,11 +2,10 @@
 race_slug: 2024-chinese-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2024_Chinese_Grand_Prix&oldid=1346097879
-source_revision: "1346097879"
+source_revision: '1346097879'
 source_title: 2024 Chinese Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-26"
-model: github-copilot/claude-opus-4.6
+generated_at: '2026-05-26'
 ---
 
 The 17th running of the Chinese Grand Prix, and the first since 2019 after the planned races from 2020 to 2023 were cancelled due to the COVID-19 pandemic in the country. Held at the Shanghai International Circuit across 19–21 April, the event is the fifth round of the 2024 season and the first Grand Prix weekend of the season to utilise the sprint format.

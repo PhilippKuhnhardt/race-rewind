@@ -2,11 +2,10 @@
 race_slug: 1998-british-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1998_British_Grand_Prix&oldid=1346091142
-source_revision: "1346091142"
+source_revision: '1346091142'
 source_title: 1998 British Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings

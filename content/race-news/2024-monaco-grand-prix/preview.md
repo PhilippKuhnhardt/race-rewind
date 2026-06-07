@@ -2,11 +2,10 @@
 race_slug: 2024-monaco-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2024_Monaco_Grand_Prix&oldid=1346098610
-source_revision: "1346098610"
+source_revision: '1346098610'
 source_title: 2024 Monaco Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-26"
-model: github-copilot/claude-opus-4.6
+generated_at: '2026-05-26'
 ---
 
 The 70th running of the Monaco Grand Prix as a round of the Formula One World Championship, and the 81st time the event is held at the Circuit de Monaco across 24–26 May. This is the eighth round of the 2024 season.

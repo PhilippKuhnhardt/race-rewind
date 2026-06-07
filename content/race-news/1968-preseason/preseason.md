@@ -2,11 +2,10 @@
 race_slug: 1968-preseason
 phase: preseason
 source_url: https://en.wikipedia.org/w/index.php?title=1968_Formula_One_season&oldid=1329737165
-source_revision: "1329737165"
+source_revision: '1329737165'
 source_title: 1968 Formula One season
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 The 1968 season is the 22nd running of the Formula One World Championship, contested over twelve races from New Year's Day in South Africa through to November in Mexico. Denny Hulme defends the Drivers' title he won for Brabham in 1967; Brabham also hold the Constructors' Cup. Both titles are up for grabs in a significantly reshuffled field.

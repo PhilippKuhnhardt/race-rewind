@@ -2,11 +2,10 @@
 race_slug: 2013-korean-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2013_Korean_Grand_Prix&oldid=1346095394
-source_revision: "1346095394"
+source_revision: '1346095394'
 source_title: 2013 Korean Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings

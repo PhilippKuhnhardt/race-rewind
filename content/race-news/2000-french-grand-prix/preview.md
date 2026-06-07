@@ -2,11 +2,10 @@
 race_slug: 2000-french-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2000_French_Grand_Prix&oldid=1356028306
-source_revision: "1356028306"
+source_revision: '1356028306'
 source_title: 2000 French Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-26"
-model: claude-opus-4-7
+generated_at: '2026-05-26'
 ---
 
 ### Championship standings

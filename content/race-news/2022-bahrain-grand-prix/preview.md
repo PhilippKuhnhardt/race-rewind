@@ -2,11 +2,10 @@
 race_slug: 2022-bahrain-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2022_Bahrain_Grand_Prix&oldid=1346111225
-source_revision: "1346111225"
+source_revision: '1346111225'
 source_title: 2022 Bahrain Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 The season-opening Bahrain Grand Prix marks the fourth time Bahrain has hosted the Formula One season opener, after 2006, 2010, and 2021. Mercedes have won six of the previous eight Bahrain Grands Prix, including five with Lewis Hamilton; Hamilton and Mercedes arrive on a streak of three consecutive victories at this event.

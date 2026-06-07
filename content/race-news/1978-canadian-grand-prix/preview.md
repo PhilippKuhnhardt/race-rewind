@@ -2,11 +2,10 @@
 race_slug: 1978-canadian-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1978_Canadian_Grand_Prix&oldid=1346082170
-source_revision: "1346082170"
+source_revision: '1346082170'
 source_title: 1978 Canadian Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-26"
-model: "claude-opus-4-5"
+generated_at: '2026-05-26'
 ---
 
 ### Championship standings

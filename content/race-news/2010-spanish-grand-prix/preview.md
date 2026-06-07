@@ -2,11 +2,10 @@
 race_slug: 2010-spanish-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2010_Spanish_Grand_Prix&oldid=1346094228
-source_revision: "1346094228"
+source_revision: '1346094228'
 source_title: 2010 Spanish Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Previous race

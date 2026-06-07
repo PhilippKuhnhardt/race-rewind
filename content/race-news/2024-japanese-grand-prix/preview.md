@@ -2,11 +2,10 @@
 race_slug: 2024-japanese-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2024_Japanese_Grand_Prix&oldid=1346098484
-source_revision: "1346098484"
+source_revision: '1346098484'
 source_title: 2024 Japanese Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-26"
-model: github-copilot/claude-opus-4.6
+generated_at: '2026-05-26'
 ---
 
 The 49th running of the Japanese Grand Prix and the fourth round of the 2024 season, held at the Suzuka International Racing Course across 5–7 April. This edition is the first time the event is held as an early-season round, departing from its traditional schedule between September and November, part of Formula One's regionalisation efforts placing the Japanese Grand Prix between the Australian and Chinese Grands Prix.

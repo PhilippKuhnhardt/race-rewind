@@ -2,11 +2,10 @@
 race_slug: 2024-spanish-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2024_Spanish_Grand_Prix&oldid=1355886818
-source_revision: "1355886818"
+source_revision: '1355886818'
 source_title: 2024 Spanish Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-26"
-model: github-copilot/claude-opus-4.6
+generated_at: '2026-05-26'
 ---
 
 The Spanish Grand Prix is the tenth round of the 2024 season, held at the Circuit de Barcelona-Catalunya in Montmeló.

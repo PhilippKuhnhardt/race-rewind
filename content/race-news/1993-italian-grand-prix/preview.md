@@ -2,11 +2,10 @@
 race_slug: 1993-italian-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1993_Italian_Grand_Prix&oldid=1346088532
-source_revision: "1346088532"
+source_revision: '1346088532'
 source_title: 1993 Italian Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings

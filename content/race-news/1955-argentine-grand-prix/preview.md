@@ -2,11 +2,10 @@
 race_slug: 1955-argentine-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1955_Argentine_Grand_Prix&oldid=1353830023
-source_revision: "1353830023"
+source_revision: '1353830023'
 source_title: 1955 Argentine Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 The season opens in Buenos Aires for the third running of the Argentine Grand Prix, held at the height of the southern hemisphere summer.

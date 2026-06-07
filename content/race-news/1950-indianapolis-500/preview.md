@@ -2,11 +2,10 @@
 race_slug: 1950-indianapolis-500
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1950_Indianapolis_500&oldid=1342594607
-source_revision: "1342594607"
+source_revision: '1342594607'
 source_title: 1950 Indianapolis 500
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings
@@ -23,4 +22,4 @@ The 34th International 500-Mile Sweepstakes at Indianapolis Motor Speedway is in
 
 The race is scheduled for 200 laps over 500 miles. Walt Faulkner claimed pole position in time trials with a record run of 134.343 mph.
 
-Clark Gable and Barbara Stanwyck are at the track during the month to film scenes for the film *To Please a Lady*, set around the Indianapolis 500.
+Clark Gable and Barbara Stanwyck are at the track during the month to film scenes for the film _To Please a Lady_, set around the Indianapolis 500.

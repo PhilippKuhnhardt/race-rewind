@@ -2,11 +2,10 @@
 race_slug: 2024-canadian-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2024_Canadian_Grand_Prix&oldid=1346097855
-source_revision: "1346097855"
+source_revision: '1346097855'
 source_title: 2024 Canadian Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-26"
-model: github-copilot/claude-opus-4.6
+generated_at: '2026-05-26'
 ---
 
 The Canadian Grand Prix is the ninth round of the 2024 season, held at the Circuit Gilles Villeneuve in Montreal.

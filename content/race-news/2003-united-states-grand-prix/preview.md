@@ -2,11 +2,10 @@
 race_slug: 2003-united-states-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2003_United_States_Grand_Prix&oldid=1349855449
-source_revision: "1349855449"
+source_revision: '1349855449'
 source_title: 2003 United States Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings

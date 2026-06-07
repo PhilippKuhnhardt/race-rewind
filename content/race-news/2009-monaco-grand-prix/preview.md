@@ -2,11 +2,10 @@
 race_slug: 2009-monaco-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2009_Monaco_Grand_Prix&oldid=1346693078
-source_revision: "1346693078"
+source_revision: '1346693078'
 source_title: 2009 Monaco Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings

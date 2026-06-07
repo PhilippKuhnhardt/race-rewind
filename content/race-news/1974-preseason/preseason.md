@@ -2,11 +2,10 @@
 race_slug: 1974-preseason
 phase: preseason
 source_url: https://en.wikipedia.org/w/index.php?title=1974_Formula_One_season&oldid=1350482119
-source_revision: "1350482119"
+source_revision: '1350482119'
 source_title: 1974 Formula One season
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 The 1974 season is the 28th FIA Formula One World Championship, contested over fifteen races from January to October. Jackie Stewart, the 1973 champion, has retired without handing the title on — he did not race. Ronnie Peterson takes number 1 as team leader at Constructors' champion Lotus, an anomaly the rules did not anticipate.

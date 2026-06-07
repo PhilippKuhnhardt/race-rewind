@@ -2,11 +2,10 @@
 race_slug: 2022-japanese-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2022_Japanese_Grand_Prix&oldid=1347988334
-source_revision: "1347988334"
+source_revision: '1347988334'
 source_title: 2022 Japanese Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings

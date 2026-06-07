@@ -2,11 +2,10 @@
 race_slug: 1996-argentine-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1996_Argentine_Grand_Prix&oldid=1346090130
-source_revision: "1346090130"
+source_revision: '1346090130'
 source_title: 1996 Argentine Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings
@@ -20,4 +19,3 @@ At Interlagos, Hill won in heavy rain for his 15th career Grand Prix victory, su
 ### Entrants
 
 Tarso Marques continues at Minardi for a second successive race in place of Fisichella, who remains committed to the International Touring Car Championship.
-

@@ -2,11 +2,10 @@
 race_slug: 1956-indianapolis-500
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1956_Indianapolis_500&oldid=1342594116
-source_revision: "1342594116"
+source_revision: '1342594116'
 source_title: 1956 Indianapolis 500
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Previous race

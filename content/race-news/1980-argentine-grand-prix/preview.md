@@ -2,11 +2,10 @@
 race_slug: 1980-argentine-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1980_Argentine_Grand_Prix&oldid=1346084277
-source_revision: "1346084277"
+source_revision: '1346084277'
 source_title: 1980 Argentine Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 The 1980 season opens at the Autodromo Municipal Ciudad de Buenos Aires. This is the 16th Argentine Grand Prix and the sixth to be held on the No.15 circuit variant — a 5.81-kilometre layout run over 53 laps for a total distance of 308 kilometres.

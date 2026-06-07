@@ -2,11 +2,10 @@
 race_slug: 1998-preseason
 phase: preseason
 source_url: https://en.wikipedia.org/w/index.php?title=1998_Formula_One_World_Championship&oldid=1356328406
-source_revision: "1356328406"
+source_revision: '1356328406'
 source_title: 1998 Formula One World Championship
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 The 52nd FIA Formula One World Championship runs across 16 races from 8 March to 1 November. The season is shaped by Renault's withdrawal from the sport and the arrival of designer Adrian Newey at McLaren — two events that have fundamentally reshuffled the pecking order.

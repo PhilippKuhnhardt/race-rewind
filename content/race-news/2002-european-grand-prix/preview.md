@@ -2,11 +2,10 @@
 race_slug: 2002-european-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2002_European_Grand_Prix&oldid=1351485927
-source_revision: "1351485927"
+source_revision: '1351485927'
 source_title: 2002 European Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings

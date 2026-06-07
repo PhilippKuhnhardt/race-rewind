@@ -2,11 +2,10 @@
 race_slug: 1983-italian-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1983_Italian_Grand_Prix&oldid=1346086463
-source_revision: "1346086463"
+source_revision: '1346086463'
 source_title: 1983 Italian Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings
@@ -20,5 +19,3 @@ Arnoux won the Dutch Grand Prix after Prost and Piquet collided on lap 41 while 
 ### Between-race developments
 
 John Watson also moves to the TAG Porsche turbo engine for Monza, making this McLaren's first race with both cars on turbo power.
-
-

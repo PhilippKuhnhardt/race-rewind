@@ -2,11 +2,10 @@
 race_slug: 2010-abu-dhabi-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2010_Abu_Dhabi_Grand_Prix&oldid=1349829875
-source_revision: "1349829875"
+source_revision: '1349829875'
 source_title: 2010 Abu Dhabi Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings

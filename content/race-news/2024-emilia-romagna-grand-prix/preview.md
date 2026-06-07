@@ -2,11 +2,10 @@
 race_slug: 2024-emilia-romagna-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2024_Emilia_Romagna_Grand_Prix&oldid=1353432581
-source_revision: "1353432581"
+source_revision: '1353432581'
 source_title: 2024 Emilia Romagna Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-26"
-model: github-copilot/claude-opus-4.6
+generated_at: '2026-05-26'
 ---
 
 The fourth running of the Emilia Romagna Grand Prix and seventh round of the 2024 season, held at the Autodromo Internazionale Enzo e Dino Ferrari in Imola across 17–19 May. The event returns for the first time since 2022 after the 2023 Grand Prix was cancelled due to flooding in the region.

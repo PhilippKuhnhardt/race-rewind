@@ -2,11 +2,10 @@
 race_slug: 1996-brazilian-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1996_Brazilian_Grand_Prix&oldid=1346102510
-source_revision: "1346102510"
+source_revision: '1346102510'
 source_title: 1996 Brazilian Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings
@@ -20,4 +19,3 @@ At Melbourne, Hill won from second on the grid to take back-to-back Australian G
 ### Entrants
 
 Giancarlo Fisichella is absent from the Minardi seat due to his commitments with Alfa Romeo in the International Touring Car Championship. European Formula 3000 driver Tarso Marques replaces him for this race.
-

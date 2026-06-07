@@ -2,11 +2,10 @@
 race_slug: 2004-san-marino-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2004_San_Marino_Grand_Prix&oldid=1349801744
-source_revision: "1349801744"
+source_revision: '1349801744'
 source_title: 2004 San Marino Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Previous race

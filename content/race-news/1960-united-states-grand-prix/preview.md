@@ -2,11 +2,10 @@
 race_slug: 1960-united-states-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1960_United_States_Grand_Prix&oldid=1346060951
-source_revision: "1346060951"
+source_revision: '1346060951'
 source_title: 1960 United States Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-26"
-model: "claude-sonnet-4-6"
+generated_at: '2026-05-26'
 ---
 
 ### Previous race

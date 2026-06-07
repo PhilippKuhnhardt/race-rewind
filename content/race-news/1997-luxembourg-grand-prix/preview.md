@@ -2,11 +2,10 @@
 race_slug: 1997-luxembourg-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1997_Luxembourg_Grand_Prix&oldid=1348515745
-source_revision: "1348515745"
+source_revision: '1348515745'
 source_title: 1997 Luxembourg Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings

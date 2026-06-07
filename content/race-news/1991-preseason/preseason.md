@@ -2,11 +2,10 @@
 race_slug: 1991-preseason
 phase: preseason
 source_url: https://en.wikipedia.org/w/index.php?title=1991_Formula_One_World_Championship&oldid=1347267727
-source_revision: "1347267727"
+source_revision: '1347267727'
 source_title: 1991 Formula One World Championship
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 The 1991 FIA Formula One World Championship is the 45th season of Formula One motor racing. It is contested over sixteen races from 10 March in Phoenix to 3 November in Adelaide. Ayrton Senna and McLaren-Honda enter as defending Drivers' and Constructors' champions.

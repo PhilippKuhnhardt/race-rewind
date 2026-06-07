@@ -2,11 +2,10 @@
 race_slug: 1980-preseason
 phase: preseason
 source_url: https://en.wikipedia.org/w/index.php?title=1980_Formula_One_season&oldid=1355517320
-source_revision: "1355517320"
+source_revision: '1355517320'
 source_title: 1980 Formula One season
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 The 1980 Formula One season is the 34th running of the FIA Formula One World Championship, contested over fifteen scheduled rounds from Argentina in January to the United States in October. Jody Scheckter and Ferrari enter as defending champions in both the Drivers' and Constructors' titles.

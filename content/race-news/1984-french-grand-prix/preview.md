@@ -2,11 +2,10 @@
 race_slug: 1984-french-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1984_French_Grand_Prix&oldid=1346086740
-source_revision: "1346086740"
+source_revision: '1346086740'
 source_title: 1984 French Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings

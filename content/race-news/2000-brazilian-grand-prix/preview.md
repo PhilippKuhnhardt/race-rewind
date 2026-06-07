@@ -2,11 +2,10 @@
 race_slug: 2000-brazilian-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2000_Brazilian_Grand_Prix&oldid=1349875977
-source_revision: "1349875977"
+source_revision: '1349875977'
 source_title: 2000 Brazilian Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-26"
-model: claude-opus-4-7
+generated_at: '2026-05-26'
 ---
 
 ### Championship standings

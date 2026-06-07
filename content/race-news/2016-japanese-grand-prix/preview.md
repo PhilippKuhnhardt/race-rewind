@@ -2,11 +2,10 @@
 race_slug: 2016-japanese-grand-prix
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=2016_Japanese_Grand_Prix&oldid=1332442167
-source_revision: "1332442167"
+source_revision: '1332442167'
 source_title: 2016 Japanese Grand Prix
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 ### Championship standings

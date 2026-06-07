@@ -2,11 +2,10 @@
 race_slug: 1955-indianapolis-500
 phase: preview
 source_url: https://en.wikipedia.org/w/index.php?title=1955_Indianapolis_500&oldid=1352757637
-source_revision: "1352757637"
+source_revision: '1352757637'
 source_title: 1955 Indianapolis 500
 license: CC-BY-SA-4.0
-generated_at: "2026-05-27"
-model: "claude-opus-4-5"
+generated_at: '2026-05-27'
 ---
 
 The 39th Indianapolis 500 is the third round of the 1955 World Championship of Drivers. The race has been included in the FIA World Championship since 1950, with Indianapolis Motor Speedway vice president Theodore Meyers having lobbied successfully for the 500 to represent the United States in the new championship.
