@@ -3,7 +3,19 @@ import { parse } from 'csv-parse/sync';
 
 export function readCsv(dumpDir: string, name: string): Record<string, string>[] {
   const buf = readFileSync(`${dumpDir}/${name}`);
-  return parse(buf, { columns: true, bom: true, skip_empty_lines: true }) as Record<string, string>[];
+  const rows = parse(buf, { columns: true, bom: true, skip_empty_lines: true }) as Record<string, string>[];
+  return rows.map((row) => Object.fromEntries(
+    Object.entries(row).map(([key, value]) => [key, decodeHtmlEntities(value)]),
+  ));
+}
+
+function decodeHtmlEntities(value: string): string {
+  return value
+    .replaceAll('&amp;', '&')
+    .replaceAll('&lt;', '<')
+    .replaceAll('&gt;', '>')
+    .replaceAll('&quot;', '"')
+    .replaceAll('&#39;', "'");
 }
 
 export function asInt(row: Record<string, string>, key: string): number | null {
