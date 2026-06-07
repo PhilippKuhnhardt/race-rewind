@@ -1,5 +1,5 @@
 ---
-import { emojify } from '../../lib/ui/emojify';
+import { raceFlag } from '../../lib/ui/emojify';
 
 interface Props {
   name: string;
@@ -14,6 +14,12 @@ interface Props {
 
 const { name, season, round, raceCount, date, circuitName, circuitLocality, circuitCountry } =
   Astro.props;
+const circuitFlag = circuitCountry ? raceFlag(circuitCountry) : null;
+const countryLabel = circuitCountry ?? null;
+const mobilePlace = [circuitLocality, countryLabel].filter(Boolean).join(', ');
+const placeLabel = mobilePlace ? `${circuitFlag ? `${circuitFlag} ` : ''}${mobilePlace}` : null;
+const desktopPlace = [circuitName, circuitLocality, countryLabel].filter(Boolean).join(', ');
+const desktopLocation = `${circuitFlag ? `${circuitFlag} ` : ''}${desktopPlace}`;
 ---
 
 <div class="mb-6">
@@ -21,16 +27,15 @@ const { name, season, round, raceCount, date, circuitName, circuitLocality, circ
     {season}
     {name}
   </h1>
-  <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-fg-muted text-sm">
-    <span>
-      {circuitCountry && emojify(circuitCountry)}
-      {circuitName}{circuitLocality ? `, ${circuitLocality}` : ''}{
-        circuitCountry ? `, ${circuitCountry}` : ''
-      }</span
-    >
-    <span aria-hidden="true">·</span>
+  <div
+    class="mt-2 flex flex-col items-start gap-1 text-sm text-fg-muted sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-1"
+  >
+    <span class="hidden sm:inline">{desktopLocation}</span>
+    <span class="sm:hidden">{circuitName}</span>
+    {placeLabel && <span class="sm:hidden">{placeLabel}</span>}
+    <span class="hidden sm:inline" aria-hidden="true">·</span>
     <time datetime={date}>{date}</time>
-    <span aria-hidden="true">·</span>
+    <span class="hidden sm:inline" aria-hidden="true">·</span>
     <span>Round {round} of {raceCount}</span>
   </div>
 </div>
