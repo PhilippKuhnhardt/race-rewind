@@ -1,62 +1,63 @@
 # Race Rewind
 
-Time-travel F1 stats — pick any historic race and see standings, results, and championship context exactly as they were at that moment.
+Race Rewind is a spoiler-free Formula 1 history companion for watching old seasons race by race.
 
-## Prerequisites
+Pick a season and a race weekend to see the championship exactly as it stood at that point in time: standings, race-weekend results, team and driver context, recent form, and Wikipedia-derived historical notes. The app is built to preserve uncertainty while following a past season, so future outcomes are not shown during normal navigation and race results are kept behind an additional click.
 
-| Tool                             | Purpose                            | Install                                            |
-| -------------------------------- | ---------------------------------- | -------------------------------------------------- |
-| [pnpm](https://pnpm.io)          | JS package manager (Astro)         | `npm i -g pnpm`                                    |
-| [uv](https://docs.astral.sh/uv/) | Python package manager (ingestion) | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
+Race Rewind does not host race footage. It provides the historical context, data, and spoiler-controlled navigation to accompany rewatches from external sources.
 
-No other global installs needed — uv manages the Python version and virtual environment automatically.
+## Stack
+
+- [Astro](https://astro.build/) with Svelte islands
+- Tailwind CSS
+- Drizzle ORM with `@libsql/client`
+- SQLite database committed at `data/race-rewind.sqlite`
+- TypeScript ingestion pipeline under `ingest/`
+- Vitest for ingestion and utility tests
+- Vercel adapter for deployment
 
 ## Setup
 
+Requirements:
+
+- Node.js
+- [pnpm](https://pnpm.io/)
+
 ```bash
-# Clone and install JS dependencies
 pnpm install
-
-# Create the Python virtual environment and install dev dependencies (pytest)
-uv sync
-
-# Build the SQLite database from the committed CSV dump (~1.5s)
-uv run python -m ingestion.build_db \
-  --dump ingestion/jolpica-dump/2026-04-02 \
-  --out  data/race-rewind.sqlite
-
-# Start the Astro dev server
 pnpm dev
 ```
 
-The SQLite file is committed to the repo, so if you just want to run the frontend you can skip the `uv run` step.
+The SQLite database is committed to the repository, so local development works without rebuilding the data.
 
-## Ingestion
-
-The ingestion pipeline converts the Jolpica CSV dump into `data/race-rewind.sqlite`. It is a full drop-and-rebuild — safe to re-run at any time.
+## Scripts
 
 ```bash
-# Rebuild the database
-uv run python -m ingestion.build_db \
-  --dump ingestion/jolpica-dump/2026-04-02 \
-  --out  data/race-rewind.sqlite
-
-# Run the invariant test suite
-uv run pytest
+pnpm dev           # Start the Astro dev server
+pnpm build         # Build the site
+pnpm preview       # Preview the production build
+pnpm ingest        # Rebuild data/race-rewind.sqlite from the CSV dump
+pnpm test          # Run Vitest
+pnpm lint          # Run ESLint
+pnpm check         # Run Astro type checks
 ```
 
-To ingest a new dump: add the new Jolpica CSV folder under `ingestion/jolpica-dump/<date>/` and point `--dump` at it.
+## Data
 
-## Data source
+Structured race data comes from the [Jolpica F1](https://github.com/jolpica/jolpica-f1) CSV export. The committed dump under `ingest/jolpica-dump/<date>/` is the source of truth for the generated SQLite database.
 
-Race data comes from the [Jolpica F1 API](https://api.jolpi.ca/docs/#) (Ergast successor). The raw CSV export lives in `ingestion/jolpica-dump/<date>/` and is the source of truth; `data/race-rewind.sqlite` is a fully derived artifact.
+```bash
+pnpm ingest
+```
 
-DB schema docs: https://dbdocs.io/jolpica/jolpica-f1?view=relationships
+The ingestion pipeline is a full drop-and-rebuild. To update the data, add a new Jolpica CSV folder under `ingest/jolpica-dump/<date>/` and run the build script against that folder.
 
 ## Content licensing
 
-Race context blocks under `content/race-news/` are adapted from Wikipedia and licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Each block carries visible per-entry attribution in the UI. These files are Adapted Material under the CC BY-SA licence; the rest of the project (code, UI, structured race data from Jolpica) is a separate, independent work bundled in a Collection and is not subject to ShareAlike.
+Race context blocks under `content/race-news/` are adapted from Wikipedia and licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Each block carries visible per-entry attribution in the UI.
 
-## Architecture
+These files are Adapted Material under the CC BY-SA license. The rest of the project, including code, UI, and structured race data from Jolpica, is a separate independent work bundled in a Collection and is not subject to ShareAlike.
 
-See [architecture.md](./architecture.md) for the full design — data model, ingestion pipeline, rendering strategy, and cost breakdown.
+## Unofficial project
+
+Race Rewind is an independent and unofficial project. It is not affiliated with Formula 1, the FIA, any team, constructor, driver, circuit, race promoter, or rights holder.
