@@ -15,6 +15,7 @@ import {
 } from '../../../../lib/queries';
 import { getRaceNews } from '../../../../lib/race-news';
 import { getRacePageBase } from '../../../../lib/race-page';
+import { raceOverviewSeo } from '../../../../lib/seo';
 
 export async function getStaticPaths() {
   return (await getAllRaces()).map((r) => ({
@@ -56,8 +57,7 @@ const teamLeader = preRaceTeamChamp[0]
 
 const newsEntry = await getRaceNews(`${season}-${raceSlug}`, 'preview');
 
-const title = `${race.season} ${race.name}`;
-const description = `${race.season} ${race.name} at ${race.circuit_name}${race.circuit_locality ? ', ' + race.circuit_locality : ''}: standings and session details.`;
+const { title, description } = raceOverviewSeo(race);
 ---
 
 <RaceSessionLayout

@@ -27,8 +27,8 @@ const pageContext: PageContext = {
 
 const rows = await getSeasonStoryRows(season, bookends.firstRaceNumber);
 
-const title = `${season} Season — Race Calendar`;
-const description = `${season} F1 season calendar: all ${bookends.raceCount} rounds at a glance.`;
+const title = `${season} F1 Season Calendar`;
+const description = `${season} F1 season calendar: all ${bookends.raceCount} rounds with spoiler-safe race-weekend navigation.`;
 ---
 
 <Base {title} {description} canonical={`/seasons/${season}/preseason/season/`} {pageContext}>

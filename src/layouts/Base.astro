@@ -19,6 +19,18 @@ interface Props {
 
 const { title, description, canonical, lang = 'en', robots, pageContext } = Astro.props;
 const canonicalURL = new URL(canonical, SITE_URL).href;
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: title,
+  description,
+  url: canonicalURL,
+  isPartOf: {
+    '@type': 'WebSite',
+    name: 'Race Rewind',
+    url: SITE_URL,
+  },
+};
 
 const [{ seasons, byseason }, latest] = await Promise.all([getAllRacesBySeason(), getLatestRace()]);
 
@@ -54,6 +66,7 @@ const { currentSeason, currentRaceSlug, currentChainSlug, compareSlug, section }
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:type" content="website" />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(structuredData)} />
   </head>
   <body class="min-h-screen bg-bg font-sans text-fg antialiased">
     <div class="flex min-h-screen flex-col">

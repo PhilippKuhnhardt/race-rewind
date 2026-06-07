@@ -5,6 +5,7 @@ import Podium from '../../../../components/race/Podium.astro';
 import { getAllRaces, getRaceResults } from '../../../../lib/queries';
 import { getRacePageBase } from '../../../../lib/race-page';
 import { raceLink } from '../../../../lib/format';
+import { raceSessionSeo } from '../../../../lib/seo';
 
 export async function getStaticPaths() {
   return (await getAllRaces()).map((r) => ({
@@ -23,8 +24,7 @@ const podium = results
   .filter((r) => r.position != null && r.position <= 3)
   .sort((a, b) => (a.position ?? 99) - (b.position ?? 99));
 
-const title = `${race.season} ${race.name} — Race Results`;
-const description = `${race.season} ${race.name} race results at ${race.circuit_name}${race.circuit_locality ? ', ' + race.circuit_locality : ''}.`;
+const { title, description } = raceSessionSeo(race, 'Race Results');
 ---
 
 <RaceSessionLayout {race} {raceCount} {raceSlug} {hasQuali} {hasSprintQualifying} {sessionOrder} {pageContext} {title} {description} canonical={`${raceLink(season, raceSlug)}race/`} activeId="race">

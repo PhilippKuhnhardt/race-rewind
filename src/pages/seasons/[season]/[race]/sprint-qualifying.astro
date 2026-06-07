@@ -7,6 +7,7 @@ import { eq } from 'drizzle-orm';
 import { stripYearPrefix, raceLink } from '../../../../lib/format';
 import { getSprintQualifyingResults } from '../../../../lib/queries';
 import { getRacePageBase } from '../../../../lib/race-page';
+import { raceSessionSeo } from '../../../../lib/seo';
 
 export async function getStaticPaths() {
   const rows = await db
@@ -26,8 +27,7 @@ const { race, raceCount, pageContext, hasQuali, hasSprintQualifying, sessionOrde
 
 const sprintQuali = await getSprintQualifyingResults(race.race_number);
 
-const title = `${race.season} ${race.name} — Sprint Qualifying`;
-const description = `${race.season} ${race.name} sprint qualifying results at ${race.circuit_name}.`;
+const { title, description } = raceSessionSeo(race, 'Sprint Qualifying');
 ---
 
 <RaceSessionLayout {race} {raceCount} {raceSlug} {hasQuali} {hasSprintQualifying} {sessionOrder} {pageContext} {title} {description} canonical={`${raceLink(season, raceSlug)}sprint-qualifying/`} activeId="sprint-qualifying">

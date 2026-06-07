@@ -12,6 +12,7 @@ import {
 import { stripYearPrefix, preseasonLink } from '../../../lib/format';
 import { pitForPreseason } from '../../../lib/point-in-time';
 import { getRaceNews } from '../../../lib/race-news';
+import { preseasonSeo } from '../../../lib/seo';
 import type { PageContext } from '../../../lib/types';
 
 export async function getStaticPaths() {
@@ -42,8 +43,7 @@ const pageContext: PageContext = {
   firstRaceSlug,
 };
 
-const title = `${season} Season — Start of Season`;
-const description = `${season} F1 season: the starting grid and career statistics for every driver going into the season.`;
+const { title, description } = preseasonSeo(season);
 
 const newsEntry = await getRaceNews(`${season}-preseason`, 'preseason');
 ---

@@ -6,6 +6,7 @@ import { raceLink } from '../../../../lib/format';
 import { pitForRace } from '../../../../lib/point-in-time';
 import { getAllRaces, getTeamStandingsBeforeRace } from '../../../../lib/queries';
 import { getRacePageBase } from '../../../../lib/race-page';
+import { raceSessionSeo } from '../../../../lib/seo';
 
 export async function getStaticPaths() {
   return (await getAllRaces()).map((r) => ({
@@ -21,8 +22,7 @@ const pit = pitForRace(race, raceSlug!);
 
 const preRaceTeamChamp = await getTeamStandingsBeforeRace(race.race_number);
 
-const title = `${race.season} ${race.name} — Teams`;
-const description = `Constructor championship standings going into the ${race.season} ${race.name}.`;
+const { title, description } = raceSessionSeo(race, 'Teams');
 ---
 
 <Base

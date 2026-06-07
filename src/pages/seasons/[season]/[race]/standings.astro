@@ -12,6 +12,7 @@ import {
 import { getRacePageBase } from '../../../../lib/race-page';
 import { raceLink } from '../../../../lib/format';
 import { pitForRace } from '../../../../lib/point-in-time';
+import { raceSessionSeo } from '../../../../lib/seo';
 
 export async function getStaticPaths() {
   return (await getAllRaces()).map((r) => ({
@@ -35,8 +36,7 @@ const [preRaceDriverChamp, postRaceDriverChamp, preRaceTeamChamp, postRaceTeamCh
 const preRaceDriverPosById = new Map(preRaceDriverChamp.map((r) => [r.driver_id, r.position]));
 const preRaceTeamPosById   = new Map(preRaceTeamChamp.map((r) => [r.team_id, r.position]));
 
-const title = `${race.season} ${race.name} — Standings`;
-const description = `Driver and constructor championship standings after the ${race.season} ${race.name}.`;
+const { title, description } = raceSessionSeo(race, 'Standings');
 ---
 
 <RaceSessionLayout {race} {raceCount} {raceSlug} {hasQuali} {hasSprintQualifying} {sessionOrder} {pageContext} {title} {description} canonical={`${raceLink(season, raceSlug)}standings/`} activeId="standings">

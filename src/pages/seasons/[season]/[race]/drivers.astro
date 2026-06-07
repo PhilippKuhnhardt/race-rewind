@@ -6,6 +6,7 @@ import { getAllRaces, getDriverStandingsBeforeRace } from '../../../../lib/queri
 import { getRacePageBase } from '../../../../lib/race-page';
 import { raceLink } from '../../../../lib/format';
 import { pitForRace } from '../../../../lib/point-in-time';
+import { raceSessionSeo } from '../../../../lib/seo';
 
 export async function getStaticPaths() {
   return (await getAllRaces()).map((r) => ({
@@ -21,8 +22,7 @@ const pit = pitForRace(race, raceSlug!);
 
 const preRaceDriverChamp = await getDriverStandingsBeforeRace(race.race_number);
 
-const title = `${race.season} ${race.name} — Drivers`;
-const description = `Driver championship standings going into the ${race.season} ${race.name}.`;
+const { title, description } = raceSessionSeo(race, 'Drivers');
 ---
 
 <Base title={title} description={description} canonical={`${raceLink(season, raceSlug)}drivers/`} {pageContext}>

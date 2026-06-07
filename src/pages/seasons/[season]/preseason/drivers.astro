@@ -27,8 +27,8 @@ const pageContext: PageContext = {
 
 const rows = await getDriverStandingsBeforeRace(bookends.firstRaceNumber);
 
-const title = `${season} Season — Drivers (Preseason)`;
-const description = `Driver championship standings going into the ${season} season.`;
+const title = `${season} F1 Driver Standings Before the Season`;
+const description = `${season} F1 driver championship standings before round 1, fixed to the start of the season.`;
 ---
 
 <Base {title} {description} canonical={`${preseasonLink(season)}drivers/`} {pageContext}>
