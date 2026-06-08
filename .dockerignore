@@ -1,0 +1,10 @@
+.astro
+.git
+.opencode
+.pytest_cache
+.venv
+.vscode
+dist
+node_modules
+npm-debug.log
+pnpm-debug.log
