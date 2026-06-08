@@ -2,6 +2,7 @@
 import ContinueButton from '../components/ContinueButton.svelte';
 import Base from '../layouts/Base.astro';
 import { getAllSeasons } from '../lib/queries';
+import { driverHref, teamHref } from '../lib/static-client';
 
 const seasons = await getAllSeasons();
 
@@ -18,14 +19,14 @@ const featuredMoments = [
     title: 'Ferrari before Schumi',
     description:
       "Whose footsteps did Schumi follow when joining Ferrari in 1996? Investigate the state of the Scuderia at the start of Schumacher's first season.",
-    href: '/teams/ferrari/1996/preseason/',
+    href: teamHref('ferrari', { season: 1996, chain: 'preseason' }),
   },
   {
     label: 'Hamilton, 2013',
     title: 'A rising star',
     description:
       'How successful was Sir Lewis Hamilton before his legendary run at Mercedes? Travel back to 2013 to find out.',
-    href: '/drivers/lewis-hamilton/2013/preseason/',
+    href: driverHref('lewis-hamilton', { season: 2013, chain: 'preseason' }),
   },
   {
     label: 'Postseason, 1984',

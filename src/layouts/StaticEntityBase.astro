@@ -1,0 +1,47 @@
+---
+import '../styles/app.css';
+import Footer from '../components/layout/Footer.astro';
+import { SITE_URL } from '../lib/const';
+import Analytics from '@vercel/analytics/astro';
+
+interface Props {
+  canonical: string;
+}
+
+const { canonical } = Astro.props;
+const title = 'Race Rewind';
+const description = 'Formula 1 history, fixed to a selected point in time.';
+const canonicalURL = new URL(canonical, SITE_URL).href;
+---
+
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <script is:inline>
+      try {
+        const t =
+          localStorage.getItem('theme') ||
+          (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', t);
+        // eslint-disable-next-line no-empty
+      } catch {}
+    </script>
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content="noindex, follow" />
+    <link rel="canonical" href={canonicalURL} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <Analytics />
+  </head>
+  <body class="min-h-screen bg-bg font-sans text-fg antialiased">
+    <div class="flex min-h-screen flex-col">
+      <slot />
+      <Footer />
+    </div>
+  </body>
+</html>

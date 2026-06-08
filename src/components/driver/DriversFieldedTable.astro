@@ -7,7 +7,7 @@ interface Props {
   driverHref?: (slug: string) => string;
 }
 
-const { drivers, driverHref = (slug) => `/drivers/${slug}/` } = Astro.props;
+const { drivers, driverHref = (slug) => `/drivers/?slug=${encodeURIComponent(slug)}` } = Astro.props;
 ---
 
 {drivers.length > 0 && (

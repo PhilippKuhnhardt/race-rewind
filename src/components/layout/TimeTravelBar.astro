@@ -1,5 +1,6 @@
 ---
 import type { PageContext } from '../../lib/types';
+import { compareDriversHref, comparePickerHref, driverHref, teamHref } from '../../lib/static-client';
 
 interface Props {
   pageContext: PageContext;
@@ -33,35 +34,56 @@ if (pageContext.kind === 'preseason') {
 } else if (pageContext.kind === 'driver-race') {
   label = pageContext.driverName;
   detail = `career as of ${pageContext.raceName} ${pageContext.season}`;
-  compareHref = `/compare/${pageContext.season}/${pageContext.raceSlug}/?prefill=${pageContext.driverSlug}`;
-  if (pageContext.prevRaceSlug) prevHref = `/drivers/${pageContext.driverSlug}/${pageContext.season}/${pageContext.prevRaceSlug}/`;
-  if (pageContext.nextRaceSlug) nextHref = `/drivers/${pageContext.driverSlug}/${pageContext.season}/${pageContext.nextRaceSlug}/`;
+  compareHref = comparePickerHref(
+    { season: pageContext.season, chain: pageContext.raceSlug },
+    { prefill: pageContext.driverSlug },
+  );
+  if (pageContext.prevRaceSlug) {
+    prevHref = driverHref(pageContext.driverSlug, { season: pageContext.season, chain: pageContext.prevRaceSlug });
+  }
+  if (pageContext.nextRaceSlug) {
+    nextHref = driverHref(pageContext.driverSlug, { season: pageContext.season, chain: pageContext.nextRaceSlug });
+  }
 } else if (pageContext.kind === 'team-race') {
   label = pageContext.teamName;
   detail = `stats as of ${pageContext.raceName} ${pageContext.season}`;
-  if (pageContext.prevRaceSlug) prevHref = `/teams/${pageContext.teamSlug}/${pageContext.season}/${pageContext.prevRaceSlug}/`;
-  if (pageContext.nextRaceSlug) nextHref = `/teams/${pageContext.teamSlug}/${pageContext.season}/${pageContext.nextRaceSlug}/`;
+  if (pageContext.prevRaceSlug) {
+    prevHref = teamHref(pageContext.teamSlug, { season: pageContext.season, chain: pageContext.prevRaceSlug });
+  }
+  if (pageContext.nextRaceSlug) {
+    nextHref = teamHref(pageContext.teamSlug, { season: pageContext.season, chain: pageContext.nextRaceSlug });
+  }
 } else if (pageContext.kind === 'compare-race') {
   label = `${pageContext.driverAName} vs ${pageContext.driverBName}`;
   detail = `compared as of ${pageContext.raceName} ${pageContext.season}`;
-  if (pageContext.prevRaceSlug) prevHref = `/compare/${pageContext.driverASlug}/${pageContext.driverBSlug}/${pageContext.season}/${pageContext.prevRaceSlug}/`;
-  if (pageContext.nextRaceSlug) nextHref = `/compare/${pageContext.driverASlug}/${pageContext.driverBSlug}/${pageContext.season}/${pageContext.nextRaceSlug}/`;
+  if (pageContext.prevRaceSlug) {
+    prevHref = compareDriversHref(pageContext.driverASlug, pageContext.driverBSlug, {
+      season: pageContext.season,
+      chain: pageContext.prevRaceSlug,
+    });
+  }
+  if (pageContext.nextRaceSlug) {
+    nextHref = compareDriversHref(pageContext.driverASlug, pageContext.driverBSlug, {
+      season: pageContext.season,
+      chain: pageContext.nextRaceSlug,
+    });
+  }
 } else if (pageContext.kind === 'driver-preseason') {
   label = pageContext.driverName;
   detail = `career going into ${pageContext.season} · ${pageContext.raceCount} rounds`;
-  nextHref = `/drivers/${pageContext.driverSlug}/${pageContext.season}/${pageContext.nextRaceSlug}/`;
+  nextHref = driverHref(pageContext.driverSlug, { season: pageContext.season, chain: pageContext.nextRaceSlug });
 } else if (pageContext.kind === 'driver-postseason') {
   label = pageContext.driverName;
   detail = `career after ${pageContext.season} · ${pageContext.raceCount} rounds`;
-  prevHref = `/drivers/${pageContext.driverSlug}/${pageContext.season}/${pageContext.prevRaceSlug}/`;
+  prevHref = driverHref(pageContext.driverSlug, { season: pageContext.season, chain: pageContext.prevRaceSlug });
 } else if (pageContext.kind === 'team-preseason') {
   label = pageContext.teamName;
   detail = `stats going into ${pageContext.season} · ${pageContext.raceCount} rounds`;
-  nextHref = `/teams/${pageContext.teamSlug}/${pageContext.season}/${pageContext.nextRaceSlug}/`;
+  nextHref = teamHref(pageContext.teamSlug, { season: pageContext.season, chain: pageContext.nextRaceSlug });
 } else if (pageContext.kind === 'team-postseason') {
   label = pageContext.teamName;
   detail = `stats after ${pageContext.season} · ${pageContext.raceCount} rounds`;
-  prevHref = `/teams/${pageContext.teamSlug}/${pageContext.season}/${pageContext.prevRaceSlug}/`;
+  prevHref = teamHref(pageContext.teamSlug, { season: pageContext.season, chain: pageContext.prevRaceSlug });
 } else if (pageContext.kind === 'stats') {
   label = 'Driver Stats';
   if (pageContext.chainSlug === 'preseason') {

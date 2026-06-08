@@ -1,4 +1,10 @@
 import type { PointInTime } from './point-in-time';
+import {
+  compareDriversHref,
+  comparePickerHref,
+  driverHref,
+  teamHref,
+} from './static-client';
 
 function pitSlug(pit: PointInTime): string {
   if (pit.kind === 'preseason') return 'preseason';
@@ -7,11 +13,11 @@ function pitSlug(pit: PointInTime): string {
 }
 
 export function driverLinkAt(slug: string, pit: PointInTime): string {
-  return `/drivers/${slug}/${pit.season}/${pitSlug(pit)}/`;
+  return driverHref(slug, { season: pit.season, chain: pitSlug(pit) });
 }
 
 export function teamLinkAt(slug: string, pit: PointInTime): string {
-  return `/teams/${slug}/${pit.season}/${pitSlug(pit)}/`;
+  return teamHref(slug, { season: pit.season, chain: pitSlug(pit) });
 }
 
 export function raceLinkAt(pit: PointInTime): string {
@@ -26,12 +32,14 @@ export function raceSubpageLinkAt(
 }
 
 export function compareLinkAt(pit: PointInTime, opts?: { prefillDriverSlug?: string }): string {
-  const base = `/compare/${pit.season}/${pitSlug(pit)}/`;
-  return opts?.prefillDriverSlug ? `${base}?prefill=${opts.prefillDriverSlug}` : base;
+  return comparePickerHref(
+    { season: pit.season, chain: pitSlug(pit) },
+    { prefill: opts?.prefillDriverSlug },
+  );
 }
 
 export function compareTwoDriversLinkAt(driverA: string, driverB: string, pit: PointInTime): string {
-  return `/compare/${driverA}/${driverB}/${pit.season}/${pitSlug(pit)}/`;
+  return compareDriversHref(driverA, driverB, { season: pit.season, chain: pitSlug(pit) });
 }
 
 export function statsLinkAt(pit: PointInTime): string {
@@ -49,10 +57,10 @@ export function seasonLinkAt(pit: PointInTime): string {
 // ---------------------------------------------------------------------------
 
 export const driverLink = (slug: string, season: number | string, raceSlug: string): string =>
-  `/drivers/${slug}/${season}/${raceSlug}/`;
+  driverHref(slug, { season: Number(season), chain: raceSlug });
 
 export const teamLink = (slug: string, season: number | string, raceSlug: string): string =>
-  `/teams/${slug}/${season}/${raceSlug}/`;
+  teamHref(slug, { season: Number(season), chain: raceSlug });
 
 export const raceLink = (season: number | string, raceSlug: string): string =>
   `/seasons/${season}/${raceSlug}/`;

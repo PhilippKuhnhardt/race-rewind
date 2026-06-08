@@ -13,6 +13,7 @@ __pycache__/
 node_modules/
 dist/
 .astro/
+public/_data/
 
 # Misc
 .env

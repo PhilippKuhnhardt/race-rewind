@@ -8,7 +8,7 @@ interface Props {
   teamHref?: (slug: string) => string;
 }
 
-const { teams, teamHref = (slug) => `/teams/${slug}/` } = Astro.props;
+const { teams, teamHref = (slug) => `/teams/?slug=${encodeURIComponent(slug)}` } = Astro.props;
 ---
 
 {teams.length > 0 && (

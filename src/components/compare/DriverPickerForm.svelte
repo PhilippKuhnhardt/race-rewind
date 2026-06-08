@@ -1,32 +1,38 @@
 <script lang="ts">
   import DriverCombobox from './DriverCombobox.svelte';
   import type { DriverPickerEntry } from '../../lib/api-types';
+  import { compareDriversHref } from '../../lib/static-client';
 
   interface Props {
     season: number;
-    raceSlug: string;
+    chain: string;
     drivers: DriverPickerEntry[];
     prefillA?: string;
     prefillB?: string;
     autoNavigate?: boolean;
   }
 
-  let { season, raceSlug, drivers, prefillA, prefillB, autoNavigate = false }: Props = $props();
+  let { season, chain, drivers, prefillA, prefillB, autoNavigate = false }: Props = $props();
 
-  let driverASlug = $state(prefillA ?? '');
-  let driverBSlug = $state(prefillB ?? '');
+  let driverASlug = $state('');
+  let driverBSlug = $state('');
 
   const canCompare = $derived(driverASlug.length > 0 && driverBSlug.length > 0);
 
+  $effect(() => {
+    driverASlug = prefillA ?? '';
+    driverBSlug = prefillB ?? '';
+  });
+
   function compare() {
     if (!canCompare) return;
-    window.location.href = `/compare/${driverASlug}/${driverBSlug}/${season}/${raceSlug}/`;
+    window.location.href = compareDriversHref(driverASlug, driverBSlug, { season, chain });
   }
 
   $effect(() => {
     if (!autoNavigate || !driverASlug || !driverBSlug) return;
-    const target = `/compare/${driverASlug}/${driverBSlug}/${season}/${raceSlug}/`;
-    if (target !== window.location.pathname) {
+    const target = compareDriversHref(driverASlug, driverBSlug, { season, chain });
+    if (target !== `${window.location.pathname}${window.location.search}`) {
       window.location.href = target;
     }
   });

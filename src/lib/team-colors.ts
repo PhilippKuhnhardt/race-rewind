@@ -16,7 +16,7 @@
  * ADDING A NEW TEAM
  * -----------------
  * Use the team's `slug` field from the DB (= the URL segment, e.g. "lotus_f1").
- * Slugs are found in URLs: /teams/<slug>/<season>/…
+ * Slugs are found in static team query URLs and team data payloads.
  * Rebrands are separate slugs (e.g. toro_rosso → alphatauri → rb).
  *
  * COVERAGE NOTES (as of initial population)

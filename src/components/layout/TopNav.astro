@@ -1,5 +1,6 @@
 ---
 import type { RaceNavEntry } from '../../lib/queries/races';
+import { comparePickerHref } from '../../lib/static-client';
 import ThemeToggle from '../primitives/ThemeToggle.svelte';
 import LogoMark from './LogoMark.astro';
 import MobileNav from './MobileNav.svelte';
@@ -31,7 +32,9 @@ const isBoundaryPage = currentChainSlug === 'preseason' || currentChainSlug === 
 const navSlug = isBoundaryPage ? currentChainSlug : currentRaceSlug;
 const raceBase = navSlug ? `/seasons/${currentSeason}/${navSlug}` : '';
 const statsBase = currentChainSlug ? `/stats/${currentSeason}/${currentChainSlug}/` : `/stats/`;
-const compareHref = compareSlug ? `/compare/${currentSeason}/${compareSlug}/` : '/compare/';
+const compareHref = compareSlug
+  ? comparePickerHref({ season: currentSeason, chain: compareSlug })
+  : '/compare/';
 
 const navLinks = [
   { id: 'race', href: raceBase ? `${raceBase}/` : '/', label: 'Race' },

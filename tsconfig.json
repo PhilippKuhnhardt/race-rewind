@@ -6,5 +6,5 @@
     "noUnusedParameters": true
   },
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist", "eslint.config.mjs"]
+  "exclude": ["dist", "public/_data", "eslint.config.mjs"]
 }

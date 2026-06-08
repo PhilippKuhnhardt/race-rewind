@@ -18,7 +18,14 @@
     "**/.venv/**": true,
     "**/content/**": true,
     "**/dist/**": true,
-    "**/node_modules/**": true
+    "**/node_modules/**": true,
+    "**/public/_data/**": true
+  },
+  "files.exclude": {
+    "**/public/_data/**": true
+  },
+  "search.exclude": {
+    "**/public/_data/**": true
   },
   "editor.quickSuggestions": {
     "strings": "on"

@@ -1,10 +1,8 @@
-import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import svelte from '@astrojs/svelte';
 import tailwindcss from '@tailwindcss/vite';
+import { defineConfig } from 'astro/config';
 import { SITE_URL } from './src/lib/const.ts';
-
-import vercel from '@astrojs/vercel';
 
 export default defineConfig({
   site: SITE_URL,
@@ -15,11 +13,11 @@ export default defineConfig({
       filter: (page) => {
         const pathname = page.startsWith(SITE_URL) ? page.slice(SITE_URL.length) : page;
         return (
-          !pathname.startsWith('/drivers/')
-          && !pathname.startsWith('/teams/')
-          && !pathname.startsWith('/compare/')
-          && !pathname.startsWith('/legal/')
-          && pathname !== '/stats/'
+          !pathname.startsWith('/drivers/') &&
+          !pathname.startsWith('/teams/') &&
+          !pathname.startsWith('/compare/') &&
+          !pathname.startsWith('/legal/') &&
+          pathname !== '/stats/'
         );
       },
     }),
@@ -37,12 +35,10 @@ export default defineConfig({
           '**/content/**',
           '**/dist/**',
           '**/node_modules/**',
+          '**/_data/**',
+          '**/.vercel/**',
         ],
       },
     },
   },
-
-  adapter: vercel({
-    includeFiles: ['data/race-rewind.sqlite'],
-  }),
 });
