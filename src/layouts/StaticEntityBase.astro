@@ -2,7 +2,6 @@
 import '../styles/app.css';
 import Footer from '../components/layout/Footer.astro';
 import { SITE_URL } from '../lib/const';
-import Analytics from '@vercel/analytics/astro';
 
 interface Props {
   canonical: string;
@@ -36,7 +35,6 @@ const canonicalURL = new URL(canonical, SITE_URL).href;
     <meta name="robots" content="noindex, follow" />
     <link rel="canonical" href={canonicalURL} />
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <Analytics />
   </head>
   <body class="min-h-screen bg-bg font-sans text-fg antialiased">
     <div class="flex min-h-screen flex-col">
