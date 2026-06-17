@@ -1,10 +1,7 @@
 ---
 import type { RaceNavEntry } from '../../lib/queries/races';
-import ThemeToggle from '../primitives/ThemeToggle.svelte';
 import LogoMark from './LogoMark.astro';
-import MobileNav from './MobileNav.svelte';
-import RacePicker from './RacePicker.svelte';
-import YearPicker from './YearPicker.svelte';
+import PitNav from './PitNav.svelte';
 
 interface Props {
   seasons: number[];
@@ -14,6 +11,7 @@ interface Props {
   currentChainSlug?: string;
   compareSlug?: string;
   section?: 'seasons' | 'stats';
+  allowSavedPitOverride?: boolean;
 }
 
 const {
@@ -24,23 +22,8 @@ const {
   currentChainSlug,
   compareSlug,
   section = 'seasons',
+  allowSavedPitOverride = false,
 } = Astro.props;
-
-const isBoundaryPage = currentChainSlug === 'preseason' || currentChainSlug === 'postseason';
-// Boundary pages use 'preseason'/'postseason' as the slug — no race-based sub-routes exist
-const navSlug = isBoundaryPage ? currentChainSlug : currentRaceSlug;
-const raceBase = navSlug ? `/seasons/${currentSeason}/${navSlug}` : '';
-const statsBase = currentChainSlug ? `/stats/${currentSeason}/${currentChainSlug}/` : `/stats/`;
-const compareHref = compareSlug ? `/compare/${currentSeason}/${compareSlug}/` : '/compare/';
-
-const navLinks = [
-  { id: 'race', href: raceBase ? `${raceBase}/` : '/', label: 'Race' },
-  { id: 'season', href: raceBase ? `${raceBase}/season/` : '/', label: 'Season' },
-  { id: 'drivers', href: raceBase ? `${raceBase}/drivers/` : '/', label: 'Drivers' },
-  { id: 'teams', href: raceBase ? `${raceBase}/teams/` : '/', label: 'Teams' },
-  { id: 'stats', href: statsBase, label: 'Stats' },
-  { id: 'compare', href: compareHref, label: 'Compare' },
-];
 
 const pathname = Astro.url.pathname;
 const lastSeg = pathname.replace(/\/$/, '').split('/').at(-1) ?? '';
@@ -57,7 +40,7 @@ function isActive(id: string): boolean {
   return false;
 }
 
-const activeId = navLinks.find((l) => isActive(l.id))?.id;
+const activeId = ['race', 'season', 'drivers', 'teams', 'stats', 'compare'].find(isActive);
 ---
 
 <header class="border-b border-border bg-bg/90 backdrop-blur-sm">
@@ -71,36 +54,17 @@ const activeId = navLinks.find((l) => isActive(l.id))?.id;
       Race <span class="text-accent">Rewind</span>
     </a>
 
-    <!-- Primary nav (md+) -->
-    <nav class="ml-6 hidden items-center gap-1 md:flex" aria-label="Primary">
-      {
-        navLinks.map(({ id, href, label }) => {
-          const active = isActive(id);
-          return (
-            <a
-              href={href}
-              class={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors no-underline ${active ? 'bg-bg-alt text-fg' : 'text-fg-muted hover:bg-bg-hover hover:text-fg'}`}
-              aria-current={active ? 'page' : undefined}
-            >
-              {label}
-            </a>
-          );
-        })
-      }
-    </nav>
-
-    <!-- Right side controls -->
-    <div class="ml-auto flex items-center gap-1">
-      <MobileNav links={navLinks} {activeId} client:load />
-      <ThemeToggle client:idle />
-      <YearPicker {seasons} {currentSeason} {section} client:load />
-      <RacePicker
-        {byseason}
-        {currentSeason}
-        currentChainSlug={currentChainSlug ?? ''}
-        {section}
-        client:load
-      />
-    </div>
+    <PitNav
+      {seasons}
+      {byseason}
+      {currentSeason}
+      {currentRaceSlug}
+      currentChainSlug={currentChainSlug ?? ''}
+      {compareSlug}
+      {section}
+      {activeId}
+      {allowSavedPitOverride}
+      client:load
+    />
   </div>
 </header>

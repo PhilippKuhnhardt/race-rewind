@@ -1,7 +1,7 @@
 ---
-import { getLatestRace } from '../../lib/queries';
+import { getLatestRaceWithData } from '../../lib/queries';
 
-const r = await getLatestRace();
+const r = await getLatestRaceWithData();
 const target = `/stats/${r.season}/${r.slug.slice(String(r.season).length + 1)}/`;
 ---
 <!doctype html>

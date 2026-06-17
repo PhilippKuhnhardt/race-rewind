@@ -3,7 +3,7 @@ import '../styles/app.css';
 import TopNav from '../components/layout/TopNav.astro';
 import TimeTravelBar from '../components/layout/TimeTravelBar.astro';
 import Footer from '../components/layout/Footer.astro';
-import { getAllRacesBySeason, getLatestRace } from '../lib/queries';
+import { getAllRacesBySeason, getLatestRaceWithData } from '../lib/queries';
 import { SITE_URL } from '../lib/const';
 import { resolvePageNavState } from '../lib/page-nav';
 import type { PageContext } from '../lib/types';
@@ -32,10 +32,61 @@ const structuredData = {
   },
 };
 
-const [{ seasons, byseason }, latest] = await Promise.all([getAllRacesBySeason(), getLatestRace()]);
+const [{ seasons, byseason }, latest] = await Promise.all([getAllRacesBySeason(), getLatestRaceWithData()]);
 
 const { currentSeason, currentRaceSlug, currentChainSlug, compareSlug, section } =
   resolvePageNavState(pageContext, latest);
+
+type LastRaceEntry =
+  | { kind: 'preseason' | 'postseason'; season: number }
+  | { kind: 'race'; season: number; raceSlug: string; name: string; flag: null };
+
+function savedBoundaryEntry(
+  season: number,
+  chainSlug?: string,
+): LastRaceEntry | null {
+  if (chainSlug !== 'preseason' && chainSlug !== 'postseason') return null;
+  return { kind: chainSlug, season };
+}
+
+function savedRaceEntry(
+  season: number,
+  raceSlug: string,
+  raceName: string | null,
+): LastRaceEntry | null {
+  if (raceSlug === 'preseason' || raceSlug === 'postseason') {
+    return { kind: raceSlug, season };
+  }
+  if (!raceName) return null;
+  return { kind: 'race', season, raceSlug, name: raceName, flag: null };
+}
+
+function resolveLastRaceEntry(context: PageContext | undefined): LastRaceEntry | null {
+  if (!context) return null;
+
+  switch (context.kind) {
+    case 'preseason':
+    case 'postseason':
+      return { kind: context.kind, season: context.season };
+    case 'race':
+    case 'driver-race':
+    case 'team-race':
+    case 'compare-race':
+      return savedRaceEntry(context.season, context.raceSlug, context.raceName);
+    case 'stats':
+      return savedRaceEntry(context.season, context.chainSlug, context.raceName);
+    case 'season':
+      return savedBoundaryEntry(context.season, context.chainSlug);
+    case 'driver-preseason':
+    case 'team-preseason':
+      return { kind: 'preseason', season: context.season };
+    case 'driver-postseason':
+    case 'team-postseason':
+      return { kind: 'postseason', season: context.season };
+  }
+}
+
+const lastRaceEntry = resolveLastRaceEntry(pageContext);
 ---
 
 <!doctype html>
@@ -72,6 +123,17 @@ const { currentSeason, currentRaceSlug, currentChainSlug, compareSlug, section }
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:type" content="website" />
     <script is:inline type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+    {
+      lastRaceEntry && (
+        <script is:inline define:vars={{ lastRaceEntry }}>
+          try {
+            localStorage.setItem('lastRace', JSON.stringify(lastRaceEntry));
+          } catch {
+            // localStorage unavailable
+          }
+        </script>
+      )
+    }
   </head>
   <body class="min-h-screen bg-bg font-sans text-fg antialiased">
     <div class="flex min-h-screen flex-col">
@@ -84,6 +146,7 @@ const { currentSeason, currentRaceSlug, currentChainSlug, compareSlug, section }
           {currentChainSlug}
           {compareSlug}
           {section}
+          allowSavedPitOverride={!pageContext}
         />
 
         {pageContext && <TimeTravelBar {pageContext} />}

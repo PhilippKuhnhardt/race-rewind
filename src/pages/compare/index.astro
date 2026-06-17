@@ -1,7 +1,7 @@
 ---
-import { getLatestRace } from '../../lib/queries';
+import { getLatestRaceWithData } from '../../lib/queries';
 
-const { season, slug } = await getLatestRace();
+const { season, slug } = await getLatestRaceWithData();
 const target = `/compare/${season}/${slug.slice(String(season).length + 1)}/`;
 ---
 

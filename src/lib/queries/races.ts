@@ -1,6 +1,6 @@
-import { eq, desc, asc, lte } from 'drizzle-orm';
+import { eq, desc, asc } from 'drizzle-orm';
 import { db } from '../../db/client';
-import { races, circuits } from '../../db/schema';
+import { races, circuits, raceResults } from '../../db/schema';
 import { stripYearPrefix } from '../format';
 
 export interface RaceNavEntry {
@@ -104,12 +104,11 @@ export async function getSeasonBounds(season: number): Promise<SeasonBounds | un
   };
 }
 
-export async function getLatestRace(): Promise<LatestRace> {
-  const today = new Date().toISOString().slice(0, 10);
+export async function getLatestRaceWithData(): Promise<LatestRace> {
   const row = await db
     .select({ season: races.season, slug: races.slug })
     .from(races)
-    .where(lte(races.date, today))
+    .innerJoin(raceResults, eq(raceResults.raceNumber, races.raceNumber))
     .orderBy(desc(races.raceNumber))
     .limit(1)
     .get();
