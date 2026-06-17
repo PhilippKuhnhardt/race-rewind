@@ -13,6 +13,11 @@ __pycache__/
 node_modules/
 dist/
 .astro/
+.tmp/
+
+# Jolpica source dumps are downloaded by CI and kept out of commits.
+ingest/jolpica-dump/
+*.zip
 
 # Misc
 .env

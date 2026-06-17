@@ -38,7 +38,8 @@ The SQLite database is committed to the repository, so local development works w
 pnpm dev           # Start the Astro dev server
 pnpm build         # Build the site
 pnpm preview       # Preview the production build
-pnpm ingest        # Rebuild data/race-rewind.sqlite from the CSV dump
+pnpm ingest        # Rebuild data/race-rewind.sqlite from a configured CSV dump
+pnpm jolpica:update # Download a new delayed Jolpica CSV dump when available
 pnpm test          # Run Vitest
 pnpm lint          # Run ESLint
 pnpm check         # Run Astro type checks
@@ -46,13 +47,14 @@ pnpm check         # Run Astro type checks
 
 ## Data
 
-Structured race data comes from the [Jolpica F1](https://github.com/jolpica/jolpica-f1) CSV export. The committed dump under `ingest/jolpica-dump/<date>/` is the source of truth for the generated SQLite database.
+Structured race data comes from the [Jolpica F1](https://github.com/jolpica/jolpica-f1) CSV export. Source CSV dumps are downloaded from Jolpica's public delayed dump endpoint and are not committed. The committed SQLite database at `data/race-rewind.sqlite` and the last-ingested dump metadata at `ingest/jolpica-dump.json` are the source of truth for the app.
 
 ```bash
-pnpm ingest
+pnpm jolpica:update
+pnpm ingest -- --dump .tmp/jolpica-dump/csv
 ```
 
-The ingestion pipeline is a full drop-and-rebuild. To update the data, add a new Jolpica CSV folder under `ingest/jolpica-dump/<date>/` and run the build script against that folder.
+The ingestion pipeline is a full drop-and-rebuild. The nightly GitHub Actions workflow checks `https://api.jolpi.ca/data/dumps/download/`, downloads the newest delayed CSV dump only when its hash differs from `ingest/jolpica-dump.json`, rebuilds the SQLite database, runs validation, and commits the updated database and metadata to `main`.
 
 ## Content licensing
 

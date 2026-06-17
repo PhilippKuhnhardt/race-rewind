@@ -1,0 +1,71 @@
+name: Jolpica Dump
+
+on:
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: jolpica-dump
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v5
+        with:
+          ref: main
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check and download Jolpica dump
+        id: jolpica
+        run: pnpm jolpica:update -- --work-dir .tmp/jolpica-dump
+
+      - name: Rebuild database
+        if: steps.jolpica.outputs.update_found == 'true'
+        run: pnpm tsx ingest/build_db.ts --dump "${{ steps.jolpica.outputs.dump_dir }}" --out data/race-rewind.sqlite
+
+      - name: Test
+        if: steps.jolpica.outputs.update_found == 'true'
+        run: pnpm test
+
+      - name: Lint
+        if: steps.jolpica.outputs.update_found == 'true'
+        run: pnpm lint
+
+      - name: Check
+        if: steps.jolpica.outputs.update_found == 'true'
+        run: pnpm check
+
+      - name: Commit update
+        if: steps.jolpica.outputs.update_found == 'true'
+        run: |
+          if git diff --quiet -- data/race-rewind.sqlite ingest/jolpica-dump.json; then
+            echo "No database or metadata changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/race-rewind.sqlite ingest/jolpica-dump.json
+          git commit -m "chore: update jolpica dump"
+          git push origin HEAD:main

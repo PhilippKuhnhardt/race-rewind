@@ -1,0 +1,7 @@
+{
+  "dump_type": "csv",
+  "file_hash": "committed-2026-04-02-csv-snapshot",
+  "file_size": null,
+  "uploaded_at": "2026-04-02T00:00:00.000000Z",
+  "source": "committed CSV snapshot previously stored at ingest/jolpica-dump/2026-04-02"
+}

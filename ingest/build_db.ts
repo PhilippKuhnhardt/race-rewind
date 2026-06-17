@@ -20,7 +20,7 @@ import { buildDerived } from './transform/derived';
 
 function parseArgs() {
   const args = process.argv.slice(2);
-  let dumpDir = 'ingest/jolpica-dump/2026-04-02';
+  let dumpDir = process.env.JOLPICA_DUMP_DIR ?? '';
   let outPath = 'data/race-rewind.sqlite';
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--dump' && args[i + 1]) dumpDir = args[++i];
@@ -105,7 +105,11 @@ async function printRowCounts(client: ReturnType<typeof createClient>) {
 
 const { dumpDir, outPath } = parseArgs();
 if (!existsSync(dumpDir)) {
-  console.error(`Dump directory not found: ${dumpDir}`);
+  console.error(
+    dumpDir
+      ? `Dump directory not found: ${dumpDir}`
+      : 'Dump directory not configured. Pass --dump <dir> or set JOLPICA_DUMP_DIR.',
+  );
   process.exit(1);
 }
 build(dumpDir, outPath).catch(err => { console.error(err); process.exit(1); });
