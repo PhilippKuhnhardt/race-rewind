@@ -16,7 +16,6 @@ Race Rewind does not host race footage. It provides the historical context, data
 - SQLite database committed at `data/race-rewind.sqlite`
 - TypeScript ingestion pipeline under `ingest/`
 - Vitest for ingestion and utility tests
-- Vercel adapter for deployment
 
 ## Setup
 
@@ -31,6 +30,8 @@ pnpm dev
 ```
 
 The SQLite database is committed to the repository, so local development works without rebuilding the data.
+
+For production deployments, the app reads `data/race-rewind.sqlite` relative to the working directory by default. Set `RACE_REWIND_DB_PATH` to point at a different SQLite file path.
 
 ## Scripts
 

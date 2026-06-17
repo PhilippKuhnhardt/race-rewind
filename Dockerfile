@@ -19,6 +19,7 @@ FROM node:22-bookworm-slim AS runtime
 ENV NODE_ENV="production"
 ENV HOST="0.0.0.0"
 ENV PORT="4321"
+ENV RACE_REWIND_DB_PATH="/app/data/race-rewind.sqlite"
 
 WORKDIR /app
 
