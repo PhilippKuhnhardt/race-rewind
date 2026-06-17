@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: jolpica-dump
@@ -76,3 +77,7 @@ jobs:
           git add data/race-rewind.sqlite ingest/jolpica-dump.json content/race-news
           git commit -m "chore: update jolpica dump"
           git push origin HEAD:main
+
+          gh workflow run docker.yml --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}
