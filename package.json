@@ -12,6 +12,7 @@
     "format:check": "prettier --check .",
     "ingest": "tsx ingest/build_db.ts",
     "jolpica:update": "tsx ingest/update_jolpica_dump.ts",
+    "race-news:generate": "tsx ingest/race_news_generator.ts",
     "test": "vitest run"
   },
   "dependencies": {

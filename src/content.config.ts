@@ -1,6 +1,6 @@
-import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { defineCollection } from 'astro:content';
 
 const raceNews = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './content/race-news' }),
@@ -13,7 +13,6 @@ const raceNews = defineCollection({
     license: z.literal('CC-BY-SA-4.0'),
     generated_at: z.string(),
     model: z.string().optional(),
-    authored_by: z.string().optional(),
   }),
 });
 

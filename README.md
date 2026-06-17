@@ -40,6 +40,7 @@ pnpm build         # Build the site
 pnpm preview       # Preview the production build
 pnpm ingest        # Rebuild data/race-rewind.sqlite from a configured CSV dump
 pnpm jolpica:update # Download a new delayed Jolpica CSV dump when available
+pnpm race-news:generate # Generate missing completed-race previews via OpenRouter
 pnpm test          # Run Vitest
 pnpm lint          # Run ESLint
 pnpm check         # Run Astro type checks
@@ -54,7 +55,9 @@ pnpm jolpica:update
 pnpm ingest -- --dump .tmp/jolpica-dump/csv
 ```
 
-The ingestion pipeline is a full drop-and-rebuild. The nightly GitHub Actions workflow checks `https://api.jolpi.ca/data/dumps/download/`, downloads the newest delayed CSV dump only when its hash differs from `ingest/jolpica-dump.json`, rebuilds the SQLite database, runs validation, and commits the updated database and metadata to `main`.
+The ingestion pipeline is a full drop-and-rebuild. The nightly GitHub Actions workflow checks `https://api.jolpi.ca/data/dumps/download/`, downloads the newest delayed CSV dump only when its hash differs from `ingest/jolpica-dump.json`, rebuilds the SQLite database, generates missing completed-race preview markdown via OpenRouter, runs validation, and commits the updated database, metadata, and race-news content to `main`.
+
+Race-news generation requires `OPENROUTER_API_KEY` and `OPENROUTER_MODEL`. The generator only targets races with race results in the database and no existing `content/race-news/{slug}/preview.md`.
 
 ## Content licensing
 

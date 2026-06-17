@@ -48,6 +48,13 @@ jobs:
         if: steps.jolpica.outputs.update_found == 'true'
         run: pnpm test
 
+      - name: Generate race news
+        if: steps.jolpica.outputs.update_found == 'true'
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
+        run: pnpm race-news:generate
+
       - name: Lint
         if: steps.jolpica.outputs.update_found == 'true'
         run: pnpm lint
@@ -59,13 +66,13 @@ jobs:
       - name: Commit update
         if: steps.jolpica.outputs.update_found == 'true'
         run: |
-          if git diff --quiet -- data/race-rewind.sqlite ingest/jolpica-dump.json; then
-            echo "No database or metadata changes to commit."
+          if git diff --quiet -- data/race-rewind.sqlite ingest/jolpica-dump.json content/race-news; then
+            echo "No database, metadata, or race-news changes to commit."
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/race-rewind.sqlite ingest/jolpica-dump.json
+          git add data/race-rewind.sqlite ingest/jolpica-dump.json content/race-news
           git commit -m "chore: update jolpica dump"
           git push origin HEAD:main
