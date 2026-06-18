@@ -6,6 +6,7 @@ import { and, eq, sql } from 'drizzle-orm';
 import * as schema from '../src/db/schema';
 import { raceSlug, slugify, deduplicate } from './slugs';
 import { JolpicaClient, JolpicaRateLimitError, JolpicaRequestBudgetError, deterministicNegativeId } from './jolpica_api';
+import { normalizeRaceWikipediaUrl } from './wikipedia';
 import { buildDerived } from './transform/derived';
 
 type Db = LibSQLDatabase<typeof schema>;
@@ -184,7 +185,8 @@ export async function backfillJolpicaApi(args: Args): Promise<BackfillResult> {
       for (const event of schedule.data.events) {
         if (!shouldInspectEvent(event, args.now)) continue;
         try {
-          const localRace = await ensureRaceAndSessions(db, season, event, indexes);
+          const { race: localRace, didChange: didUpdateRace } = await ensureRaceAndSessions(db, season, event, indexes);
+          changed ||= didUpdateRace;
           const available = await api.getJson<AvailableResultsResponse>(`/f1/alpha/results/${event.round.id}/`);
           const neededTypes = await resultTypesToFetch(available.data.available_results ?? [], localRace.raceNumber, client);
           const payloads: AlphaResultResponse[] = [];
@@ -278,8 +280,11 @@ async function ensureRaceAndSessions(
   season: number,
   event: ScheduleEvent,
   indexes: LocalIndexes,
-): Promise<typeof schema.races.$inferSelect> {
+): Promise<{ race: typeof schema.races.$inferSelect; didChange: boolean }> {
   let race = await db.select().from(schema.races).where(eq(schema.races.jolpicaApiId, event.round.id)).get();
+  let didChange = false;
+  const wikipedia = normalizeRaceWikipediaUrl(event.round.wikipedia);
+
   if (!race) {
     const circuit = await ensureCircuit(db, event, indexes);
     const existingSlugs = new Set((await db.select({ slug: schema.races.slug }).from(schema.races)).map(r => r.slug));
@@ -295,10 +300,18 @@ async function ensureRaceAndSessions(
       name: event.round.name ?? `Round ${event.round.number}`,
       date: firstRaceDate(event),
       hasSprint: event.schedule.some(group => group.code === 'SR') ? 1 : 0,
-      wikipedia: event.round.wikipedia ?? null,
+      wikipedia,
     });
     race = await db.select().from(schema.races).where(eq(schema.races.jolpicaApiId, event.round.id)).get();
     if (!race) throw new Error(`Failed to insert race ${event.round.id}`);
+    didChange = true;
+  } else if (event.round.wikipedia && race.wikipedia !== wikipedia) {
+    await db.update(schema.races)
+      .set({ wikipedia })
+      .where(eq(schema.races.raceNumber, race.raceNumber));
+    race = await db.select().from(schema.races).where(eq(schema.races.jolpicaApiId, event.round.id)).get();
+    if (!race) throw new Error(`Failed to reload race ${event.round.id}`);
+    didChange = true;
   }
 
   for (const group of event.schedule) {
@@ -321,7 +334,7 @@ async function ensureRaceAndSessions(
     }
   }
 
-  return race;
+  return { race, didChange };
 }
 
 async function ensureCircuit(db: Db, event: ScheduleEvent, indexes: LocalIndexes): Promise<typeof schema.circuits.$inferSelect> {

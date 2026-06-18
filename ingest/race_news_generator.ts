@@ -1,6 +1,9 @@
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createClient } from '@libsql/client';
+import { wikipediaTitleFallbacks, wikipediaUrlToTitle } from './wikipedia';
+
+export { wikipediaTitleFallbacks, wikipediaUrlToTitle } from './wikipedia';
 
 export type RaceNewsCandidate = {
   raceNumber: number;
@@ -135,16 +138,23 @@ export async function findRaceNewsCandidates(
   }
 }
 
-export function wikipediaUrlToTitle(url: string): string {
-  const parsed = new URL(url);
-  if (parsed.hostname !== 'en.wikipedia.org') throw new Error(`Expected en.wikipedia.org URL, got ${url}`);
-  const match = parsed.pathname.match(/^\/wiki\/(.+)$/);
-  if (!match) throw new Error(`Expected Wikipedia article URL, got ${url}`);
-  return decodeURIComponent(match[1]).replaceAll('_', ' ');
-}
-
 export async function fetchWikipediaSource(url: string): Promise<WikipediaSource> {
   const requestedTitle = wikipediaUrlToTitle(url);
+  const titles = [requestedTitle, ...wikipediaTitleFallbacks(requestedTitle)];
+  let missingTitle = requestedTitle;
+
+  for (const title of titles) {
+    const source = await fetchWikipediaSourceByTitle(title, extractSpoilerSafeWikipediaText, 'Wikipedia source');
+    if (source) return source;
+    missingTitle = title;
+  }
+
+  throw new Error(`Wikipedia page not found: ${missingTitle}`);
+}
+
+type WikipediaExtractor = (wikitext: string) => string;
+
+async function fetchWikipediaSourceByTitle(title: string, extractor: WikipediaExtractor, label: string): Promise<WikipediaSource | null> {
   const apiUrl = new URL('https://en.wikipedia.org/w/api.php');
   apiUrl.search = new URLSearchParams({
     action: 'query',
@@ -154,7 +164,7 @@ export async function fetchWikipediaSource(url: string): Promise<WikipediaSource
     redirects: '1',
     rvprop: 'ids|content',
     rvslots: 'main',
-    titles: requestedTitle,
+    titles: title,
   }).toString();
 
   const response = await fetch(apiUrl, {
@@ -163,7 +173,7 @@ export async function fetchWikipediaSource(url: string): Promise<WikipediaSource
       'user-agent': 'RaceRewindRaceNewsBot/1.0 (https://racerewind.org)',
     },
   });
-  if (!response.ok) throw new Error(`Failed to fetch Wikipedia source for ${requestedTitle}: ${response.status}`);
+  if (!response.ok) throw new Error(`Failed to fetch ${label} for ${title}: ${response.status}`);
 
   const json = await response.json() as {
     query?: {
@@ -183,72 +193,32 @@ export async function fetchWikipediaSource(url: string): Promise<WikipediaSource
   };
 
   const page = json.query?.pages?.[0];
-  if (!page || page.missing) throw new Error(`Wikipedia page not found: ${requestedTitle}`);
+  if (!page || page.missing) return null;
   const revision = page.revisions?.[0];
   const revid = revision?.revid;
   const content = revision?.slots?.main?.content;
-  if (!page.title || !revid || !content) throw new Error(`Wikipedia page did not include revision content: ${requestedTitle}`);
+  if (!page.title || !revid || !content) throw new Error(`Wikipedia page did not include revision content: ${title}`);
 
   return {
     title: page.title,
     revision: String(revid),
     oldidUrl: `https://en.wikipedia.org/w/index.php?title=${encodeURIComponent(page.title).replaceAll('%20', '_')}&oldid=${revid}`,
-    extract: extractSpoilerSafeWikipediaText(content),
+    extract: extractor(content),
   };
 }
 
 async function fetchPreviousRaceWikipediaSource(url: string): Promise<WikipediaSource> {
   const requestedTitle = wikipediaUrlToTitle(url);
-  const apiUrl = new URL('https://en.wikipedia.org/w/api.php');
-  apiUrl.search = new URLSearchParams({
-    action: 'query',
-    format: 'json',
-    formatversion: '2',
-    prop: 'revisions',
-    redirects: '1',
-    rvprop: 'ids|content',
-    rvslots: 'main',
-    titles: requestedTitle,
-  }).toString();
+  const titles = [requestedTitle, ...wikipediaTitleFallbacks(requestedTitle)];
+  let missingTitle = requestedTitle;
 
-  const response = await fetch(apiUrl, {
-    headers: {
-      accept: 'application/json',
-      'user-agent': 'RaceRewindRaceNewsBot/1.0 (https://racerewind.org)',
-    },
-  });
-  if (!response.ok) throw new Error(`Failed to fetch previous race Wikipedia source for ${requestedTitle}: ${response.status}`);
+  for (const title of titles) {
+    const source = await fetchWikipediaSourceByTitle(title, extractPreviousRaceWikipediaText, 'previous race Wikipedia source');
+    if (source) return source;
+    missingTitle = title;
+  }
 
-  const json = await response.json() as {
-    query?: {
-      pages?: Array<{
-        missing?: boolean;
-        title?: string;
-        revisions?: Array<{
-          revid?: number;
-          slots?: {
-            main?: {
-              content?: string;
-            };
-          };
-        }>;
-      }>;
-    };
-  };
-
-  const page = json.query?.pages?.[0];
-  if (!page || page.missing) throw new Error(`Wikipedia page not found: ${requestedTitle}`);
-  const revision = page.revisions?.[0];
-  const revid = revision?.revid;
-  const content = revision?.slots?.main?.content;
-  if (!page.title || !revid || !content) throw new Error(`Wikipedia page did not include revision content: ${requestedTitle}`);
-
-  return {
-    title: page.title,
-    revision: String(revid),
-    oldidUrl: `https://en.wikipedia.org/w/index.php?title=${encodeURIComponent(page.title).replaceAll('%20', '_')}&oldid=${revid}`,
-    extract: extractPreviousRaceWikipediaText(content),
-  };
+  throw new Error(`Wikipedia page not found: ${missingTitle}`);
 }
 
 export function extractSpoilerSafeWikipediaText(wikitext: string): string {

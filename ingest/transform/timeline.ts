@@ -2,6 +2,7 @@ import type { LibSQLDatabase } from 'drizzle-orm/libsql';
 import { readCsv, asInt, asBool } from '../csv';
 import { raceSlug, deduplicate } from '../slugs';
 import type { IngestState } from '../state';
+import { normalizeRaceWikipediaUrl } from '../wikipedia';
 import * as schema from '../../src/db/schema';
 
 const CHUNK = 500;
@@ -53,7 +54,7 @@ export async function loadTimeline(
       name: r.name,
       date,
       hasSprint,
-      wikipedia: r.wikipedia || null,
+      wikipedia: normalizeRaceWikipediaUrl(r.wikipedia),
     });
   }
 

@@ -1,21 +1,24 @@
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   extractInfoboxWeather,
   extractPreviousRaceWikipediaText,
   extractSpoilerSafeWikipediaText,
+  fetchWikipediaSource,
   findRaceNewsCandidates,
   buildPromptWithContext,
   parseArgs,
   parseGeneratedMarkdown,
   renderPreviewFile,
   validateGeneratedMarkdown,
+  wikipediaTitleFallbacks,
   wikipediaUrlToTitle,
   type RaceNewsCandidate,
   type WikipediaSource,
 } from '../race_news_generator';
+import { normalizeRaceWikipediaUrl } from '../wikipedia';
 import { skipIfNoDb } from './helpers';
 
 const candidate: RaceNewsCandidate = {
@@ -48,6 +51,58 @@ describe('race news generator helpers', () => {
   it('converts Wikipedia article URLs to page titles', () => {
     expect(wikipediaUrlToTitle('https://en.wikipedia.org/wiki/2024_S%C3%A3o_Paulo_Grand_Prix'))
       .toBe('2024 São Paulo Grand Prix');
+  });
+
+  it('builds a narrow Grand Prix title fallback for missing race pages', () => {
+    expect(wikipediaTitleFallbacks('2026 Barcelona-Catalunya')).toEqual(['2026 Barcelona-Catalunya Grand Prix']);
+    expect(wikipediaTitleFallbacks('2026 Monaco Grand Prix')).toEqual([]);
+  });
+
+  it('normalizes the known bad 2026 Barcelona-Catalunya upstream URL', () => {
+    expect(normalizeRaceWikipediaUrl('https://en.wikipedia.org/wiki/2026_Barcelona-Catalunya'))
+      .toBe('https://en.wikipedia.org/wiki/2026_Barcelona-Catalunya_Grand_Prix');
+  });
+
+  it('retries missing Wikipedia race pages with the Grand Prix fallback title', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+      const title = new URL(String(input)).searchParams.get('titles');
+      const page = title === '2026 Barcelona-Catalunya Grand Prix'
+        ? {
+            title,
+            revisions: [{
+              revid: 987654,
+              slots: {
+                main: {
+                  content: [
+                    '== Background ==',
+                    'Barcelona-Catalunya context.',
+                    '== Race ==',
+                    'Winner spoiler.',
+                  ].join('\n'),
+                },
+              },
+            }],
+          }
+        : { title, missing: true };
+
+      return new Response(JSON.stringify({ query: { pages: [page] } }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+    });
+
+    try {
+      const wikipediaSource = await fetchWikipediaSource('https://en.wikipedia.org/wiki/2026_Barcelona-Catalunya');
+
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(wikipediaSource.title).toBe('2026 Barcelona-Catalunya Grand Prix');
+      expect(wikipediaSource.revision).toBe('987654');
+      expect(wikipediaSource.oldidUrl).toBe('https://en.wikipedia.org/w/index.php?title=2026_Barcelona-Catalunya_Grand_Prix&oldid=987654');
+      expect(wikipediaSource.extract).toContain('Barcelona-Catalunya context.');
+      expect(wikipediaSource.extract).not.toContain('Winner spoiler');
+    } finally {
+      fetchMock.mockRestore();
+    }
   });
 
   it('extracts infobox weather', () => {
