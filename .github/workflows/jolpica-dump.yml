@@ -1,8 +1,8 @@
-name: Jolpica Dump
+name: Jolpica Data
 
 on:
   schedule:
-    - cron: '0 4 * * *'
+    - cron: '16 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -45,27 +45,31 @@ jobs:
         if: steps.jolpica.outputs.update_found == 'true'
         run: pnpm tsx ingest/build_db.ts --dump "${{ steps.jolpica.outputs.dump_dir }}" --out data/race-rewind.sqlite
 
+      - name: Backfill live Jolpica API data
+        id: backfill
+        run: pnpm jolpica:backfill
+
       - name: Test
-        if: steps.jolpica.outputs.update_found == 'true'
+        if: steps.jolpica.outputs.update_found == 'true' || steps.backfill.outputs.backfill_changed == 'true'
         run: pnpm test
 
       - name: Generate race news
-        if: steps.jolpica.outputs.update_found == 'true'
+        if: steps.jolpica.outputs.update_found == 'true' || steps.backfill.outputs.race_results_added == 'true'
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
         run: pnpm race-news:generate
 
       - name: Lint
-        if: steps.jolpica.outputs.update_found == 'true'
+        if: steps.jolpica.outputs.update_found == 'true' || steps.backfill.outputs.backfill_changed == 'true'
         run: pnpm lint
 
       - name: Check
-        if: steps.jolpica.outputs.update_found == 'true'
+        if: steps.jolpica.outputs.update_found == 'true' || steps.backfill.outputs.backfill_changed == 'true'
         run: pnpm check
 
       - name: Commit update
-        if: steps.jolpica.outputs.update_found == 'true'
+        if: steps.jolpica.outputs.update_found == 'true' || steps.backfill.outputs.backfill_changed == 'true'
         run: |
           if git diff --quiet -- data/race-rewind.sqlite ingest/jolpica-dump.json content/race-news; then
             echo "No database, metadata, or race-news changes to commit."
@@ -75,7 +79,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/race-rewind.sqlite ingest/jolpica-dump.json content/race-news
-          git commit -m "chore: update jolpica dump"
+          git commit -m "chore: update jolpica data"
           git push origin HEAD:main
 
           gh workflow run docker.yml --ref main
