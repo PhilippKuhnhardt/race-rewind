@@ -115,6 +115,13 @@ export async function getLatestRaceWithData(): Promise<LatestRace> {
   return row!;
 }
 
+export async function getRaceNumbersWithResults(): Promise<Set<number>> {
+  const rows = await db
+    .selectDistinct({ raceNumber: raceResults.raceNumber })
+    .from(raceResults);
+  return new Set(rows.map((r) => r.raceNumber));
+}
+
 export async function getAllSeasons(): Promise<number[]> {
   const rows = await db
     .selectDistinct({ season: races.season })

@@ -2,21 +2,25 @@
 import RaceSessionLayout from '../../../../layouts/RaceSessionLayout.astro';
 import RaceResultsTable from '../../../../components/race/RaceResultsTable.astro';
 import Podium from '../../../../components/race/Podium.astro';
-import { getAllRaces, getRaceResults } from '../../../../lib/queries';
-import { getRacePageBase } from '../../../../lib/race-page';
+import { getAllRaces, getRaceNumbersWithResults, getRaceResults } from '../../../../lib/queries';
+import { getNextUnresultedRaceNumber, getRacePageBase, isCompletedOrNextUnresultedRace } from '../../../../lib/race-page';
 import { raceLink } from '../../../../lib/format';
 import { raceSessionSeo } from '../../../../lib/seo';
 
 export async function getStaticPaths() {
-  return (await getAllRaces()).map((r) => ({
-    params: { season: String(r.season), race: r.race_slug },
-  }));
+  const [allRaces, resultSet] = await Promise.all([getAllRaces(), getRaceNumbersWithResults()]);
+  const nextUnresultedRaceNumber = getNextUnresultedRaceNumber(allRaces, resultSet);
+  return allRaces
+    .filter((r) => isCompletedOrNextUnresultedRace(r.race_number, resultSet, nextUnresultedRaceNumber))
+    .map((r) => ({
+      params: { season: String(r.season), race: r.race_slug },
+    }));
 }
 
 const { season, race: raceSlug } = Astro.params;
 const base = await getRacePageBase(season, raceSlug);
 if (!base) throw new Error(`Race not found: ${season}-${raceSlug}`);
-const { race, raceCount, pageContext, hasQuali, hasSprintQualifying, sessionOrder } = base;
+const { race, raceCount, pageContext, hasGrid, sessionOrder, availability } = base;
 
 const results = await getRaceResults(race.race_number);
 
@@ -27,7 +31,7 @@ const podium = results
 const { title, description } = raceSessionSeo(race, 'Race Results');
 ---
 
-<RaceSessionLayout {race} {raceCount} {raceSlug} {hasQuali} {hasSprintQualifying} {sessionOrder} {pageContext} {title} {description} canonical={`${raceLink(season, raceSlug)}race/`} activeId="race">
+<RaceSessionLayout {race} {raceCount} {raceSlug} {hasGrid} {sessionOrder} {pageContext} {title} {description} canonical={`${raceLink(season, raceSlug)}race/`} activeId="race" hasStandings={availability.hasRaceResults}>
   <div class="space-y-8">
 
     <Podium {podium} season={race.season} {raceSlug} />

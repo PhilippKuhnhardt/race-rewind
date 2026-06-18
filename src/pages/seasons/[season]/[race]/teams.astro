@@ -4,7 +4,7 @@ import TeamStandingsTable from '../../../../components/standings/TeamStandingsTa
 import Base from '../../../../layouts/Base.astro';
 import { raceLink } from '../../../../lib/format';
 import { pitForRace } from '../../../../lib/point-in-time';
-import { getAllRaces, getTeamStandingsBeforeRace } from '../../../../lib/queries';
+import { getAllRaces, getTeamStandings, getTeamStandingsBeforeRace } from '../../../../lib/queries';
 import { getRacePageBase } from '../../../../lib/race-page';
 import { raceSessionSeo } from '../../../../lib/seo';
 
@@ -17,10 +17,15 @@ export async function getStaticPaths() {
 const { season, race: raceSlug } = Astro.params;
 const base = await getRacePageBase(season, raceSlug);
 if (!base) throw new Error(`Race not found: ${season}-${raceSlug}`);
-const { race, raceCount, pageContext } = base;
+const { race, raceCount, pageContext, availability } = base;
 const pit = pitForRace(race, raceSlug!);
 
-const preRaceTeamChamp = await getTeamStandingsBeforeRace(race.race_number);
+const preRaceTeamChamp = availability.standingsAsOfRaceNumber != null
+  ? await getTeamStandings(availability.standingsAsOfRaceNumber)
+  : await getTeamStandingsBeforeRace(race.race_number);
+const standingsHint = availability.status === 'future' && availability.latestCompletedRound != null
+  ? `Season in progress — standings as of round ${availability.latestCompletedRound} / ${raceCount} (${availability.latestCompletedName}).`
+  : null;
 
 const { title, description } = raceSessionSeo(race, 'Teams');
 ---
@@ -41,6 +46,12 @@ const { title, description } = raceSessionSeo(race, 'Teams');
     circuitLocality={race.circuit_locality}
     circuitCountry={race.circuit_country}
   />
+
+  {standingsHint && (
+    <div class="mb-6 rounded-lg border border-border bg-bg-alt px-4 py-3 text-sm text-fg-muted">
+      {standingsHint}
+    </div>
+  )}
 
   <TeamStandingsTable
     title="Constructors' Championship"

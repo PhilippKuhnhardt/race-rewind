@@ -5,15 +5,29 @@ interface Props {
   season: number;
   raceSlug: string;
   sessionOrder: string[];
-  hasQuali: boolean;
-  hasSprintQualifying: boolean;
-  hasSprint: boolean;
   hasGrid?: boolean;
+  overviewOnly?: boolean;
+  hasStandings?: boolean;
   activeId: string;
 }
 
-const { season, raceSlug, sessionOrder, hasQuali, hasSprintQualifying, hasSprint, hasGrid = false, activeId } = Astro.props;
-const items = raceSubNavItems(season, raceSlug, sessionOrder, hasQuali, hasSprintQualifying, hasSprint, hasGrid);
+const {
+  season,
+  raceSlug,
+  sessionOrder,
+  hasGrid = false,
+  overviewOnly = false,
+  hasStandings = true,
+  activeId,
+} = Astro.props;
+const items = raceSubNavItems(
+  season,
+  raceSlug,
+  sessionOrder,
+  hasGrid,
+  overviewOnly,
+  hasStandings,
+);
 ---
 
 <nav class="mb-8 -mx-4 sm:-mx-6 border-b border-border" aria-label="Race sections">

@@ -1,36 +1,40 @@
 ---
 import RaceSessionLayout from '../../../../layouts/RaceSessionLayout.astro';
 import SprintQualifyingTable from '../../../../components/race/SprintQualifyingTable.astro';
-import { db } from '../../../../db/client';
-import { races, sprintQualifyingResults } from '../../../../db/schema';
-import { eq } from 'drizzle-orm';
-import { stripYearPrefix, raceLink } from '../../../../lib/format';
-import { getSprintQualifyingResults } from '../../../../lib/queries';
-import { getRacePageBase } from '../../../../lib/race-page';
+import { raceLink } from '../../../../lib/format';
+import { getAllRaces, getRaceNumbersWithResults, getRaceNumbersWithSprintQualifying, getSessionTabOrderByRace, getSprintQualifyingResults } from '../../../../lib/queries';
+import { getNextUnresultedRaceNumber, getRacePageBase } from '../../../../lib/race-page';
 import { raceSessionSeo } from '../../../../lib/seo';
 
 export async function getStaticPaths() {
-  const rows = await db
-    .selectDistinct({ season: races.season, slug: races.slug })
-    .from(sprintQualifyingResults)
-    .innerJoin(races, eq(races.raceNumber, sprintQualifyingResults.raceNumber));
+  const [allRaces, sprintQualiSet, resultSet, orderMap] = await Promise.all([
+    getAllRaces(),
+    getRaceNumbersWithSprintQualifying(),
+    getRaceNumbersWithResults(),
+    getSessionTabOrderByRace(),
+  ]);
+  const nextUnresultedRaceNumber = getNextUnresultedRaceNumber(allRaces, resultSet);
 
-  return rows.map((r) => ({
-    params: { season: String(r.season), race: stripYearPrefix(r.slug, r.season) },
-  }));
+  return allRaces
+    .filter((r) => sprintQualiSet.has(r.race_number) || (
+      r.race_number === nextUnresultedRaceNumber && (orderMap.get(r.race_number) ?? []).includes('sprint-qualifying')
+    ))
+    .map((r) => ({
+      params: { season: String(r.season), race: r.race_slug },
+    }));
 }
 
 const { season, race: raceSlug } = Astro.params;
 const base = await getRacePageBase(season, raceSlug);
 if (!base) throw new Error(`Race not found: ${season}-${raceSlug}`);
-const { race, raceCount, pageContext, hasQuali, hasSprintQualifying, sessionOrder } = base;
+const { race, raceCount, pageContext, hasGrid, sessionOrder, availability } = base;
 
 const sprintQuali = await getSprintQualifyingResults(race.race_number);
 
 const { title, description } = raceSessionSeo(race, 'Sprint Qualifying');
 ---
 
-<RaceSessionLayout {race} {raceCount} {raceSlug} {hasQuali} {hasSprintQualifying} {sessionOrder} {pageContext} {title} {description} canonical={`${raceLink(season, raceSlug)}sprint-qualifying/`} activeId="sprint-qualifying">
+<RaceSessionLayout {race} {raceCount} {raceSlug} {hasGrid} {sessionOrder} {pageContext} {title} {description} canonical={`${raceLink(season, raceSlug)}sprint-qualifying/`} activeId="sprint-qualifying" hasStandings={availability.hasRaceResults}>
   <section>
     <h2 class="mb-4 text-lg font-semibold text-fg">Sprint Qualifying</h2>
     <SprintQualifyingTable {sprintQuali} season={race.season} {raceSlug} />

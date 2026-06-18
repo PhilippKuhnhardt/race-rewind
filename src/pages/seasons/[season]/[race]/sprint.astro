@@ -1,36 +1,40 @@
 ---
 import RaceSessionLayout from '../../../../layouts/RaceSessionLayout.astro';
 import RaceResultsTable from '../../../../components/race/RaceResultsTable.astro';
-import { db } from '../../../../db/client';
-import { races } from '../../../../db/schema';
-import { eq } from 'drizzle-orm';
-import { stripYearPrefix, raceLink } from '../../../../lib/format';
-import { getSprintResults } from '../../../../lib/queries';
-import { getRacePageBase } from '../../../../lib/race-page';
+import { raceLink } from '../../../../lib/format';
+import { getAllRaces, getRaceNumbersWithResults, getRaceNumbersWithSprintResults, getSessionTabOrderByRace, getSprintResults } from '../../../../lib/queries';
+import { getNextUnresultedRaceNumber, getRacePageBase } from '../../../../lib/race-page';
 import { raceSessionSeo } from '../../../../lib/seo';
 
 export async function getStaticPaths() {
-  const rows = await db
-    .select({ season: races.season, slug: races.slug })
-    .from(races)
-    .where(eq(races.hasSprint, 1));
+  const [allRaces, sprintSet, resultSet, orderMap] = await Promise.all([
+    getAllRaces(),
+    getRaceNumbersWithSprintResults(),
+    getRaceNumbersWithResults(),
+    getSessionTabOrderByRace(),
+  ]);
+  const nextUnresultedRaceNumber = getNextUnresultedRaceNumber(allRaces, resultSet);
 
-  return rows.map((r) => ({
-    params: { season: String(r.season), race: stripYearPrefix(r.slug, r.season) },
-  }));
+  return allRaces
+    .filter((r) => sprintSet.has(r.race_number) || (
+      r.race_number === nextUnresultedRaceNumber && (orderMap.get(r.race_number) ?? []).includes('sprint')
+    ))
+    .map((r) => ({
+      params: { season: String(r.season), race: r.race_slug },
+    }));
 }
 
 const { season, race: raceSlug } = Astro.params;
 const base = await getRacePageBase(season, raceSlug);
 if (!base) throw new Error(`Race not found: ${season}-${raceSlug}`);
-const { race, raceCount, pageContext, hasQuali, hasSprintQualifying, sessionOrder } = base;
+const { race, raceCount, pageContext, hasGrid, sessionOrder, availability } = base;
 
 const sprint = await getSprintResults(race.race_number);
 
 const { title, description } = raceSessionSeo(race, 'Sprint');
 ---
 
-<RaceSessionLayout {race} {raceCount} {raceSlug} {hasQuali} {hasSprintQualifying} {sessionOrder} {pageContext} {title} {description} canonical={`${raceLink(season, raceSlug)}sprint/`} activeId="sprint">
+<RaceSessionLayout {race} {raceCount} {raceSlug} {hasGrid} {sessionOrder} {pageContext} {title} {description} canonical={`${raceLink(season, raceSlug)}sprint/`} activeId="sprint" hasStandings={availability.hasRaceResults}>
   <section>
     <h2 class="mb-4 text-lg font-semibold text-fg">Sprint Race</h2>
     <RaceResultsTable results={sprint} season={race.season} {raceSlug} isSprint={true} />

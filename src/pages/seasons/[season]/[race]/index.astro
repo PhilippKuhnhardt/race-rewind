@@ -9,8 +9,10 @@ import { raceLink } from '../../../../lib/format';
 import { pitForRace } from '../../../../lib/point-in-time';
 import {
   getAllRaces,
+  getDriverStandings,
   getDriverStandingsBeforeRace,
   getRecentFormRows,
+  getTeamStandings,
   getTeamStandingsBeforeRace,
 } from '../../../../lib/queries';
 import { getRaceNews } from '../../../../lib/race-news';
@@ -26,13 +28,18 @@ export async function getStaticPaths() {
 const { season, race: raceSlug } = Astro.params;
 const base = await getRacePageBase(season, raceSlug);
 if (!base) throw new Error(`Race not found: ${season}-${raceSlug}`);
-const { race, raceCount, pageContext, hasQuali, hasSprintQualifying, sessionOrder } = base;
+const { race, raceCount, pageContext, hasGrid, sessionOrder, availability } = base;
 const pit = pitForRace(race, raceSlug!);
+const standingsAsOfRaceNumber = availability.standingsAsOfRaceNumber;
 
 const [preRaceDriverChamp, preRaceTeamChamp, recentForm] = await Promise.all([
-  getDriverStandingsBeforeRace(race.race_number),
-  getTeamStandingsBeforeRace(race.race_number),
-  getRecentFormRows(race.season, race.race_number, 5),
+  standingsAsOfRaceNumber != null
+    ? getDriverStandings(standingsAsOfRaceNumber)
+    : getDriverStandingsBeforeRace(race.race_number),
+  standingsAsOfRaceNumber != null
+    ? getTeamStandings(standingsAsOfRaceNumber)
+    : getTeamStandingsBeforeRace(race.race_number),
+  getRecentFormRows(race.season, availability.recentFormAsOfRaceNumber, 5),
 ]);
 
 const driverLeader = preRaceDriverChamp[0]
@@ -58,26 +65,36 @@ const teamLeader = preRaceTeamChamp[0]
 const newsEntry = await getRaceNews(`${season}-${raceSlug}`, 'preview');
 
 const { title, description } = raceOverviewSeo(race);
+const standingsHint = availability.status === 'future' && availability.latestCompletedRound != null
+  ? `Season in progress — standings as of round ${availability.latestCompletedRound} / ${raceCount} (${availability.latestCompletedName}).`
+  : null;
 ---
 
 <RaceSessionLayout
   {race}
   {raceCount}
   {raceSlug}
-  {hasQuali}
-  {hasSprintQualifying}
+  {hasGrid}
   {sessionOrder}
   {pageContext}
   {title}
   {description}
   canonical={raceLink(season, raceSlug)}
   activeId="overview"
+  overviewOnly={availability.overviewOnly}
+  hasStandings={availability.hasRaceResults}
 >
   <div class="space-y-8">
     <PreRaceLeaders {driverLeader} {teamLeader} season={race.season} {raceSlug} />
     {newsEntry && <RaceNewsCard entry={newsEntry} />}
 
     <RecentFormStrip rows={recentForm} {pit} />
+
+    {standingsHint && (
+      <div class="rounded-lg border border-border bg-bg-alt px-4 py-3 text-sm text-fg-muted">
+        {standingsHint}
+      </div>
+    )}
 
     <!-- Pre-race standings truncated — link to full Drivers/Teams tabs -->
     <DriverStandingsTable

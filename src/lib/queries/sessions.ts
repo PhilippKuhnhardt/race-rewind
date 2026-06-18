@@ -41,6 +41,13 @@ export async function getRaceNumbersWithSprintQualifying(): Promise<Set<number>>
   return new Set(rows.map((r) => r.raceNumber));
 }
 
+export async function getRaceNumbersWithSprintResults(): Promise<Set<number>> {
+  const rows = await db
+    .selectDistinct({ raceNumber: sprintResults.raceNumber })
+    .from(sprintResults);
+  return new Set(rows.map((r) => r.raceNumber));
+}
+
 export async function getQualifyingResults(raceNumber: number) {
   return db
     .select({

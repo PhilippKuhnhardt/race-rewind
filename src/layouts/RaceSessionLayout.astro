@@ -18,17 +18,31 @@ interface Props {
   };
   raceCount: number;
   raceSlug: string;
-  hasQuali: boolean;
-  hasSprintQualifying: boolean;
+  hasGrid: boolean;
   sessionOrder: string[];
   pageContext: PageContext;
   title: string;
   description: string;
   canonical: string;
   activeId: 'overview' | 'qualifying' | 'sprint-qualifying' | 'sprint' | 'grid' | 'race' | 'standings';
+  overviewOnly?: boolean;
+  hasStandings?: boolean;
 }
 
-const { race, raceCount, raceSlug, hasQuali, hasSprintQualifying, sessionOrder, pageContext, title, description, canonical, activeId } = Astro.props;
+const {
+  race,
+  raceCount,
+  raceSlug,
+  hasGrid,
+  sessionOrder,
+  pageContext,
+  title,
+  description,
+  canonical,
+  activeId,
+  overviewOnly = false,
+  hasStandings = true,
+} = Astro.props;
 const circuitFlag = race.circuit_country ? (raceFlag(race.circuit_country) ?? null) : null;
 ---
 
@@ -48,10 +62,9 @@ const circuitFlag = race.circuit_country ? (raceFlag(race.circuit_country) ?? nu
     season={race.season}
     {raceSlug}
     {sessionOrder}
-    {hasQuali}
-    {hasSprintQualifying}
-    hasSprint={!!race.has_sprint}
-    hasGrid={!hasQuali}
+    {hasGrid}
+    {overviewOnly}
+    {hasStandings}
     {activeId}
   />
 
