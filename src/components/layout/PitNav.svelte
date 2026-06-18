@@ -10,6 +10,12 @@
   type SavedRace = { kind: 'race'; season: number; raceSlug: string };
   type SavedBoundary = { kind: 'preseason' | 'postseason'; season: number };
   type SavedPit = SavedRace | SavedBoundary;
+  type NavOverride = {
+    season: number;
+    chainSlug: string;
+    raceSlug?: string;
+    compareSlug?: string;
+  };
 
   interface Props {
     byseason: Record<number, RaceNavEntry[]>;
@@ -35,11 +41,14 @@
     allowSavedPitOverride = false,
   }: Props = $props();
 
-  let effectiveSeason = $state(currentSeason);
-  let effectiveChainSlug = $state(currentChainSlug);
-  let effectiveRaceSlug = $state(currentRaceSlug);
-  let effectiveCompareSlug = $state(compareSlug);
-  let ready = $state(!allowSavedPitOverride);
+  let savedPitOverride = $state<NavOverride | null>(null);
+  let savedPitChecked = $state(false);
+
+  const effectiveSeason = $derived(savedPitOverride?.season ?? currentSeason);
+  const effectiveChainSlug = $derived(savedPitOverride?.chainSlug ?? currentChainSlug);
+  const effectiveRaceSlug = $derived(savedPitOverride?.raceSlug ?? currentRaceSlug);
+  const effectiveCompareSlug = $derived(savedPitOverride?.compareSlug ?? compareSlug);
+  const ready = $derived(!allowSavedPitOverride || savedPitChecked);
 
   function isSavedPit(value: unknown): value is SavedPit {
     if (typeof value !== 'object' || value === null) return false;
@@ -62,17 +71,21 @@
 
     if (saved.kind === 'race') {
       if (!hasRace(saved.season, saved.raceSlug)) return;
-      effectiveSeason = saved.season;
-      effectiveChainSlug = saved.raceSlug;
-      effectiveRaceSlug = saved.raceSlug;
-      effectiveCompareSlug = saved.raceSlug;
+      savedPitOverride = {
+        season: saved.season,
+        chainSlug: saved.raceSlug,
+        raceSlug: saved.raceSlug,
+        compareSlug: saved.raceSlug,
+      };
       return;
     }
 
-    effectiveSeason = saved.season;
-    effectiveChainSlug = saved.kind;
-    effectiveRaceSlug = saved.kind;
-    effectiveCompareSlug = saved.kind;
+    savedPitOverride = {
+      season: saved.season,
+      chainSlug: saved.kind,
+      raceSlug: saved.kind,
+      compareSlug: saved.kind,
+    };
   }
 
   $effect(() => {
@@ -80,7 +93,7 @@
     try {
       const raw = localStorage.getItem('lastRace');
       if (!raw) {
-        ready = true;
+        savedPitChecked = true;
         return;
       }
       const saved: unknown = JSON.parse(raw);
@@ -89,14 +102,14 @@
       } else {
         localStorage.removeItem('lastRace');
       }
-      ready = true;
+      savedPitChecked = true;
     } catch {
       try {
         localStorage.removeItem('lastRace');
       } catch {
         // ignore storage failures
       }
-      ready = true;
+      savedPitChecked = true;
     }
   });
 

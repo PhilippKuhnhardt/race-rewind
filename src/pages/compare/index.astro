@@ -6,4 +6,4 @@ const target = `/compare/${season}/${slug.slice(String(season).length + 1)}/`;
 ---
 
 <meta http-equiv="refresh" content={`0; url=${target}`} />
-<script define:vars={{ target }}>window.location.href = target;</script>
+<script is:inline define:vars={{ target }}>window.location.href = target;</script>
