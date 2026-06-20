@@ -3,24 +3,26 @@ import Base from '../../../../../layouts/Base.astro';
 import ComparisonTable from '../../../../../components/compare/ComparisonTable.astro';
 import DriverPickerForm from '../../../../../components/compare/DriverPickerForm.svelte';
 import { buildDriverAtRacePayload } from '../../../../../lib/payloads/driver-at-race';
-import { getAllRacesBySeason, getSeasonBounds, getAllDriversForPicker } from '../../../../../lib/queries';
+import { getActiveRace, getAllRacesBySeason, getSeasonBounds, getAllDriversForPicker } from '../../../../../lib/queries';
 import { getDriverBySlug, getDriverCareerStats } from '../../../../../lib/queries';
 import { raceLink, preseasonLink, postseasonLink } from '../../../../../lib/format';
-import { NOINDEX_FOLLOW, setNoSharedCache, setNoindexFollow } from '../../../../../lib/response';
+import { NOINDEX_FOLLOW, setNoindexFollow, setPageCache } from '../../../../../lib/response';
 import type { PageContext } from '../../../../../lib/types';
 import type { DriverAtRacePayload } from '../../../../../lib/api-types';
 
 export const prerender = false;
 
 setNoindexFollow(Astro.response.headers);
-setNoSharedCache(Astro.response.headers);
 
 const { driverA, driverB, season: seasonStr, race: raceSlug } = Astro.params;
 const season = Number(seasonStr);
 
 const isBoundary = raceSlug === 'preseason' || raceSlug === 'postseason';
 
-const drivers = await getAllDriversForPicker();
+const [drivers, activeRace] = await Promise.all([
+  getAllDriversForPicker(),
+  getActiveRace(),
+]);
 
 let payloadA: DriverAtRacePayload;
 let payloadB: DriverAtRacePayload;
@@ -133,6 +135,11 @@ if (isBoundary) {
 const title = `${payloadA.driver.full_name} vs ${payloadB.driver.full_name} — ${subLabel}`;
 const description = `Compare ${payloadA.driver.full_name} and ${payloadB.driver.full_name}: ${subLabel}.`;
 const canonical = `/compare/${payloadA.driver.slug}/${payloadB.driver.slug}/${season}/${raceSlug}/`;
+setPageCache(
+  Astro.response.headers,
+  season,
+  !isBoundary && activeRace?.season === season && activeRace.slug === raceSlug,
+);
 ---
 
 <Base {title} {description} {canonical} robots={NOINDEX_FOLLOW} {pageContext}>

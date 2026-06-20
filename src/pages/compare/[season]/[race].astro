@@ -2,15 +2,14 @@
 import Base from '../../../layouts/Base.astro';
 import DriverPickerForm from '../../../components/compare/DriverPickerForm.svelte';
 import PageHeader from '../../../components/layout/PageHeader.astro';
-import { getAllDriversForPicker, getRaceBySlug, getAllRacesBySeason, getSeasonBounds } from '../../../lib/queries';
+import { getActiveRace, getAllDriversForPicker, getRaceBySlug, getAllRacesBySeason, getSeasonBounds } from '../../../lib/queries';
 import { stripYearPrefix } from '../../../lib/format';
-import { NOINDEX_FOLLOW, setNoSharedCache, setNoindexFollow } from '../../../lib/response';
+import { NOINDEX_FOLLOW, setNoindexFollow, setPageCache } from '../../../lib/response';
 import type { PageContext } from '../../../lib/types';
 
 export const prerender = false;
 
 setNoindexFollow(Astro.response.headers);
-setNoSharedCache(Astro.response.headers);
 
 const { season: seasonStr, race: raceSlug } = Astro.params;
 const prefill = Astro.url.searchParams.get('prefill') ?? undefined;
@@ -18,9 +17,10 @@ const season = Number(seasonStr);
 
 const isBoundary = raceSlug === 'preseason' || raceSlug === 'postseason';
 
-const [drivers, { byseason }] = await Promise.all([
+const [drivers, { byseason }, activeRace] = await Promise.all([
   getAllDriversForPicker(),
   getAllRacesBySeason(),
+  getActiveRace(),
 ]);
 
 const seasonRaces = byseason[season] ?? [];
@@ -69,6 +69,11 @@ if (isBoundary) {
   subtitle = `${race.season} ${race.name}`;
   canonical = `/compare/${race.season}/${raceNavSlug}/`;
 }
+setPageCache(
+  Astro.response.headers,
+  season,
+  !isBoundary && activeRace?.season === season && activeRace.slug === raceSlug,
+);
 ---
 
 <Base {title} description={`Compare any two F1 drivers at the ${subtitle}.`} {canonical} robots={NOINDEX_FOLLOW} {pageContext}>

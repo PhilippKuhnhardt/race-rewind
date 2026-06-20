@@ -1,4 +1,4 @@
-import { eq, desc, asc } from 'drizzle-orm';
+import { eq, desc, asc, sql } from 'drizzle-orm';
 import { db } from '../../db/client';
 import { races, circuits, raceResults } from '../../db/schema';
 import { stripYearPrefix } from '../format';
@@ -11,6 +11,31 @@ export interface RaceNavEntry {
 export interface LatestRace {
   season: number;
   slug: string;
+}
+
+let activeRacePromise: Promise<LatestRace | undefined> | undefined;
+
+async function loadActiveRace(): Promise<LatestRace | undefined> {
+  const row = await db
+    .select({ season: races.season, slug: races.slug })
+    .from(races)
+    .where(sql`${races.season} = (SELECT MAX(season) FROM races)
+      AND NOT EXISTS (
+        SELECT 1 FROM ${raceResults}
+        WHERE ${raceResults.raceNumber} = ${races.raceNumber}
+      )`)
+    .orderBy(asc(races.round))
+    .limit(1)
+    .get();
+
+  return row
+    ? { season: row.season, slug: stripYearPrefix(row.slug, row.season) }
+    : undefined;
+}
+
+export function getActiveRace(): Promise<LatestRace | undefined> {
+  activeRacePromise ??= loadActiveRace();
+  return activeRacePromise;
 }
 
 export async function getAllRacesBySeason(): Promise<{
