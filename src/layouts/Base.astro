@@ -113,6 +113,15 @@ const lastRaceEntry = resolveLastRaceEntry(pageContext);
       } catch {}
     </script>
 
+    <script>
+      import { polyfillCountryFlagEmojis } from 'country-flag-emoji-polyfill';
+
+      polyfillCountryFlagEmojis(
+        'Twemoji Country Flags',
+        '/fonts/TwemojiCountryFlags.woff2',
+      );
+    </script>
+
     <title>{title}</title>
     <meta name="description" content={description} />
     {robots && <meta name="robots" content={robots} />}
