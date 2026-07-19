@@ -390,6 +390,7 @@ async function insertResult(
   payload: AlphaResultResponse,
   indexes: LocalIndexes,
 ): Promise<boolean> {
+  if (!hasResultRows(payload)) return false;
   if (payload.data.code === 'R' && await hasRows(client, 'race_results', raceNumber)) return false;
   if (payload.data.code === 'SR' && await hasRows(client, 'sprint_results', raceNumber)) return false;
   if (payload.data.code === 'Q' && await hasRows(client, 'qualifying_results', raceNumber)) return false;
@@ -403,6 +404,10 @@ async function insertResult(
   }
   await insertSessionEntries(db, raceNumber, payload, indexes);
   return true;
+}
+
+export function hasResultRows(payload: { data: { results: readonly unknown[] } }): boolean {
+  return payload.data.results.length > 0;
 }
 
 async function hasRows(client: Client, table: string, raceNumber: number): Promise<boolean> {

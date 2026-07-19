@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { deterministicNegativeId, JolpicaClient, JolpicaRateLimitError, JolpicaRequestBudgetError } from '../jolpica_api';
-import { normalizeLapTime, normalizeRaceTime } from '../backfill_jolpica_api';
+import { hasResultRows, normalizeLapTime, normalizeRaceTime } from '../backfill_jolpica_api';
 
 describe('Jolpica API rate-limited client', () => {
   it('enforces the per-run request budget', async () => {
@@ -60,5 +60,10 @@ describe('Jolpica backfill helpers', () => {
     expect(normalizeLapTime('1:12.051')).toBe('00:01:12.051');
     expect(normalizeRaceTime('2:23:31.243')).toBe('02:23:31.243');
     expect(normalizeRaceTime('56:36.709')).toBe('00:56:36.709');
+  });
+
+  it('does not treat empty result payloads as database changes', () => {
+    expect(hasResultRows({ data: { results: [] } })).toBe(false);
+    expect(hasResultRows({ data: { results: [{}] } })).toBe(true);
   });
 });
