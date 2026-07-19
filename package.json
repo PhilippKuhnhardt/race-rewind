@@ -17,12 +17,12 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@astrojs/node": "^10.1.4",
+    "@astrojs/node": "^11.0.2",
     "@astrojs/sitemap": "^3.7.3",
-    "@astrojs/svelte": "^8.1.2",
+    "@astrojs/svelte": "^9.0.1",
     "@libsql/client": "^0.17.4",
     "@tailwindcss/vite": "^4.3.1",
-    "astro": "^6.4.8",
+    "astro": "^7.1.1",
     "bits-ui": "^2.18.1",
     "clsx": "^2.1.1",
     "country-emoji": "^2.0.1",

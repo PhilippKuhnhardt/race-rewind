@@ -30,7 +30,7 @@ const team = slug && (await getTeamBySlug(slug));
 if (!team) throw new Error(`Team not found: ${slug}`);
 
 const bookends = await getSeasonBookends(season);
-setPageCache(Astro.response.headers, season);
+setPageCache(Astro.response.headers, Astro.cache, season);
 const pit = pitForPostseason(season);
 const asOf = resolveAsOfRaceNumber(pit, bookends);
 const lastRaceSlug = stripYearPrefix(bookends.lastSlug, season);

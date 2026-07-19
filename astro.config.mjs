@@ -1,7 +1,7 @@
 import sitemap from '@astrojs/sitemap';
 import svelte from '@astrojs/svelte';
 import tailwindcss from '@tailwindcss/vite';
-import { defineConfig } from 'astro/config';
+import { defineConfig, memoryCache } from 'astro/config';
 import { SITE_URL } from './src/lib/const.ts';
 
 import node from '@astrojs/node';
@@ -10,6 +10,11 @@ export default defineConfig({
   site: SITE_URL,
   trailingSlash: 'always',
   build: { format: 'directory' },
+  // Cloudflare remains the outer shared cache. This origin cache protects the
+  // Node server when a response is not present at the edge.
+  cache: {
+    provider: memoryCache(),
+  },
   integrations: [
     sitemap({
       filter: (page) => {

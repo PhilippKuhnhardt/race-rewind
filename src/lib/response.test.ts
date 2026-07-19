@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { getPageEdgeCacheTtl, setPageCache } from './response';
 
 describe('getPageEdgeCacheTtl', () => {
@@ -18,9 +18,12 @@ describe('getPageEdgeCacheTtl', () => {
 describe('setPageCache', () => {
   it('keeps the browser TTL at zero while setting a shared-cache TTL', () => {
     const headers = new Headers();
+    const cache = { set: vi.fn() };
 
-    setPageCache(headers, 2025, false, 2026);
+    setPageCache(headers, cache, 2025, false, 2026);
 
+    expect(cache.set).toHaveBeenCalledWith({ maxAge: 2592000 });
+    expect(headers.get('Cloudflare-CDN-Cache-Control')).toBe('max-age=2592000');
     expect(headers.get('Cache-Control')).toBe('public, max-age=0, s-maxage=2592000');
   });
 });

@@ -137,6 +137,7 @@ const description = `Compare ${payloadA.driver.full_name} and ${payloadB.driver.
 const canonical = `/compare/${payloadA.driver.slug}/${payloadB.driver.slug}/${season}/${raceSlug}/`;
 setPageCache(
   Astro.response.headers,
+  Astro.cache,
   season,
   !isBoundary && activeRace?.season === season && activeRace.slug === raceSlug,
 );

@@ -71,6 +71,7 @@ if (isBoundary) {
 }
 setPageCache(
   Astro.response.headers,
+  Astro.cache,
   season,
   !isBoundary && activeRace?.season === season && activeRace.slug === raceSlug,
 );

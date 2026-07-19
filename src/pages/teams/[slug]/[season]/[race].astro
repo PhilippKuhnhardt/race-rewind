@@ -45,6 +45,7 @@ const [stats, driverHeroes, seasonOverview, driversFielded, { byseason }, active
 ]);
 setPageCache(
   Astro.response.headers,
+  Astro.cache,
   race.season,
   activeRace?.season === race.season && activeRace.slug === raceNavSlug,
 );
