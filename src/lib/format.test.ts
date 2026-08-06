@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { formatGap } from './format';
+import { formatGap, formatRaceLabel } from './format';
+
+describe('formatRaceLabel', () => {
+  it('separates the season and race name', () => {
+    expect(formatRaceLabel(2013, 'Australian Grand Prix')).toBe('2013 Australian Grand Prix');
+  });
+});
 
 describe('formatGap', () => {
   it('derives a lap-behind gap for classified rows without elapsed time', () => {

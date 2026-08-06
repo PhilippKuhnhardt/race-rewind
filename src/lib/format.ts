@@ -20,6 +20,11 @@ export function formatPts(pts: number | null | undefined): string {
   return pts % 1 === 0 ? String(pts) : pts.toFixed(1);
 }
 
+/** Format the standard season-and-race label used in race navigation and headings. */
+export function formatRaceLabel(season: number, name: string): string {
+  return `${season} ${name}`;
+}
+
 /**
  * Format a finishing position.
  * Returns 'DNF' for null — null means did not finish, not missing data.

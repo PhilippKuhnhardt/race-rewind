@@ -4,7 +4,7 @@ import TeamColorSwatch from '../../../../components/primitives/TeamColorSwatch.a
 import TeamDriverHeroCards from '../../../../components/team/TeamDriverHeroCards.astro';
 import TeamSeasonOverviewTable from '../../../../components/team/TeamSeasonOverviewTable.astro';
 import Base from '../../../../layouts/Base.astro';
-import { driverLink, formatPts, raceLink, stripYearPrefix, teamLink } from '../../../../lib/format';
+import { driverLink, formatPts, formatRaceLabel, raceLink, stripYearPrefix, teamLink } from '../../../../lib/format';
 import { pitForRace } from '../../../../lib/point-in-time';
 import { NOINDEX_FOLLOW, setNoindexFollow, setPageCache } from '../../../../lib/response';
 import {
@@ -82,8 +82,7 @@ const description = `${team.name}'s career going into the ${race.season} ${race.
       href={raceLink(race.season, raceNavSlug)}
       class="text-sm text-fg-muted hover:text-accent transition-colors"
     >
-      &larr; {race.season}
-      {race.name}
+      {`← ${formatRaceLabel(race.season, race.name)}`}
     </a>
   </div>
 

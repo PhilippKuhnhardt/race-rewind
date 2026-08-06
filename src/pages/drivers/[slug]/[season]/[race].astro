@@ -2,19 +2,26 @@
 import DriverSeasonOverviewTable from '../../../../components/driver/DriverSeasonOverviewTable.astro';
 import TeamsDrivenTable from '../../../../components/team/TeamsDrivenTable.astro';
 import Base from '../../../../layouts/Base.astro';
-import { driverLink, formatPts, raceLink, stripYearPrefix, teamLink } from '../../../../lib/format';
+import {
+  driverLink,
+  formatPts,
+  formatRaceLabel,
+  raceLink,
+  stripYearPrefix,
+  teamLink,
+} from '../../../../lib/format';
 import { pitForRace } from '../../../../lib/point-in-time';
-import { NOINDEX_FOLLOW, setNoindexFollow, setPageCache } from '../../../../lib/response';
 import {
   getActiveRace,
   getAllRacesBySeason,
   getDriverBySlug,
   getDriverCareerStats,
-  getDriverSeasonOverview,
   getDriverPriorSeasons,
+  getDriverSeasonOverview,
   getDriverTeamsDriven,
   getRaceBySlug,
 } from '../../../../lib/queries';
+import { NOINDEX_FOLLOW, setNoindexFollow, setPageCache } from '../../../../lib/response';
 import type { PageContext } from '../../../../lib/types';
 import { emojify } from '../../../../lib/ui/emojify';
 
@@ -33,19 +40,20 @@ if (!race) throw new Error(`Race not found: ${fullSlug}`);
 
 const raceNavSlug = stripYearPrefix(race.slug, race.season);
 const pit = pitForRace(race, raceNavSlug);
-const [stats, seasonOverview, teamsDriven, { byseason }, priorSeasons, activeRace] = await Promise.all([
-  getDriverCareerStats(driver.id, race.race_number),
-  getDriverSeasonOverview(driver.id, race.race_number),
-  getDriverTeamsDriven(driver.id, race.race_number),
-  getAllRacesBySeason(),
-  getDriverPriorSeasons(driver.id, race.race_number),
-  getActiveRace(),
-]);
+const [stats, seasonOverview, teamsDriven, { byseason }, priorSeasons, activeRace] =
+  await Promise.all([
+    getDriverCareerStats(driver.id, race.race_number),
+    getDriverSeasonOverview(driver.id, race.race_number),
+    getDriverTeamsDriven(driver.id, race.race_number),
+    getAllRacesBySeason(),
+    getDriverPriorSeasons(driver.id, race.race_number),
+    getActiveRace(),
+  ]);
 setPageCache(
   Astro.response.headers,
   Astro.cache,
   race.season,
-  activeRace?.season === race.season && activeRace.slug === raceNavSlug,
+  activeRace?.season === race.season && activeRace.slug === raceNavSlug
 );
 
 const seasonRaces = byseason[race.season] ?? [];
@@ -80,8 +88,7 @@ const description = `${driver.full_name}'s career going into the ${race.season} 
       href={raceLink(race.season, raceNavSlug)}
       class="text-sm text-fg-muted hover:text-accent transition-colors"
     >
-      &larr; {race.season}
-      {race.name}
+      {`← ${formatRaceLabel(race.season, race.name)}`}
     </a>
   </div>
 

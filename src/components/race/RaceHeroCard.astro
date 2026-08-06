@@ -1,4 +1,5 @@
 ---
+import { formatRaceLabel } from '../../lib/format';
 import { raceFlag } from '../../lib/ui/emojify';
 
 interface Props {
@@ -20,12 +21,12 @@ const mobilePlace = [circuitLocality, countryLabel].filter(Boolean).join(', ');
 const placeLabel = mobilePlace ? `${circuitFlag ? `${circuitFlag} ` : ''}${mobilePlace}` : null;
 const desktopPlace = [circuitName, circuitLocality, countryLabel].filter(Boolean).join(', ');
 const desktopLocation = `${circuitFlag ? `${circuitFlag} ` : ''}${desktopPlace}`;
+const raceLabel = formatRaceLabel(season, name);
 ---
 
 <div class="mb-6">
   <h1 class="text-3xl font-bold tracking-tight text-fg sm:text-4xl">
-    {season}
-    {name}
+    {raceLabel}
   </h1>
   <div
     class="mt-2 flex flex-col items-start gap-1 text-sm text-fg-muted sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-1"
