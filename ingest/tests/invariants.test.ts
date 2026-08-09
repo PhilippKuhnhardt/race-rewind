@@ -135,6 +135,47 @@ it('1986 Hungarian GP has driver_standings rows', async () => {
   expect(result.rows[0].n as number).toBeGreaterThan(0);
 });
 
+it('2007 McLaren constructors standings follow the contemporary penalties', async () => {
+  const skip = skipIfNoDb();
+  if (skip) return;
+  const result = await client().execute(`
+    SELECT r.slug, ts.points, ts.position
+    FROM team_standings ts
+    JOIN teams t ON t.id = ts.team_id
+    JOIN races r ON r.race_number = ts.race_number
+    WHERE t.slug = 'mclaren'
+      AND r.slug IN (
+        '2007-australian-grand-prix',
+        '2007-hungarian-grand-prix',
+        '2007-italian-grand-prix',
+        '2007-belgian-grand-prix',
+        '2007-brazilian-grand-prix'
+      )
+  `);
+  const standings = Object.fromEntries(
+    (result.rows as Record<string, unknown>[]).map((row) => [row.slug as string, row])
+  );
+
+  expect(standings['2007-australian-grand-prix']).toMatchObject({ points: 14, position: 1 });
+  expect(standings['2007-hungarian-grand-prix']).toMatchObject({ points: 138, position: 1 });
+  expect(standings['2007-italian-grand-prix']).toMatchObject({ points: 166, position: 1 });
+  expect(standings['2007-belgian-grand-prix']).toMatchObject({ points: 0, position: null });
+  expect(standings['2007-brazilian-grand-prix']).toMatchObject({ points: 0, position: null });
+});
+
+it('Ferrari is second after the 2007 Australian Grand Prix', async () => {
+  const skip = skipIfNoDb();
+  if (skip) return;
+  const result = await client().execute(`
+    SELECT ts.position
+    FROM team_standings ts
+    JOIN teams t ON t.id = ts.team_id
+    JOIN races r ON r.race_number = ts.race_number
+    WHERE t.slug = 'ferrari' AND r.slug = '2007-australian-grand-prix'
+  `);
+  expect(result.rows[0]?.position).toBe(2);
+});
+
 it('every race with SR session has has_sprint = 1', async () => {
   const skip = skipIfNoDb();
   if (skip) return;

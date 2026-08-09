@@ -31,6 +31,70 @@ export async function loadStandings(
   await loadDriverStandings(db, dumpDir, driverMap, rnByRoundFromDb, teamByEntry);
   await loadTeamStandings(db, dumpDir, teamMap, rnByRoundFromDb);
   await loadChampionshipAdjustments(db, dumpDir, driverMap, teamMap, seasonMap);
+  await applyHistoricalTeamStandingCorrections(client);
+}
+
+/**
+ * Jolpica's championship snapshots are final-record data. That means its 2007
+ * McLaren rows apply the later season-wide exclusion to every round, even
+ * though the decision was issued between the Italian and Belgian Grands Prix.
+ *
+ * Reconstruct the contemporaneous constructors' table through Italy. The
+ * Hungarian GP's separate no-constructor-points penalty remains in effect.
+ * From Belgium onward, retain Jolpica's official final-record rows.
+ */
+async function applyHistoricalTeamStandingCorrections(client: Client): Promise<void> {
+  const mclaren = await client.execute(`
+    SELECT t.id AS team_id
+    FROM championship_adjustments ca
+    JOIN teams t ON t.id = ca.team_id
+    WHERE ca.season_id = 2007
+      AND ca.adjustment = 102
+      AND t.slug = 'mclaren'
+  `);
+  if (mclaren.rows.length !== 1) return;
+
+  const teamId = mclaren.rows[0].team_id as number;
+
+  // McLaren led the provisional constructors' standings after every one of
+  // these rounds. Preserve the source's ordering between the other teams.
+  await client.execute(`
+    UPDATE team_standings
+    SET position = position + 1
+    WHERE team_id != ${teamId}
+      AND position IS NOT NULL
+      AND race_number IN (
+        SELECT race_number
+        FROM races
+        WHERE season = 2007 AND round <= 13
+      )
+  `);
+
+  await client.execute(`
+    UPDATE team_standings AS standings
+    SET
+      points = (
+        SELECT COALESCE(SUM(
+          CASE WHEN completed.round = 11 THEN 0 ELSE COALESCE(result.points, 0) END
+        ), 0)
+        FROM race_results result
+        JOIN races completed ON completed.race_number = result.race_number
+        WHERE result.team_id = ${teamId}
+          AND completed.season = 2007
+          AND completed.round <= (
+            SELECT current.round FROM races current
+            WHERE current.race_number = standings.race_number
+          )
+      ),
+      position = 1,
+      adjustment_type = 0
+    WHERE standings.team_id = ${teamId}
+      AND standings.race_number IN (
+        SELECT race_number
+        FROM races
+        WHERE season = 2007 AND round <= 13
+      )
+  `);
 }
 
 async function loadDriverStandings(
