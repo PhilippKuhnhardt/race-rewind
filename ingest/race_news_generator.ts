@@ -354,7 +354,6 @@ export async function generateRaceNews(
     body: JSON.stringify({
       model,
       messages: buildPromptWithContext(candidate, source, context),
-      temperature: 0.2,
       response_format: {
         type: 'json_schema',
         json_schema: {
