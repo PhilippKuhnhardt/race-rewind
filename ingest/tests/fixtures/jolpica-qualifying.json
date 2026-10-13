@@ -1,0 +1,38 @@
+{
+  "data": {
+    "code": "Q",
+    "results": [
+      {
+        "driver": {
+          "id": "driver_VkTWWTC5",
+          "abbreviation": "VER",
+          "given_name": "Max",
+          "family_name": "Verstappen"
+        },
+        "team": {
+          "id": "team_SYB8m2Vp",
+          "name": "Red Bull"
+        },
+        "position": 1,
+        "time": "1:31.373",
+        "is_classified": true,
+        "status": "FINISHED",
+        "car_number": 3,
+        "components": {
+          "Q1": {
+            "position": 8,
+            "time": "1:33.241"
+          },
+          "Q2": {
+            "position": 2,
+            "time": "1:31.639"
+          },
+          "Q3": {
+            "position": 1,
+            "time": "1:31.373"
+          }
+        }
+      }
+    ]
+  }
+}

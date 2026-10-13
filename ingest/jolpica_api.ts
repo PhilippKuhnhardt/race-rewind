@@ -1,3 +1,5 @@
+import type { z } from 'zod';
+
 export const JOLPICA_API_BASE_URL = 'https://api.jolpi.ca';
 
 export type JolpicaFetchOptions = {
@@ -47,7 +49,7 @@ export class JolpicaClient {
     return this.used;
   }
 
-  async getJson<T>(path: string): Promise<T> {
+  async getJson<T>(path: string, schema: z.ZodType<T>): Promise<T> {
     if (this.used >= this.requestBudget) {
       throw new JolpicaRequestBudgetError(`Jolpica API request budget exhausted (${this.requestBudget})`);
     }
@@ -76,7 +78,12 @@ export class JolpicaClient {
       throw new Error(`Jolpica API request failed: ${response.status} ${response.statusText} (${url})`);
     }
 
-    return await response.json() as T;
+    const result = schema.safeParse(await response.json());
+    if (!result.success) {
+      const issues = result.error.issues.map(issue => `${issue.path.join('.') || '<root>'}: ${issue.message}`).join('; ');
+      throw new Error(`Jolpica API contract violation (${url}): ${issues}`);
+    }
+    return result.data;
   }
 }
 

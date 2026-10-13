@@ -1,0 +1,27 @@
+{
+  "MRData": {
+    "StandingsTable": {
+      "StandingsLists": [
+        {
+          "DriverStandings": [
+            {
+              "position": "1",
+              "points": "340",
+              "wins": "8",
+              "Driver": {
+                "code": "ANT",
+                "givenName": "Andrea Kimi",
+                "familyName": "Antonelli"
+              },
+              "Constructors": [
+                {
+                  "name": "Mercedes"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

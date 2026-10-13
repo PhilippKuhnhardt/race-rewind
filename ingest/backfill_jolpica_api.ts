@@ -8,6 +8,11 @@ import { raceSlug, slugify, deduplicate } from './slugs';
 import { JolpicaClient, JolpicaRateLimitError, JolpicaRequestBudgetError, deterministicNegativeId } from './jolpica_api';
 import { normalizeRaceWikipediaUrl } from './wikipedia';
 import { buildDerived } from './transform/derived';
+import {
+  scheduleResponseSchema, availableResultsResponseSchema, alphaResultResponseSchema,
+  driverStandingsResponseSchema, constructorStandingsResponseSchema,
+  type ScheduleEvent, type ResultType, type AlphaResultResponse, type AlphaResult,
+} from './jolpica_schemas';
 
 type Db = LibSQLDatabase<typeof schema>;
 
@@ -24,108 +29,6 @@ type BackfillResult = {
   raceResultsAdded: boolean;
   requestsUsed: number;
   rateLimited: boolean;
-};
-
-type ScheduleResponse = {
-  data: {
-    events: ScheduleEvent[];
-  };
-};
-
-type ScheduleEvent = {
-  round: {
-    id: string;
-    number?: number | null;
-    name?: string | null;
-    is_cancelled: boolean;
-    race_number?: number | null;
-    wikipedia?: string | null;
-  };
-  circuit: {
-    id: string;
-    name: string;
-    locality?: string | null;
-    country_code?: string | null;
-    country?: string | null;
-    latitude?: number | null;
-    longitude?: number | null;
-    altitude?: number | null;
-    wikipedia?: string | null;
-  };
-  schedule: Array<{
-    code: string;
-    timestamp?: string | null;
-    timezone?: string | null;
-    sessions: Array<{
-      id: string;
-      number?: number | null;
-      type: string;
-      is_cancelled?: boolean | null;
-      scheduled_laps?: number | null;
-    }>;
-  }>;
-};
-
-type AvailableResultsResponse = {
-  data: {
-    available_results?: Array<{ type: ResultType; url: string }>;
-  };
-};
-
-type ResultType = 'R' | 'Q' | 'SR' | 'SQ' | 'FP1' | 'FP2' | 'FP3';
-
-type AlphaResultResponse = {
-  data: {
-    code: ResultType;
-    sessions: Array<{ id: string; number?: number | null; type: string }>;
-    round: { id: string; number?: number | null; race_number?: number | null };
-    results: AlphaResult[];
-  };
-};
-
-type AlphaResult = {
-  driver: { id: string; abbreviation?: string | null; given_name: string; family_name: string };
-  team: { id: string; name: string };
-  position?: number | null;
-  position_text?: string | null;
-  time?: string | null;
-  is_classified?: boolean | null;
-  status?: string | null;
-  points?: number | null;
-  laps?: number | null;
-  car_number?: number | null;
-  components?: Record<string, { position?: number | null; time?: string | null }>;
-};
-
-type LegacyDriverStandingsResponse = {
-  MRData: {
-    StandingsTable: {
-      StandingsLists: Array<{
-        DriverStandings: Array<{
-          position: string;
-          points: string;
-          wins: string;
-          Driver: { driverId: string; code?: string; givenName: string; familyName: string };
-          Constructors: Array<{ constructorId: string; name: string }>;
-        }>;
-      }>;
-    };
-  };
-};
-
-type LegacyConstructorStandingsResponse = {
-  MRData: {
-    StandingsTable: {
-      StandingsLists: Array<{
-        ConstructorStandings: Array<{
-          position: string;
-          points: string;
-          wins: string;
-          Constructor: { constructorId: string; name: string };
-        }>;
-      }>;
-    };
-  };
 };
 
 type LocalIndexes = {
@@ -180,18 +83,18 @@ export async function backfillJolpicaApi(args: Args): Promise<BackfillResult> {
   try {
     const seasons = args.seasons.length ? args.seasons : [await latestSeason(db)];
     for (const season of seasons) {
-      const schedule = await api.getJson<ScheduleResponse>(`/f1/alpha/schedules/${season}/`);
+      const schedule = await api.getJson(`/f1/alpha/schedules/${season}/`, scheduleResponseSchema);
       const indexes = await loadIndexes(db);
       for (const event of schedule.data.events) {
         if (!shouldInspectEvent(event, args.now)) continue;
         try {
           const { race: localRace, didChange: didUpdateRace } = await ensureRaceAndSessions(db, season, event, indexes);
           changed ||= didUpdateRace;
-          const available = await api.getJson<AvailableResultsResponse>(`/f1/alpha/results/${event.round.id}/`);
-          const neededTypes = await resultTypesToFetch(available.data.available_results ?? [], localRace.raceNumber, client);
+          const available = await api.getJson(`/f1/alpha/results/${event.round.id}/`, availableResultsResponseSchema);
+          const neededTypes = await resultTypesToFetch(available.data.available_results, localRace.raceNumber, client);
           const payloads: AlphaResultResponse[] = [];
           for (const type of neededTypes) {
-            payloads.push(await api.getJson<AlphaResultResponse>(`/f1/alpha/results/${event.round.id}/${type}/`));
+            payloads.push(await api.getJson(`/f1/alpha/results/${event.round.id}/${type}/`, alphaResultResponseSchema));
           }
 
           await client.execute('BEGIN');
@@ -368,11 +271,11 @@ function firstRaceDate(event: ScheduleEvent): string {
 }
 
 async function resultTypesToFetch(
-  available: Array<{ type: ResultType }>,
+  available: Array<{ code: ResultType }>,
   raceNumber: number,
   client: Client,
 ): Promise<ResultType[]> {
-  const types = available.map(r => r.type).filter(type => ['Q', 'SQ', 'SR', 'R'].includes(type));
+  const types = available.map(r => r.code).filter(type => ['Q', 'SQ', 'SR', 'R'].includes(type));
   const needed: ResultType[] = [];
   for (const type of types) {
     if (type === 'Q' && !await hasRows(client, 'qualifying_results', raceNumber)) needed.push(type);
@@ -557,7 +460,7 @@ async function insertStandings(
   indexes: LocalIndexes,
 ) {
   if (!await hasRowsRaw(db, schema.driverStandings, raceNumber)) {
-    const standings = await api.getJson<LegacyDriverStandingsResponse>(`/ergast/f1/${season}/${round}/driverstandings/`);
+    const standings = await api.getJson(`/ergast/f1/${season}/${round}/driverstandings/`, driverStandingsResponseSchema);
     const rows = standings.MRData.StandingsTable.StandingsLists[0]?.DriverStandings.map((row) => {
       const driver = resolveDriver(null, row.Driver.code, row.Driver.givenName, row.Driver.familyName, indexes);
       const constructor = row.Constructors[0];
@@ -578,7 +481,7 @@ async function insertStandings(
   }
 
   if (!await hasRowsRaw(db, schema.teamStandings, raceNumber)) {
-    const standings = await api.getJson<LegacyConstructorStandingsResponse>(`/ergast/f1/${season}/${round}/constructorstandings/`);
+    const standings = await api.getJson(`/ergast/f1/${season}/${round}/constructorstandings/`, constructorStandingsResponseSchema);
     const rows = standings.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings.map((row) => {
       const team = resolveTeam(null, row.Constructor.name, indexes);
       return {

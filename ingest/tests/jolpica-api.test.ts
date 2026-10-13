@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { describe, expect, it } from 'vitest';
 import { deterministicNegativeId, JolpicaClient, JolpicaRateLimitError, JolpicaRequestBudgetError } from '../jolpica_api';
 import { hasResultRows, normalizeLapTime, normalizeRaceTime } from '../backfill_jolpica_api';
@@ -10,8 +11,8 @@ describe('Jolpica API rate-limited client', () => {
       fetchImpl: async () => Response.json({ ok: true }),
     });
 
-    await expect(client.getJson('/first')).resolves.toEqual({ ok: true });
-    await expect(client.getJson('/second')).rejects.toBeInstanceOf(JolpicaRequestBudgetError);
+    await expect(client.getJson('/first', z.object({ ok: z.boolean() }))).resolves.toEqual({ ok: true });
+    await expect(client.getJson('/second', z.object({ ok: z.boolean() }))).rejects.toBeInstanceOf(JolpicaRequestBudgetError);
     expect(client.requestsUsed).toBe(1);
   });
 
@@ -29,9 +30,9 @@ describe('Jolpica API rate-limited client', () => {
       fetchImpl: async () => Response.json({ ok: true }),
     });
 
-    await client.getJson('/first');
+    await client.getJson('/first', z.object({ ok: z.boolean() }));
     now += 100;
-    await client.getJson('/second');
+    await client.getJson('/second', z.object({ ok: z.boolean() }));
 
     expect(sleeps).toEqual([400]);
     expect(client.requestsUsed).toBe(2);
@@ -44,7 +45,7 @@ describe('Jolpica API rate-limited client', () => {
       fetchImpl: async () => new Response('{}', { status: 429 }),
     });
 
-    await expect(client.getJson('/limited')).rejects.toBeInstanceOf(JolpicaRateLimitError);
+    await expect(client.getJson('/limited', z.object({ ok: z.boolean() }))).rejects.toBeInstanceOf(JolpicaRateLimitError);
     expect(client.rateLimited).toBe(true);
   });
 });

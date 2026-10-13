@@ -1,0 +1,35 @@
+{
+  "data": {
+    "code": "R",
+    "results": [
+      {
+        "driver": {
+          "id": "driver_VkTWWTC5",
+          "abbreviation": "VER",
+          "given_name": "Max",
+          "family_name": "Verstappen"
+        },
+        "team": {
+          "id": "team_SYB8m2Vp",
+          "name": "Red Bull"
+        },
+        "position": 1,
+        "time": "1:42:00.785",
+        "is_classified": true,
+        "status": "FINISHED",
+        "car_number": 3,
+        "components": {
+          "GRID": {
+            "position": 1
+          },
+          "FLAP": {
+            "position": 5,
+            "time": "1:36.201"
+          }
+        },
+        "points": 25,
+        "laps": 62
+      }
+    ]
+  }
+}
