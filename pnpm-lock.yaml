@@ -53,6 +53,9 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@4.3.1)
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
     devDependencies:
       '@astrojs/check':
         specifier: ^0.9.9
@@ -96,9 +99,6 @@ importers:
       vitest:
         specifier: ^4.1.9
         version: 4.1.9(@types/node@25.9.4)(vite@8.1.5(@types/node@25.9.4)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))
-      zod:
-        specifier: 4.4.3
-        version: 4.4.3
 
 packages:
 

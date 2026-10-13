@@ -13,6 +13,7 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm build
 RUN pnpm prune --prod
+RUN node scripts/smoke-server.mjs
 
 FROM node:22-bookworm-slim AS runtime
 
