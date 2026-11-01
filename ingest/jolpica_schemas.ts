@@ -64,7 +64,8 @@ export const availableResultsResponseSchema = z.object({
 const alphaResultSchema = z.object({
   driver: z.object({
     id: text,
-    abbreviation: text.nullable(),
+    // Some result responses omit the driver's abbreviation.
+    abbreviation: text.nullish(),
     given_name: text,
     family_name: text,
   }),

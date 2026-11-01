@@ -23,8 +23,8 @@ const contracts = [
     optional: /\.sessions\.\d+\.(number|scheduled_laps)$/ },
   { name: 'available sessions', schema: availableResultsResponseSchema,
     fixture: { data: { available_results: [{ code: 'R' }, { code: 'Q' }, { code: 'SQ' }, { code: 'SR' }, { code: 'FP1' }] } } },
-  { name: 'race results', schema: alphaResultResponseSchema, fixture: results, optional: /\.time$/ },
-  { name: 'qualifying', schema: alphaResultResponseSchema, fixture: qualifying, optional: /\.time$/ },
+  { name: 'race results', schema: alphaResultResponseSchema, fixture: results, optional: /\.time$|\.driver\.abbreviation$/ },
+  { name: 'qualifying', schema: alphaResultResponseSchema, fixture: qualifying, optional: /\.time$|\.driver\.abbreviation$/ },
   { name: 'driver standings', schema: driverStandingsResponseSchema, fixture: standings, optional: /\.Driver\.code$/ },
   { name: 'constructor standings', schema: constructorStandingsResponseSchema,
     fixture: { MRData: { StandingsTable: { StandingsLists: [{ ConstructorStandings: [{
@@ -79,6 +79,27 @@ for (const contract of contracts) {
 }
 
 afterEach(() => vi.unstubAllGlobals());
+
+describe('Jolpica driver abbreviations', () => {
+  it.each(['R', 'SR', 'Q', 'SQ'])('accepts missing and null abbreviations in %s results', (code) => {
+    const payload = structuredClone(code === 'R' || code === 'SR' ? results : qualifying);
+    payload.data.code = code;
+    deleteField(payload, ['data', 'results', '0', 'driver', 'abbreviation']);
+    expect(alphaResultResponseSchema.safeParse(payload).success).toBe(true);
+
+    const withNull = { data: { ...payload.data, results: [{
+      ...payload.data.results[0], driver: { ...payload.data.results[0].driver, abbreviation: null },
+    }] } };
+    expect(alphaResultResponseSchema.safeParse(withNull).success).toBe(true);
+  });
+
+  it.each(['', 123])('rejects an invalid abbreviation %j', (abbreviation) => {
+    const payload = { data: { ...qualifying.data, results: [{
+      ...qualifying.data.results[0], driver: { ...qualifying.data.results[0].driver, abbreviation },
+    }] } };
+    expect(alphaResultResponseSchema.safeParse(payload).success).toBe(false);
+  });
+});
 
 describe('Jolpica contract failure handling', () => {
   it('rejects the old type field instead of silently skipping every session', async () => {
