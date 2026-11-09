@@ -4,7 +4,7 @@ import { createClient, type Client } from '@libsql/client';
 import { drizzle, type LibSQLDatabase } from 'drizzle-orm/libsql';
 import { and, eq, sql } from 'drizzle-orm';
 import * as schema from '../src/db/schema';
-import { raceSlug, slugify, deduplicate } from './slugs';
+import { raceSlug, driverSlug, slugify, deduplicate } from './slugs';
 import { JolpicaClient, JolpicaRateLimitError, JolpicaRequestBudgetError, deterministicNegativeId } from './jolpica_api';
 import { normalizeRaceWikipediaUrl } from './wikipedia';
 import { buildDerived } from './transform/derived';
@@ -320,7 +320,7 @@ async function hasRows(client: Client, table: string, raceNumber: number): Promi
 
 async function ensureRoundEntries(db: Db, raceNumber: number, results: AlphaResult[], indexes: LocalIndexes) {
   for (const result of results) {
-    const driver = resolveDriver(result.driver.id, result.driver.abbreviation, result.driver.given_name, result.driver.family_name, indexes);
+    const driver = await ensureDriver(db, result.driver, indexes);
     const team = resolveTeam(result.team.id, result.team.name, indexes);
     const apiId = `api_backfill:round_entry:${raceNumber}:${driver.jolpicaApiId}:${team.jolpicaApiId}`;
     const existing = await db.select({ id: schema.roundEntries.id }).from(schema.roundEntries).where(eq(schema.roundEntries.jolpicaApiId, apiId)).get();
@@ -504,6 +504,39 @@ async function hasRowsRaw(db: Db, table: typeof schema.driverStandings | typeof 
   return row != null;
 }
 
+/**
+ * Resolves a driver from a result row, creating it when the driver is new
+ * since the last CSV dump (e.g. a debutant or a mid-season replacement).
+ */
+async function ensureDriver(
+  db: Db,
+  apiDriver: AlphaResult['driver'],
+  indexes: LocalIndexes,
+): Promise<typeof schema.drivers.$inferSelect> {
+  const { id, abbreviation, given_name: forename, family_name: surname } = apiDriver;
+  const known = tryResolveDriver(id, abbreviation, forename, surname, indexes);
+  if (known) return known;
+  const fullName = `${forename} ${surname}`;
+  const existingSlugs = new Set((await db.select({ slug: schema.drivers.slug }).from(schema.drivers)).map(d => d.slug));
+  await db.insert(schema.drivers).values({
+    slug: deduplicate(driverSlug(forename, surname), existingSlugs),
+    jolpicaId: deterministicNegativeId(id),
+    jolpicaApiId: id,
+    forename,
+    surname,
+    fullName,
+    abbreviation: abbreviation ?? null,
+  });
+  const driver = await db.select().from(schema.drivers).where(eq(schema.drivers.jolpicaApiId, id)).get();
+  if (!driver) throw new Error(`Failed to insert driver ${id}`);
+  console.log(`Added new driver ${fullName} (${id})`);
+  indexes.driverByApiId.set(id, driver);
+  // Standings only carry code and name. Name lookup missed above, so the name
+  // is free; codes are left alone since ambiguous ones were dropped on purpose.
+  indexes.driverByName.set(normalizeName(fullName), driver);
+  return driver;
+}
+
 function resolveDriver(
   apiId: string | null,
   code: string | null | undefined,
@@ -511,11 +544,21 @@ function resolveDriver(
   familyName: string,
   indexes: LocalIndexes,
 ): typeof schema.drivers.$inferSelect {
+  const driver = tryResolveDriver(apiId, code, givenName, familyName, indexes);
+  if (driver) return driver;
+  throw new Error(`Could not resolve driver ${apiId ?? code ?? `${givenName} ${familyName}`}`);
+}
+
+function tryResolveDriver(
+  apiId: string | null,
+  code: string | null | undefined,
+  givenName: string,
+  familyName: string,
+  indexes: LocalIndexes,
+): typeof schema.drivers.$inferSelect | undefined {
   if (apiId && indexes.driverByApiId.has(apiId)) return indexes.driverByApiId.get(apiId)!;
   if (code && indexes.driverByCode.has(code)) return indexes.driverByCode.get(code)!;
-  const byName = indexes.driverByName.get(normalizeName(`${givenName} ${familyName}`));
-  if (byName) return byName;
-  throw new Error(`Could not resolve driver ${apiId ?? code ?? `${givenName} ${familyName}`}`);
+  return indexes.driverByName.get(normalizeName(`${givenName} ${familyName}`));
 }
 
 function resolveTeam(
