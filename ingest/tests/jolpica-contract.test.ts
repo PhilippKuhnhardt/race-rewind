@@ -2,6 +2,7 @@ import { copyFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { createClient } from '@libsql/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { z } from 'zod';
 import { JolpicaClient } from '../jolpica_api';
@@ -177,4 +178,49 @@ describe('Jolpica contract failure handling', () => {
       rmSync(dir, { recursive: true, force: true });
     }
   });
+});
+
+describe('Jolpica backfill of new drivers', () => {
+  it.skipIf(skipIfNoDb() !== null)('creates drivers that are missing from the last dump', async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'jolpica-new-driver-'));
+    const dbPath = path.join(dir, 'test.sqlite');
+    copyFileSync('data/race-rewind.sqlite', dbPath);
+    const raceNumber = schedule.data.events[0].round.race_number;
+    const seed = createClient({ url: `file:${dbPath}` });
+    for (const table of ['race_results', 'driver_standings', 'team_standings']) {
+      await seed.execute({ sql: `DELETE FROM ${table} WHERE race_number = ?`, args: [raceNumber] });
+    }
+    seed.close();
+
+    const debutant = { id: 'driver_NewDebut1', given_name: 'Testy', family_name: 'Debutante' };
+    const payload = structuredClone(results);
+    payload.data.results[0].driver = debutant as typeof payload.data.results[0]['driver'];
+    const driverStandings = structuredClone(standings);
+    const standingsDriver = driverStandings.MRData.StandingsTable.StandingsLists[0].DriverStandings[0];
+    standingsDriver.Driver = { code: 'TDB', givenName: debutant.given_name, familyName: debutant.family_name };
+    standingsDriver.Constructors = [{ name: payload.data.results[0].team.name }];
+
+    vi.stubGlobal('fetch', vi.fn(async (url: string) => Response.json(
+      url.includes('/schedules/') ? schedule
+        : url.includes('/driverstandings/') ? driverStandings
+          : url.includes('/constructorstandings/') ? { MRData: { StandingsTable: { StandingsLists: [{ ConstructorStandings: [] }] } } }
+            : /\/results\/[^/]+\/R\/$/.test(url) ? payload
+              : { data: { available_results: [{ code: 'R' }] } },
+    )));
+    try {
+      const result = await backfillJolpicaApi({ dbPath, seasons: [2026], requestBudget: 10, minDelayMs: 1, now: new Date('2026-10-13') });
+      expect(result).toMatchObject({ changed: true, raceResultsAdded: true });
+
+      const check = createClient({ url: `file:${dbPath}` });
+      const driver = (await check.execute({ sql: 'SELECT id, slug, full_name, abbreviation FROM drivers WHERE jolpica_api_id = ?', args: [debutant.id] })).rows[0];
+      expect(driver).toMatchObject({ slug: 'testy-debutante', full_name: 'Testy Debutante', abbreviation: null });
+      const raceRows = await check.execute({ sql: 'SELECT position FROM race_results WHERE race_number = ? AND driver_id = ?', args: [raceNumber, driver.id] });
+      expect(raceRows.rows).toHaveLength(1);
+      const standingRows = await check.execute({ sql: 'SELECT position FROM driver_standings WHERE race_number = ? AND driver_id = ?', args: [raceNumber, driver.id] });
+      expect(standingRows.rows).toHaveLength(1);
+      check.close();
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  }, 60_000);
 });
