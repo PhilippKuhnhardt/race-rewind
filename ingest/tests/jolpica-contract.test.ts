@@ -25,7 +25,8 @@ const contracts = [
   { name: 'available sessions', schema: availableResultsResponseSchema,
     fixture: { data: { available_results: [{ code: 'R' }, { code: 'Q' }, { code: 'SQ' }, { code: 'SR' }, { code: 'FP1' }] } } },
   { name: 'race results', schema: alphaResultResponseSchema, fixture: results, optional: /\.time$|\.driver\.abbreviation$/ },
-  { name: 'qualifying', schema: alphaResultResponseSchema, fixture: qualifying, optional: /\.time$|\.driver\.abbreviation$/ },
+  { name: 'qualifying', schema: alphaResultResponseSchema, fixture: qualifying,
+    optional: /\.time$|\.driver\.abbreviation$|\.results\.\d+\.position$|\.components\.[^.]+\.position$/ },
   { name: 'driver standings', schema: driverStandingsResponseSchema, fixture: standings, optional: /\.Driver\.code$/ },
   { name: 'constructor standings', schema: constructorStandingsResponseSchema,
     fixture: { MRData: { StandingsTable: { StandingsLists: [{ ConstructorStandings: [{
@@ -98,6 +99,26 @@ describe('Jolpica driver abbreviations', () => {
     const payload = { data: { ...qualifying.data, results: [{
       ...qualifying.data.results[0], driver: { ...qualifying.data.results[0].driver, abbreviation },
     }] } };
+    expect(alphaResultResponseSchema.safeParse(payload).success).toBe(false);
+  });
+});
+
+describe('Jolpica unclassified qualifiers', () => {
+  // 2026 round 19: a driver listed without overall or Q2/Q3 positions.
+  const unclassified = { data: { ...qualifying.data, results: [{
+    ...qualifying.data.results[0], position: undefined, components: {
+      Q1: { position: 5, time: '1:33.241' }, Q2: { time: '1:31.639' }, Q3: {},
+    },
+  }] } };
+
+  it.each(['Q', 'SQ'])('accepts omitted positions in %s results', (code) => {
+    expect(alphaResultResponseSchema.safeParse({ data: { ...unclassified.data, code } }).success).toBe(true);
+  });
+
+  it.each(['R', 'SR'])('still requires positions in %s results', (code) => {
+    const payload = structuredClone(results);
+    payload.data.code = code;
+    deleteField(payload, ['data', 'results', '0', 'position']);
     expect(alphaResultResponseSchema.safeParse(payload).success).toBe(false);
   });
 });

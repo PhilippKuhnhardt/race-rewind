@@ -61,6 +61,11 @@ export const availableResultsResponseSchema = z.object({
   }),
 });
 
+const componentSchema = z.object({
+  position: integer.nullable(),
+  time: text.nullish(),
+});
+
 const alphaResultSchema = z.object({
   driver: z.object({
     id: text,
@@ -76,10 +81,7 @@ const alphaResultSchema = z.object({
   is_classified: z.boolean().nullable(),
   status: text.nullable(),
   car_number: integer.nullable(),
-  components: z.record(z.string(), z.object({
-    position: integer.nullable(),
-    time: text.nullish(),
-  })),
+  components: z.record(z.string(), componentSchema),
 });
 
 const raceResultSchema = alphaResultSchema.extend({
@@ -90,6 +92,10 @@ const qualifyingResultSchema = alphaResultSchema.extend({
   // Qualifying responses omit points and laps.
   points: z.number().nullish(),
   laps: integer.nonnegative().nullish(),
+  // Drivers without a qualifying classification (e.g. disqualified) have no
+  // overall position, and no position in the segments they were removed from.
+  position: integer.nullish(),
+  components: z.record(z.string(), componentSchema.extend({ position: integer.nullish() })),
 });
 
 export const alphaResultResponseSchema = z.object({
