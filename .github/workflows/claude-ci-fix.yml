@@ -1,0 +1,169 @@
+name: Claude CI Fix
+
+# When one of the pipelines below fails, hand the failed job logs to Claude,
+# let it fix the cause, and open a pull request with the fix.
+
+on:
+  workflow_run:
+    workflows: ["Jolpica Data", "Docker"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+  id-token: write
+
+# Only one fix attempt at a time. A newer failure waits instead of racing.
+concurrency:
+  group: claude-ci-fix
+  cancel-in-progress: false
+
+env:
+  BRANCH_PREFIX: claude/ci-fix-
+
+jobs:
+  fix:
+    # Never react to runs on fix branches (prevents loops), and only to failures.
+    if: >-
+      github.event.workflow_run.conclusion == 'failure' &&
+      !startsWith(github.event.workflow_run.head_branch, 'claude/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Skip if a fix PR is already open
+        id: guard
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          open=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --json headRefName \
+            --jq "[.[] | select(.headRefName | startswith(\"$BRANCH_PREFIX\"))] | length")
+          if [ "$open" -gt 0 ]; then
+            echo "An automatic CI fix PR is already open. Skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: steps.guard.outputs.skip == 'false'
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+          fetch-depth: 0
+          # The push below uses the Claude App token, so don't keep GITHUB_TOKEN in git config.
+          persist-credentials: false
+
+      - name: Create fix branch
+        if: steps.guard.outputs.skip == 'false'
+        id: branch
+        run: |
+          name="${BRANCH_PREFIX}${{ github.event.workflow_run.id }}"
+          git checkout -b "$name"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+
+      - name: Collect failure logs
+        if: steps.guard.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          mkdir -p .tmp/ci-failure
+          gh run view "$RUN_ID" --repo "$GITHUB_REPOSITORY" --log-failed > .tmp/ci-failure/failed.log || true
+          # Keep the prompt manageable: the end of the log holds the error.
+          tail -n 800 .tmp/ci-failure/failed.log > .tmp/ci-failure/failed-tail.log
+          wc -l .tmp/ci-failure/failed.log
+
+      - name: Set up pnpm
+        if: steps.guard.outputs.skip == 'false'
+        uses: pnpm/action-setup@v5
+
+      - name: Set up Node.js
+        if: steps.guard.outputs.skip == 'false'
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        if: steps.guard.outputs.skip == 'false'
+        run: pnpm install --frozen-lockfile
+
+      - name: Let Claude fix the failure
+        if: steps.guard.outputs.skip == 'false'
+        id: claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          additional_permissions: |
+            actions: read
+          claude_args: >-
+            --max-turns 60
+            --allowedTools "Read,Edit,MultiEdit,Write,Glob,Grep,LS,Bash(pnpm:*),Bash(npx:*),Bash(node:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(ls:*),Bash(cat:*),Bash(head:*),Bash(tail:*),Bash(sqlite3:*)"
+          prompt: |
+            The GitHub Actions workflow "${{ github.event.workflow_run.name }}" failed on
+            branch "${{ github.event.workflow_run.head_branch }}" (commit ${{ github.event.workflow_run.head_sha }}).
+            Run: ${{ github.event.workflow_run.html_url }}
+
+            The log of the failed steps is in `.tmp/ci-failure/failed-tail.log`
+            (full log: `.tmp/ci-failure/failed.log`). The workflow definitions are in
+            `.github/workflows/`. Read CLAUDE.md for the project rules.
+
+            Your task:
+            1. Find the root cause of the failure from the log and the code.
+            2. Fix it in the code. This pipeline often fails because the external
+               Jolpica API returns inconsistent or incomplete data. Prefer robust
+               handling of such data (validation, skipping or deferring inconsistent
+               records, clear logging) over one-off data patches, and never weaken
+               or delete tests just to make them pass.
+            3. Verify with the same commands the failing step ran where possible,
+               plus `pnpm lint` and `pnpm check` and `pnpm test`.
+            4. Do not commit, push or open a pull request. A later step does that.
+               Do not edit anything under `.github/`.
+            5. Finally, write a short summary for the pull request description to
+               `.tmp/ci-failure/summary.md`: root cause, what you changed, how you
+               verified it. If the failure was transient and needs no code change,
+               change no files and say so in the summary.
+
+      - name: Open pull request
+        if: steps.guard.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ steps.claude.outputs.github_token || github.token }}
+          BRANCH: ${{ steps.branch.outputs.name }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+          WORKFLOW: ${{ github.event.workflow_run.name }}
+          BASE: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          summary=".tmp/ci-failure/summary.md"
+          git add -A -- . ':!.tmp'
+          if git diff --cached --quiet; then
+            echo "Claude made no changes."
+            [ -f "$summary" ] && cat "$summary" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          git config user.name "claude[bot]"
+          git config user.email "41898282+claude[bot]@users.noreply.github.com"
+          git commit -m "fix(ci): automatic fix for failed \"$WORKFLOW\" run"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/$BRANCH"
+
+          {
+            echo "Automatic fix for the failed **$WORKFLOW** run: $RUN_URL"
+            echo
+            if [ -f "$summary" ]; then cat "$summary"; else echo "_Claude did not write a summary._"; fi
+            echo
+            echo "---"
+            echo "_Generated by the Claude CI Fix workflow. Please review before merging._"
+          } > .tmp/ci-failure/pr-body.md
+
+          gh pr create --repo "$GITHUB_REPOSITORY" \
+            --base "$BASE" --head "$BRANCH" \
+            --title "fix(ci): repair failed $WORKFLOW run" \
+            --body-file .tmp/ci-failure/pr-body.md \
+            --assignee "${{ github.repository_owner }}" || \
+          gh pr create --repo "$GITHUB_REPOSITORY" \
+            --base "$BASE" --head "$BRANCH" \
+            --title "fix(ci): repair failed $WORKFLOW run" \
+            --body-file .tmp/ci-failure/pr-body.md
