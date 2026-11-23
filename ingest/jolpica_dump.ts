@@ -64,14 +64,64 @@ export function writeDumpState(metadataPath: string, dump: JolpicaDumpMetadata) 
   writeFileSync(metadataPath, `${JSON.stringify(state, null, 2)}\n`);
 }
 
-export async function fetchDelayedCsvDump(overviewUrl = JOLPICA_DUMPS_OVERVIEW_URL): Promise<JolpicaDumpMetadata> {
-  const response = await fetch(overviewUrl, { headers: { accept: 'application/json' } });
+export type RetryOptions = {
+  attempts?: number;
+  baseDelayMs?: number;
+  fetchImpl?: typeof fetch;
+  sleep?: (ms: number) => Promise<void>;
+  log?: (message: string) => void;
+};
+
+// Jolpica sits behind Cloudflare and occasionally answers with transient 403/429/5xx
+// responses. These are retried with exponential backoff before the job fails.
+const RETRYABLE_STATUSES = new Set([403, 408, 425, 429, 500, 502, 503, 504]);
+
+export function isRetryableStatus(status: number): boolean {
+  return RETRYABLE_STATUSES.has(status);
+}
+
+export async function fetchWithRetry(url: string, init: RequestInit = {}, options: RetryOptions = {}): Promise<Response> {
+  const attempts = options.attempts ?? 4;
+  const baseDelayMs = options.baseDelayMs ?? 5_000;
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const sleep = options.sleep ?? ((ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms)));
+  const log = options.log ?? ((message: string) => console.warn(message));
+
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    let response: Response | null = null;
+    try {
+      response = await fetchImpl(url, init);
+    } catch (error) {
+      lastError = error;
+    }
+
+    if (response && (response.ok || !isRetryableStatus(response.status))) return response;
+    if (attempt === attempts) {
+      if (response) return response;
+      break;
+    }
+
+    const delay = baseDelayMs * 2 ** (attempt - 1);
+    const reason = response ? `${response.status} ${response.statusText}` : String(lastError);
+    log(`Request to ${url} failed (${reason}); retrying in ${Math.round(delay / 1000)}s (attempt ${attempt + 1}/${attempts})`);
+    await sleep(delay);
+  }
+
+  throw lastError instanceof Error ? lastError : new Error(`Request to ${url} failed`);
+}
+
+export async function fetchDelayedCsvDump(
+  overviewUrl = JOLPICA_DUMPS_OVERVIEW_URL,
+  retry: RetryOptions = {},
+): Promise<JolpicaDumpMetadata> {
+  const response = await fetchWithRetry(overviewUrl, { headers: { accept: 'application/json' } }, retry);
   if (!response.ok) throw new Error(`Failed to fetch Jolpica dumps overview: ${response.status} ${response.statusText}`);
   return getDelayedCsvDump(await response.json());
 }
 
-export async function downloadDumpZip(url: string, outputPath: string): Promise<string> {
-  const response = await fetch(url);
+export async function downloadDumpZip(url: string, outputPath: string, retry: RetryOptions = {}): Promise<string> {
+  const response = await fetchWithRetry(url, {}, retry);
   if (!response.ok) throw new Error(`Failed to download Jolpica dump: ${response.status} ${response.statusText}`);
 
   mkdirSync(path.dirname(outputPath), { recursive: true });
