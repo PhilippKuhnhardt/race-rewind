@@ -48,6 +48,13 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      # Coolify's /api/v1/deploy endpoint only accepts POST (GET now answers 405).
       - name: Deploy to Coolify
+        env:
+          COOLIFY_WEBHOOK: ${{ secrets.COOLIFY_WEBHOOK }}
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
         run: |
-          curl --fail --request GET "${{ secrets.COOLIFY_WEBHOOK }}" --header "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}"
+          curl --fail-with-body --silent --show-error \
+            --retry 3 --retry-all-errors --retry-delay 10 \
+            --request POST "$COOLIFY_WEBHOOK" \
+            --header "Authorization: Bearer $COOLIFY_TOKEN"
