@@ -2,6 +2,15 @@ import type { z } from 'zod';
 
 export const JOLPICA_API_BASE_URL = 'https://api.jolpi.ca';
 
+// Jolpica sits behind Cloudflare, which tends to block anonymous clients such as Node's
+// default "node" user agent from cloud IP ranges. Identify ourselves explicitly.
+export const JOLPICA_USER_AGENT = 'RaceRewind/1.0 (+https://racerewind.org; https://github.com/PhilippKuhnhardt/race-rewind)';
+
+export const JOLPICA_HEADERS = {
+  accept: 'application/json',
+  'user-agent': JOLPICA_USER_AGENT,
+} as const;
+
 export type JolpicaFetchOptions = {
   baseUrl?: string;
   requestBudget?: number;
@@ -62,7 +71,7 @@ export class JolpicaClient {
     const url = path.startsWith('http') ? path : `${this.baseUrl}${path}`;
     this.used += 1;
     this.lastRequestAt = this.now();
-    const response = await this.fetchImpl(url, { headers: { accept: 'application/json' } });
+    const response = await this.fetchImpl(url, { headers: JOLPICA_HEADERS });
 
     if (response.status === 429) {
       this.rateLimited = true;

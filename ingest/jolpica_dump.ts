@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { JOLPICA_HEADERS, JOLPICA_USER_AGENT } from './jolpica_api';
 
 export const JOLPICA_DUMPS_OVERVIEW_URL = 'https://api.jolpi.ca/data/dumps/download/';
 export const JOLPICA_DELAYED_CSV_DOWNLOAD_URL = 'https://api.jolpi.ca/data/dumps/download/delayed/?dump_type=csv';
@@ -47,6 +48,24 @@ export function getDelayedCsvDump(overview: unknown): JolpicaDumpMetadata {
     uploaded_at: csv.uploaded_at,
     download_url: csv.download_url ?? JOLPICA_DELAYED_CSV_DOWNLOAD_URL,
   };
+}
+
+// Delayed dumps are published with a 14 day delay, roughly weekly. If our stored dump is
+// much older than that, the dump check has been failing for too long to keep tolerating it.
+export const MAX_DUMP_AGE_DAYS = 30;
+
+export function dumpAgeDays(state: JolpicaDumpState | null, now = Date.now()): number | null {
+  if (!state?.uploaded_at) return null;
+  const uploaded = Date.parse(state.uploaded_at);
+  if (Number.isNaN(uploaded)) return null;
+  return (now - uploaded) / 86_400_000;
+}
+
+// The dumps endpoint is regularly unavailable (e.g. Cloudflare blocks). Dumps are delayed by
+// two weeks anyway, so an HTTP failure can be skipped while the stored dump is still fresh.
+export function canSkipFailedDumpCheck(error: unknown, current: JolpicaDumpState | null, now = Date.now()): boolean {
+  const age = dumpAgeDays(current, now);
+  return error instanceof JolpicaHttpError && age !== null && age <= MAX_DUMP_AGE_DAYS;
 }
 
 export function hasNewDump(current: JolpicaDumpState | null, next: JolpicaDumpMetadata): boolean {
@@ -111,18 +130,48 @@ export async function fetchWithRetry(url: string, init: RequestInit = {}, option
   throw lastError instanceof Error ? lastError : new Error(`Request to ${url} failed`);
 }
 
+export class JolpicaHttpError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+  ) {
+    super(message);
+    this.name = 'JolpicaHttpError';
+  }
+}
+
+// Collects the bits of a failed response that tell a Cloudflare block apart from an API error.
+export async function describeFailedResponse(response: Response): Promise<string> {
+  const parts = [`${response.status} ${response.statusText}`.trim()];
+  for (const header of ['server', 'cf-mitigated', 'cf-ray']) {
+    const value = response.headers.get(header);
+    if (value) parts.push(`${header}=${value}`);
+  }
+  try {
+    const body = (await response.text()).replace(/\s+/g, ' ').trim();
+    if (body) parts.push(`body: ${body.slice(0, 200)}`);
+  } catch {
+    // Body is only diagnostic.
+  }
+  return parts.join(', ');
+}
+
 export async function fetchDelayedCsvDump(
   overviewUrl = JOLPICA_DUMPS_OVERVIEW_URL,
   retry: RetryOptions = {},
 ): Promise<JolpicaDumpMetadata> {
-  const response = await fetchWithRetry(overviewUrl, { headers: { accept: 'application/json' } }, retry);
-  if (!response.ok) throw new Error(`Failed to fetch Jolpica dumps overview: ${response.status} ${response.statusText}`);
+  const response = await fetchWithRetry(overviewUrl, { headers: JOLPICA_HEADERS }, retry);
+  if (!response.ok) {
+    throw new JolpicaHttpError(`Failed to fetch Jolpica dumps overview: ${await describeFailedResponse(response)}`, response.status);
+  }
   return getDelayedCsvDump(await response.json());
 }
 
 export async function downloadDumpZip(url: string, outputPath: string, retry: RetryOptions = {}): Promise<string> {
-  const response = await fetchWithRetry(url, {}, retry);
-  if (!response.ok) throw new Error(`Failed to download Jolpica dump: ${response.status} ${response.statusText}`);
+  const response = await fetchWithRetry(url, { headers: { 'user-agent': JOLPICA_USER_AGENT } }, retry);
+  if (!response.ok) {
+    throw new JolpicaHttpError(`Failed to download Jolpica dump: ${await describeFailedResponse(response)}`, response.status);
+  }
 
   mkdirSync(path.dirname(outputPath), { recursive: true });
   writeFileSync(outputPath, Buffer.from(await response.arrayBuffer()));
