@@ -3,8 +3,11 @@ import { appendFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import {
   downloadDumpZip,
+  dumpAgeDays,
   fetchDelayedCsvDump,
   hasNewDump,
+  canSkipFailedDumpCheck,
+  type JolpicaDumpMetadata,
   JOLPICA_DELAYED_CSV_DOWNLOAD_URL,
   prepareDirectory,
   readDumpState,
@@ -51,7 +54,20 @@ function unzip(zipPath: string, extractDir: string) {
 async function main() {
   const { metadataPath, workDir, overviewUrl } = parseArgs();
   const current = readDumpState(metadataPath);
-  const latestDelayed = await fetchDelayedCsvDump(overviewUrl ?? undefined);
+
+  let latestDelayed: JolpicaDumpMetadata;
+  try {
+    latestDelayed = await fetchDelayedCsvDump(overviewUrl ?? undefined);
+  } catch (error) {
+    // Let the live API backfill run instead of failing the whole pipeline.
+    if (!canSkipFailedDumpCheck(error, current)) throw error;
+    const age = Math.floor(dumpAgeDays(current) ?? 0);
+    const message = (error as Error).message.replace(/\r?\n/g, ' ');
+    console.log(`::warning title=Jolpica dump check skipped::${message} (stored dump is ${age} days old)`);
+    setOutput('update_found', 'false');
+    setOutput('dump_check_failed', 'true');
+    return;
+  }
 
   console.log(`Latest delayed Jolpica CSV dump: ${latestDelayed.uploaded_at} ${latestDelayed.file_hash}`);
 

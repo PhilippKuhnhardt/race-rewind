@@ -1,5 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { fetchDelayedCsvDump, fetchWithRetry, getDelayedCsvDump, hasNewDump, type JolpicaDumpState } from '../jolpica_dump';
+import { JOLPICA_USER_AGENT } from '../jolpica_api';
+import {
+  canSkipFailedDumpCheck,
+  dumpAgeDays,
+  fetchDelayedCsvDump,
+  fetchWithRetry,
+  getDelayedCsvDump,
+  hasNewDump,
+  JolpicaHttpError,
+  type JolpicaDumpState,
+  MAX_DUMP_AGE_DAYS,
+} from '../jolpica_dump';
 
 const currentState: JolpicaDumpState = {
   dump_type: 'csv',
@@ -108,5 +119,55 @@ describe('Jolpica fetch retries', () => {
     const response = await fetchWithRetry('https://example.com', {}, { fetchImpl, sleep: noSleep, log: quiet });
     expect(response.status).toBe(200);
     expect(calls).toBe(2);
+  });
+});
+
+describe('Jolpica dump check resilience', () => {
+  const now = Date.parse('2026-11-24T12:00:00Z');
+  const stateUploadedAt = (uploaded_at: string): JolpicaDumpState => ({ ...currentState, uploaded_at });
+
+  it('identifies itself with a RaceRewind user agent', async () => {
+    let headers: Headers | null = null;
+    const fetchImpl = (async (_url: string, init?: RequestInit) => {
+      headers = new Headers(init?.headers);
+      return new Response(JSON.stringify({
+        delayed_dumps: { csv: { dump_type: 'csv', file_hash: 'h', file_size: 1, uploaded_at: '2026-11-08T00:00:00Z' } },
+      }), { status: 200 });
+    }) as unknown as typeof fetch;
+
+    await fetchDelayedCsvDump('https://example.com', { fetchImpl });
+    expect(headers!.get('user-agent')).toBe(JOLPICA_USER_AGENT);
+    expect(headers!.get('user-agent')).toContain('RaceRewind');
+  });
+
+  it('reports Cloudflare details when the overview is blocked', async () => {
+    const fetchImpl = (async () => new Response('<html>Attention Required! | Cloudflare</html>', {
+      status: 403,
+      statusText: 'Forbidden',
+      headers: { server: 'cloudflare', 'cf-mitigated': 'challenge', 'cf-ray': 'abc123' },
+    })) as unknown as typeof fetch;
+
+    const error = await fetchDelayedCsvDump('https://example.com', { attempts: 1, fetchImpl }).catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(JolpicaHttpError);
+    expect((error as JolpicaHttpError).status).toBe(403);
+    expect((error as Error).message).toContain('cf-mitigated=challenge');
+    expect((error as Error).message).toContain('server=cloudflare');
+    expect((error as Error).message).toContain('Attention Required');
+  });
+
+  it('skips a failed dump check while the stored dump is fresh', () => {
+    const error = new JolpicaHttpError('blocked', 403);
+    expect(canSkipFailedDumpCheck(error, stateUploadedAt('2026-11-08T23:08:14Z'), now)).toBe(true);
+  });
+
+  it('fails once the stored dump is older than the allowed age', () => {
+    const error = new JolpicaHttpError('blocked', 403);
+    expect(canSkipFailedDumpCheck(error, stateUploadedAt('2026-10-01T00:00:00Z'), now)).toBe(false);
+    expect(dumpAgeDays(stateUploadedAt('2026-10-01T00:00:00Z'), now)).toBeGreaterThan(MAX_DUMP_AGE_DAYS);
+  });
+
+  it('never skips non-HTTP errors or a missing state', () => {
+    expect(canSkipFailedDumpCheck(new Error('contract violation'), stateUploadedAt('2026-11-20T00:00:00Z'), now)).toBe(false);
+    expect(canSkipFailedDumpCheck(new JolpicaHttpError('blocked', 403), null, now)).toBe(false);
   });
 });
